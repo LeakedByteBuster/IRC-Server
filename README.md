@@ -4,13 +4,13 @@
 
 [what is socket programming ?](https://www.scaler.com/topics/socket-programming-in-c/)
 
+[Command Reference](https://dd.ircdocs.horse/refs/commands/)
+
 [Modern IRC Client Protocol](https://modern.ircdocs.horse/)
 
-[Internet Relay Chat Protocol 1459](https://datatracker.ietf.org/doc/html/rfc1459#section-4.1.1)
+[Internet Relay Chat Protocol 1459](https://datatracker.ietf.org/doc/html/rfc1459)
 
-[Internet Relay Chat: Client Protocol](https://datatracker.ietf.org/doc/htmlrfc2812#section-3.1.1)
-
-[Command Reference](https://dd.ircdocs.horse/refs/commands/)
+[Internet Relay Chat: Client Protocol 2812](https://datatracker.ietf.org/doc/html/rfc2812)
 
 ## Other Sources :
 
