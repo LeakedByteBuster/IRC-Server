@@ -1,25 +1,138 @@
 #include "Server.hpp"
 #include "InputOutput.hpp"
 
-Server::Server() 
+/* -------------------------------------------------------------------------- */
+/*                            Server constructors                             */
+/* -------------------------------------------------------------------------- */
+
+/* 
+*   Creates a TCP, IPv4, Passive socket.  * it doesn't accept any connection
+*   call handleIncomingConnections() 
+*/
+Server::Server(const in_port_t portNum, std::string password) : 
+                                password(password), listenPort(portNum)
 {
-    std::cout << "Error [Server class]: use parameterized constructor" << std::endl;
+    // used for bind function
+    struct sockaddr_in  sockAddr;
+    // For setsockopt(), the parameter should be non-zero to enable a boolean option
+    int optVal = 1;
+
+    initSockAddrStruct(&sockAddr, listenPort);
+    //  creates server socket and store fd
+    int sfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sfd == -1) {
+        throw std::runtime_error("Error socket() : " + static_cast<std::string>
+            (strerror(errno)));
+    }
+    listenFd = sfd; //  listenFd variable is used to close fd in destructor
+
+    // set socket option. SO_REUSEADDR : enables local address reuse
+    if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &optVal, sizeof(optVal))) {
+        throw std::runtime_error("Error setsocketopt() : " + 
+            static_cast<std::string>(strerror(errno)));
+    }
+    // bind the listenning socket to a specified port and address
+    if (bind(sfd, (sockaddr *)&sockAddr, sizeof(sockAddr)) == -1) {
+       throw std::runtime_error("Error setsocketopt() : " + 
+            static_cast<std::string>(strerror(errno)));
+    }
+    // Marks the socket as a passive socket
+    if (listen(sfd, BACKLOG) == -1) {
+        throw std::runtime_error("Error listen() : " + 
+            static_cast<std::string>(strerror(errno)));
+    }
 }
 
-Server::Server(std::string , std::string )
-{
-
+Server::Server(Server &rhs) : password(rhs.password), listenPort(rhs.listenPort),
+                            listenFd(rhs.listenFd) {
+    *this = rhs;
 }
 
-Server& Server::operator=(Server &)
+Server& Server::operator=(Server &rhs)
 {
+    if (this == &rhs)
+        return (*this);
     return (*this);
 }
 
 Server::~Server()
 {
+    close(listenFd);
 
+    for (std::vector<std::pair<int, struct sockaddr_in> >::iterator it = clientsFds.begin();
+        it != clientsFds.end(); it++) {
+            close(it->first);
+    }
+
+    // for (int i = 0; i < clientsFds.size(); i++) {
+    //     close(clientsFds.at(i));
+    // }
 }
+
+/* -------------------------------------------------------------------------- */
+/*                               Server Methods                               */
+/* -------------------------------------------------------------------------- */
+
+/*
+*   Accepts incoming connections
+*
+*/
+void            Server::handleIncomingConnections()
+{
+    while (1) {
+        struct sockaddr_in  cltAddr;
+        socklen_t cltAddrLen = sizeof(cltAddr);
+        memset(&cltAddr, 0, sizeof(cltAddr));
+        int cfd = accept(listenFd, (sockaddr *)&cltAddr, &cltAddrLen);
+        if (cfd != -1) {
+            const char *s = "You are connected to the IRC server\nWaiting for a response\n";
+            write(cfd, s, strlen(s));
+            char    buff[4096];
+            memset(buff, 0, sizeof(buff));
+            // while (std::getline() != '\n') {
+            //     std::cout << buff << std::flush;
+            // }
+            std::cout << "Here" << std::endl;
+            /* Storing  */
+            clientsFds.push_back(std::make_pair(cfd, cltAddr));
+        }
+        std::cerr << "Error : " << strerror(errno) << std::endl;
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                             Setters & Getters                              */
+/* -------------------------------------------------------------------------- */
+
+const unsigned short &  Server::getListenPort() const {
+    return (this->listenPort);
+}
+
+const int &             Server::getListenFd() const {
+    return (this->listenFd);
+}
+
+const std::string &     Server::getPassword() const {
+    return (this->password);
+}
+
+const std::vector<std::pair<int, struct sockaddr_in> >  &    Server::getClientsFds() const {
+    return (this->clientsFds);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*
