@@ -18,9 +18,8 @@ Server::Server(const in_port_t portNum, std::string password) :
     // For setsockopt(), the parameter should be non-zero to enable a boolean option
     int optVal = 1;
 
-    initSockAddrStruct(&sockAddr, listenPort);
     //  creates server socket and store fd
-    int sfd = socket(AF_INET, SOCK_STREAM, 0);
+    int sfd = socket(SOCK_DOMAIN, SOCK_STREAM, 0);
     if (sfd == -1) {
         throw std::runtime_error("Error socket() : " + static_cast<std::string>
             (strerror(errno)));
@@ -35,6 +34,7 @@ Server::Server(const in_port_t portNum, std::string password) :
             static_cast<std::string>(strerror(errno)));
     }
     // bind the listenning socket to a specified port and address
+    initSockAddrStruct(&sockAddr, listenPort);
     if (bind(sfd, (sockaddr *)&sockAddr, sizeof(sockAddr)) == -1) {
        throw std::runtime_error("Error setsocketopt() : " + 
             static_cast<std::string>(strerror(errno)));
@@ -44,6 +44,7 @@ Server::Server(const in_port_t portNum, std::string password) :
         throw std::runtime_error("Error listen() : " + 
             static_cast<std::string>(strerror(errno)));
     }
+    serverWelcomeMessage(sockAddr, sfd);
 }
 
 Server::Server(Server &rhs) : password(rhs.password), listenPort(rhs.listenPort),
@@ -55,8 +56,10 @@ Server& Server::operator=(Server &rhs)
 {
     if (this == &rhs)
         return (*this);
+    this->listenFd = rhs.listenFd;
     return (*this);
 }
+
 
 Server::~Server()
 {
@@ -89,18 +92,15 @@ void            Server::handleIncomingConnections()
         memset(&cltAddr, 0, sizeof(cltAddr));
         int cfd = accept(listenFd, (sockaddr *)&cltAddr, &cltAddrLen);
         if (cfd != -1) {
-            const char *s = "You are connected to the IRC server\nWaiting for a response\n";
-            write(cfd, s, strlen(s));
             char    buff[4096];
             memset(buff, 0, sizeof(buff));
             // while (std::getline() != '\n') {
             //     std::cout << buff << std::flush;
             // }
-            std::cout << "Here" << std::endl;
             /* Storing  */
-            std::cout << "new connection " << inet_ntoa(cltAddr.sin_addr) 
-                << " " << ntohs(cltAddr.sin_port) << std::endl;
             clientsFds.push_back(std::make_pair(cfd, cltAddr));
+            clientWelcomeMessage(cltAddr, listenPort, cfd);
+            printNewClientInfoOnServerSide(cltAddr);
             continue ;
         }
         else if (errno != EAGAIN) // 

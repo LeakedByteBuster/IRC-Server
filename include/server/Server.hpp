@@ -8,10 +8,13 @@
 #include <sys/socket.h> // socket(), bind(), listen(), connect(), accept()
 #include <sys/types.h> // bind()
 #include <arpa/inet.h> // inet_aton(), htons()
+#include <sys/errno.h> // errno
 
 #include "InputOutput.hpp"
 
+#define SOCK_DOMAIN AF_INET
 #define BACKLOG SOMAXCONN
+
 
 class   Server {
 
@@ -48,7 +51,19 @@ private :
     //static std::unordred_map<std::string, std::string>   users;
 };
 
-//  configure address, port, ai_flags, protocol... of the listening socket.
+//  configure address, port, protocol... of the listening socket.
 void    initSockAddrStruct(struct sockaddr_in *sock, unsigned short lport);
+//  prints date, time, host, ip and port in STDOUT
+void    serverWelcomeMessage(const struct sockaddr_in &srvSock, int sfd);
+//  prints on client side
+void    clientWelcomeMessage(
+                const struct sockaddr_in &cltSock,
+                in_port_t srvPort,
+                int cfd
+        );
+//  print IP and host of connected client on server side
+void    printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr);
+
+
 
 #endif // SERVER_HPP
