@@ -17,7 +17,6 @@ Server::Server(const in_port_t portNum, std::string password) :
     struct sockaddr_in  sockAddr;
     // For setsockopt(), the parameter should be non-zero to enable a boolean option
     int optVal = 1;
-
     //  creates server socket and store fd
     int sfd = socket(SOCK_DOMAIN, SOCK_STREAM, 0);
     if (sfd == -1) {
