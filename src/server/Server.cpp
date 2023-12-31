@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "InputOutput.hpp"
+#include <poll.h>
 
 /* -------------------------------------------------------------------------- */
 /*                            Server constructors                             */
@@ -25,6 +26,8 @@ Server::Server(const in_port_t portNum, std::string password) :
             (strerror(errno)));
     }
     listenFd = sfd; //  listenFd variable is used to close fd in destructor
+    //  Makes all I/O non blocking
+    fcntl(sfd, F_SETFL, O_NONBLOCK);
 
     // set socket option. SO_REUSEADDR : enables local address reuse
     if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &optVal, sizeof(optVal))) {
@@ -61,7 +64,8 @@ Server::~Server()
 
     for (std::vector<std::pair<int, struct sockaddr_in> >::iterator it = clientsFds.begin();
         it != clientsFds.end(); it++) {
-            close(it->first);
+            if (close(it->first) == -1)
+                throw std::runtime_error("Error close()");
     }
 
     // for (int i = 0; i < clientsFds.size(); i++) {
@@ -94,9 +98,14 @@ void            Server::handleIncomingConnections()
             // }
             std::cout << "Here" << std::endl;
             /* Storing  */
+            std::cout << "new connection " << inet_ntoa(cltAddr.sin_addr) 
+                << " " << ntohs(cltAddr.sin_port) << std::endl;
             clientsFds.push_back(std::make_pair(cfd, cltAddr));
+            continue ;
         }
-        std::cerr << "Error : " << strerror(errno) << std::endl;
+        else if (errno != EAGAIN) // 
+            std::cerr << "Error accept(): " << strerror(errno) << std::endl;
+
     }
 }
 
