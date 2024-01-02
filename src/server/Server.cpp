@@ -1,15 +1,11 @@
 #include "Server.hpp"
-#include "InputOutput.hpp"
 #include <poll.h>
 
 /* -------------------------------------------------------------------------- */
 /*                            Server constructors                             */
 /* -------------------------------------------------------------------------- */
 
-/* 
-*   Creates a TCP, IPv4, Passive socket.  * it doesn't accept any connection
-*   call handleIncomingConnections() 
-*/
+//   Creates a TCP, IPv4, Passive socket
 Server::Server(const in_port_t portNum, std::string password) : 
                                 password(password), listenPort(portNum)
 {
@@ -25,7 +21,9 @@ Server::Server(const in_port_t portNum, std::string password) :
     }
     listenFd = sfd; //  listenFd variable is used to close fd in destructor
     //  Makes all I/O non blocking
-    fcntl(sfd, F_SETFL, O_NONBLOCK);
+    if (fcntl(listenFd, F_SETFL, O_NONBLOCK) == -1) {
+        std::cerr << "Error fcntl() : " << std::endl;
+    }
 
     // set socket option. SO_REUSEADDR : enables local address reuse
     if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &optVal, sizeof(optVal))) {
@@ -59,54 +57,18 @@ Server& Server::operator=(Server &rhs)
     return (*this);
 }
 
-
 Server::~Server()
 {
     close(listenFd);
 
-    for (std::vector<std::pair<int, struct sockaddr_in> >::iterator it = clientsFds.begin();
-        it != clientsFds.end(); it++) {
+#define IT_ELEMENT std::vector<std::pair<int, struct sockaddr_in> >::iterator
+
+    for (IT_ELEMENT it = clientsFds.begin(); it != clientsFds.end(); it++) {
             if (close(it->first) == -1)
                 throw std::runtime_error("Error close()");
     }
-
-    // for (int i = 0; i < clientsFds.size(); i++) {
-    //     close(clientsFds.at(i));
-    // }
 }
 
-/* -------------------------------------------------------------------------- */
-/*                               Server Methods                               */
-/* -------------------------------------------------------------------------- */
-
-/*
-*   Accepts incoming connections
-*
-*/
-void            Server::handleIncomingConnections()
-{
-    while (1) {
-        struct sockaddr_in  cltAddr;
-        socklen_t cltAddrLen = sizeof(cltAddr);
-        memset(&cltAddr, 0, sizeof(cltAddr));
-        int cfd = accept(listenFd, (sockaddr *)&cltAddr, &cltAddrLen);
-        if (cfd != -1) {
-            char    buff[4096];
-            memset(buff, 0, sizeof(buff));
-            // while (std::getline() != '\n') {
-            //     std::cout << buff << std::flush;
-            // }
-            /* Storing  */
-            clientsFds.push_back(std::make_pair(cfd, cltAddr));
-            clientWelcomeMessage(cltAddr, listenPort, cfd);
-            printNewClientInfoOnServerSide(cltAddr);
-            continue ;
-        }
-        else if (errno != EAGAIN) // 
-            std::cerr << "Error accept(): " << strerror(errno) << std::endl;
-
-    }
-}
 
 /* -------------------------------------------------------------------------- */
 /*                             Setters & Getters                              */
@@ -124,65 +86,150 @@ const std::string &     Server::getPassword() const {
     return (this->password);
 }
 
-const std::vector<std::pair<int, struct sockaddr_in> >  &    Server::getClientsFds() const {
+const std::vector<std::pair<int, struct sockaddr_in> >  &
+        Server::getClientsFds() const {
     return (this->clientsFds);
 }
 
+/* -------------------------------------------------------------------------- */
+/*                               Server Methods                               */
+/* -------------------------------------------------------------------------- */
 
+//  Adds the socket fd to a vector<struct pollfd>
+void    Server::addNewPollfd(int fd, std::vector<struct pollfd> &fds, nfds_t &nfds)
+{
+    struct pollfd   newSock;
 
+    memset(&newSock, 0, sizeof(newSock));
+    newSock.fd = fd;
+    newSock.events = POLLIN;
+    fds.push_back(newSock);
+    nfds++;
+}
 
+int Server::isPollReady(std::vector<struct pollfd> &fds, nfds_t &nfds)
+{
+    int ret = 0;
+    if ((ret = poll(fds.data(), nfds, POLL_TIMEOUT)) == -1) {
+        throw std::runtime_error("Error poll() : " + 
+            static_cast<std::string>(strerror(errno)));
+    } else if (ret > OPEN_MAX) {
+        std::cerr 
+            << "Warning poll() : max open files per process is reached"
+            << std::endl;
+        return (0);
+    }
+    return (ret);
+}
 
+//  Accepts incoming connections
+void            Server::handleIncomingConnections()
+{
+    std::vector<struct pollfd>  fds; // holds all connection accepted
+    struct  sockaddr_in         cltAddr; // used for accept()
+    std::string                 buff; // for recv()
+    ssize_t                     bytes; // for recv()
+    nfds_t                      nfds = 0; // size of fds vector
+    socklen_t                   sockLen = 0; // used for accept()
+    int                         cltFd = 0; // used for fd returned by accept
 
+    buff.resize(1024);
 
+    //  add the server socket fd to the pollfd vector
+    Server::addNewPollfd(listenFd, fds, nfds);
 
+    while (1) {
+        if (isPollReady(fds, nfds)) {
 
+            //  Checks if there is a new connection to accept
+            if (isNewConnection(fds[0], listenFd)) {
+                memset(&cltAddr, 0, sizeof(cltAddr));
+                sockLen = sizeof(cltAddr);
+                if ((cltFd = accept( // error case
+                                listenFd,
+                                (sockaddr *)&cltAddr,
+                                &sockLen)) == -1 ) {
+                    std::cerr << "Error accept() : " << strerror(errno)
+                        << std::endl;
+                }
+                if (fcntl(cltFd, F_SETFL, O_NONBLOCK) == -1) {
+                    std::cerr << "Error fcntl() : undefined error" << std::endl;
+                }
+                Server::addNewPollfd(cltFd, fds, nfds);
+                printNewClientInfoOnServerSide(cltAddr);
+                clientWelcomeMessage(cltFd);
 
+                clientsFds.push_back(std::make_pair(cltFd, cltAddr));
+            }
 
+            for (unsigned long i = 1; i < nfds; i++) {
+   
+                if (((fds[i].revents & POLLIN) == POLLIN)
+                    && (fds[i].revents & POLLHUP) != POLLHUP) {
+   
+                    memset((void *)buff.data(), 0, sizeof(buff));
 
+                    bytes = recv(fds[i].fd, (void *)buff.data(), sizeof(buff), 0);
+                    if (bytes == 0) {
+                        std::cout << "Error recv(): 0 byte" << std::endl;
+                        std::cout.flush();
+                    } else {
+                        // check if '\n' exists
+                        std::cout << "buff is : " << buff << std::endl;
+                    }
+                } else if (((fds[i].revents & POLLHUP) == POLLHUP
+                            || (fds[i].revents & POLLERR) == POLLERR)
+                            && fds[i].fd != listenFd) {
+                    std::cout << geTime() << " | client disconnected " << std::endl;
+                    close(fds[i].fd);
+                    fds.erase(fds.begin() + i);
+                    nfds--; // decrement number of file descriptors in pollfd
+                }
+            }
+        }
+    }
+}
 
+// /*
+//   int ret = 0;
+//         if ((ret = poll(fds.data(), nfds, 1000)) == -1) {
+//                 std::cerr << "Error poll() : " << std::endl;
+//         }
+//         struct sockaddr_in  cltAddr;
+//         socklen_t cltAddrLen = sizeof(cltAddr);
+//         memset(&cltAddr, 0, sizeof(cltAddr));
+        
+//         int cfd = accept(listenFd, (sockaddr *)&cltAddr, &cltAddrLen);
+//         if (cfd != -1) {
+//             fcntl(cfd, F_SETFL, O_NONBLOCK);
 
+//             /* Sets fd and events for poll */
+//             memset(&newConnection, 0, sizeof(newConnection));
+//             newConnection.fd = cfd;
+//             newConnection.events = POLLIN | POLLOUT;
+//             fds.push_back(newConnection);
 
-
-/*
-    struct sockaddr_in  sockAddr;
-    struct sockaddr_in  cltAddr;
-    socklen_t addrLen  = sizeof(cltAddr);
-    int clientFd = 0;
-    memset(&cltAddr, 0, sizeof(cltAddr));
-    memset(&sockAddr, 0, sizeof(sockAddr));
-    sockAddr.sin_family = AF_INET;
-    sockAddr.sin_port = htons(9500);
-    sockAddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-
-    int sockFd = socket(AF_INET, SOCK_STREAM, 0);
-    // if (fcntl(sockFd, F_SETFL, O_NONBLOCK) == -1)
-    //     return (printError("fcntl()", sockFd));
-
-    int sockOpt = 1;
-    if (setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &sockOpt, sizeof(sockOpt)) == -1)
-        return (printError("setsockopt()", sockFd));
-
-    if (bind(sockFd, (sockaddr *)&sockAddr, sizeof(sockAddr)) == -1)
-        return (printError("bind()", sockFd));
-    if (listen(sockFd, SOMAXCONN) == -1)
-        return (printError("listen()", sockFd));
-
-    char buff[4096];
-    memset(&buff, 0, sizeof(buff));
-
-    for (;;){
-        if ((clientFd = accept(sockFd, (sockaddr *)&cltAddr, &addrLen)) == -1)
-            return (printError("accept()", sockFd));
-        int byteRead = 0;
-        if ((byteRead = read(clientFd, buff, BUFF_SIZE)) == -1)
-            printError("recv()", sockFd);
-        else if (byteRead == 0)
-            return (close(clientFd), 0);
-        else
-            std::cout << "{"<<buff <<"}"<< std::flush;
-    } 
-
-    close(sockFd);
-    close(clientFd);
-
-*/
+//             fcntl(fds.back().fd, F_SETFL, O_NONBLOCK);
+            
+//             /* Storing  */
+//             clientsFds.push_back(std::make_pair(cfd, cltAddr));
+//             clientWelcomeMessage(cltAddr, listenPort, cfd);
+//             printNewClientInfoOnServerSide(cltAddr);
+//             nfds++; // number of pollfd struct +1
+//             continue ;
+//         }
+//         for (unsigned long i = 0; i < fds.size(); i++) {
+//             if (((fds[i].revents & POLLIN) == POLLIN)
+//                 && (fds[i].revents & POLLHUP) != POLLHUP) {
+//                 memset(buff, 0, sizeof(buff));
+                
+//                 recv(fds[i].fd, buff, sizeof(buff), 0);
+//                 // read(fds[i].fd, buff, BUFFER_SIZE);
+//                 // if (bytes == 0) {
+//                 //     std::cout << "read() : Client closed connection" << std::endl;
+//                 //     fds[i].revents = POLLERR;
+//                 // } else {
+//                     std::cout << "buff is : " << buff << std::endl;
+//             } 
+//         }
+// */

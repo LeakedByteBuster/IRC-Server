@@ -1,10 +1,12 @@
-#include <time.h> // time()
 #include <iostream>
+#include <string>
+#include <time.h> // time()
 #include "Server.hpp"
 
 static const char *    getBigMsg();
 
-void    initSockAddrStruct(struct sockaddr_in *sock, unsigned short lport) {
+void    initSockAddrStruct(struct sockaddr_in *sock, unsigned short lport) 
+{
     memset(sock, 0, sizeof(*sock));
     sock->sin_family = SOCK_DOMAIN;
     sock->sin_port = lport;
@@ -12,11 +14,12 @@ void    initSockAddrStruct(struct sockaddr_in *sock, unsigned short lport) {
 }
 
 //  Returns local current time
-static const char * geTime() 
+std::string  geTime()
 {
     time_t  t;
     time(&t);
-    const char *currentTime = asctime(localtime(&t));
+    std::string currentTime = asctime(localtime(&t));
+    currentTime.pop_back(); // removes '\n' character from the string
     return (currentTime);
 }
 
@@ -28,54 +31,59 @@ void    serverWelcomeMessage(const struct sockaddr_in &srvSock, int)
         std::cerr << "Warning gethostname() : " << strerror(errno) << std::endl;
     }
 
-    std::cout   << geTime()
+    std::cout   << geTime() << std::endl
                 << "host : " << buff << std::endl
                 << "IP   : " << inet_ntoa(srvSock.sin_addr) << std::endl
                 << "Port : " << ntohs(srvSock.sin_port)
                 << std::endl << std::endl;
 }
 
-void    clientWelcomeMessage(
-    const struct sockaddr_in &, in_port_t , int cfd)
+void    clientWelcomeMessage(unsigned short cfd)
 {
-    std::string s(getBigMsg() + static_cast<std::string>("\n\n") + geTime());
+
+    std::string s(
+        getBigMsg() + 
+        static_cast<std::string>("\n\n") + 
+        geTime() +
+        static_cast<std::string>("\n")
+    );
     write(cfd, s.data(), s.size());
 }
 
 void    printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr)
 {
-    std::cout   << geTime()
-                << " new client | IP : " << inet_ntoa(cltAddr.sin_addr)
+    std::cout   << geTime() << " |"
+                << " new connection ==> IP : " << inet_ntoa(cltAddr.sin_addr)
                 << " | port : " << ntohs(cltAddr.sin_port)
                 << std::endl;
-
 }
+
+bool    isNewConnection(const struct pollfd &fd, int srvfd)
+{
+    if (((fd.revents & POLLIN) == POLLIN) && (fd.fd == srvfd))
+        return (1);
+    return (0);
+}
+
+bool    isReadable(const struct pollfd &fd)
+{
+    if ((fd.revents & POLLIN) == POLLIN)
+        return (1);
+    return (0);
+}
+
 
 static const char *    getBigMsg()
 {
         const char    *bigMsg =
 
-  "\n$$$$$$\\ $$$$$$$\\   $$$$$$\\         $$$$$$\\ $$$$$$$$\\         $$$$$$\\                                   \n"
-        "\\_$$  _|$$  __$$\\ $$  __$$\\       $$  __$$\\__$$  __|       $$ ___$$\\                                  \n"
-        "  $$ |  $$ |  $$ |$$ /  \\__|      $$ /  $$ |  $$ | $$$$$$\\  \\_/   $$ |                                 \n"
-        "  $$ |  $$$$$$$  |$$ |            \\$$$$$$$ |  $$ |$$  __$$\\   $$$$$ /                                  \n"
-        "  $$ |  $$  __$$< $$ |             \\____$$ |  $$ |$$$$$$$$ |  \\___$$\\                                  \n"
-        "  $$ |  $$ |  $$ |$$ |  $$\\       $$\\   $$ |  $$ |$$   ____|$$\\   $$ |                                 \n"
-        "$$$$$$\\ $$ |  $$ |\\$$$$$$  |      \\$$$$$$  |  $$ |\\$$$$$$$\\ \\$$$$$$  |                                 \n"
-        "\\______|\\__|  \\__| \\______/        \\______/   \\__| \\_______| \\______/                                  \n"
-        "                                                                                                       \n"
-        "                                                                                                       \n"
-        "                                                                                                       \n"
-        "$$\\                                $$\\ $$\\                 $$\\       $$\\       $$\\       $$\\           \n"
-        "$$ |                               $$ |\\__|                $$ |      $$ |      $$ |      \\__|          \n"
-        "$$ |      $$$$$$\\  $$\\   $$\\  $$$$$$$ |$$\\  $$$$$$\\        $$ |      $$ |  $$\\ $$$$$$$\\  $$\\  $$$$$$\\  \n"
-        "$$ |      \\____$$\\ $$ |  $$ |$$  __$$ |$$ |$$  __$$\\       $$ |      $$ | $$  |$$  __$$\\ $$ |$$  __$$\\ \n"
-        "$$ |      $$$$$$$ |$$ |  $$ |$$ /  $$ |$$ |$$ |  \\__|      $$ |      $$$$$$  / $$ |  $$ |$$ |$$ |  \\__|\n"
-        "$$ |     $$  __$$ |$$ |  $$ |$$ |  $$ |$$ |$$ |            $$ |      $$  _$$<  $$ |  $$ |$$ |$$ |      \n"
-        "$$$$$$$$\\$$$$$$$ |\\$$$$$$$ |\\$$$$$$$ |$$ |$$ |            $$$$$$$\\ $$ | \\$$\\ $$ |  $$ |$$ |$$ |      \n"
-        "\\________|\\____$$ | \\____$$ | \\_______|\\__|\\__|            \\________|\\__|  \\__|\\__|  \\__|\\__|\\__|      \n"
-        "                   $$\\   $$ |                                                                              \n"
-        "                   \\$$$$$$  |                                                                              \n"
-        "                    \\______/                                                                               \n";
+  "\n$$$$$$\\ $$$$$$$\\   $$$$$$\\  \n"
+        "\\_$$  _|$$  __$$\\ $$  __$$\\  \n"
+        "  $$ |  $$ |  $$ |$$ /   \n"
+        "  $$ |  $$$$$$$  |$$ | \n"
+        "  $$ |  $$  __$$< $$ |  \n"
+        "  $$ |  $$ |  $$ |$$ | \n"
+        "$$$$$$\\ $$ |  $$ |\\$$$$$$  |     \n"
+        "\\______|\\__|  \\__| \\______/   \n";
     return (bigMsg);
 }
