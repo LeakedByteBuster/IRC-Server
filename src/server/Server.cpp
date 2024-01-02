@@ -1,5 +1,7 @@
-#include "Server.hpp"
+#include <map>
+#include <utility>
 #include <poll.h>
+#include "Server.hpp"
 
 /* -------------------------------------------------------------------------- */
 /*                            Server constructors                             */
@@ -125,6 +127,7 @@ int Server::isPollReady(std::vector<struct pollfd> &fds, nfds_t &nfds)
 //  Accepts incoming connections
 void            Server::handleIncomingConnections()
 {
+    std::map<int, std::string>  map;
     std::vector<struct pollfd>  fds; // holds all connection accepted
     struct  sockaddr_in         cltAddr; // used for accept()
     std::string                 buff; // for recv()
@@ -138,8 +141,9 @@ void            Server::handleIncomingConnections()
     //  add the server socket fd to the pollfd vector
     Server::addNewPollfd(listenFd, fds, nfds);
 
+    int res = 0;
     while (1) {
-        if (isPollReady(fds, nfds)) {
+        if ((res = isPollReady(fds, nfds))) {
 
             //  Checks if there is a new connection to accept
             if (isNewConnection(fds[0], listenFd)) {
@@ -160,9 +164,10 @@ void            Server::handleIncomingConnections()
                 clientWelcomeMessage(cltFd);
 
                 clientsFds.push_back(std::make_pair(cltFd, cltAddr));
+                res--;
             }
 
-            for (unsigned long i = 1; i < nfds; i++) {
+            for (unsigned long i = 1; i < nfds && res > 0; i++) {
    
                 if (((fds[i].revents & POLLIN) == POLLIN)
                     && (fds[i].revents & POLLHUP) != POLLHUP) {
@@ -170,66 +175,46 @@ void            Server::handleIncomingConnections()
                     memset((void *)buff.data(), 0, sizeof(buff));
 
                     bytes = recv(fds[i].fd, (void *)buff.data(), sizeof(buff), 0);
-                    if (bytes == 0) {
-                        std::cout << "Error recv(): 0 byte" << std::endl;
+                    if (bytes == -1) {
+                        std::cout << "Error recv(): an error occured" << std::endl;
                         std::cout.flush();
-                    } else {
-                        // check if '\n' exists
-                        std::cout << "buff is : " << buff << std::endl;
+                    } else if (bytes > 0) {
+
+                        if (buff.find('\n') == std::string::npos) {
+                            std::pair<std::map<int, std::string>::iterator,bool> itRet;
+                            itRet = map.insert(std::pair<int, std::string>(fds[i].fd, buff));
+                            if (itRet.second == false) {
+                                map[fds[i].fd].append(buff); // join buff
+                            }
+                        } 
+                        else if ( !map.empty()
+                                    && buff.find('\n') != std::string::npos 
+                                    && !map[fds[i].fd].empty() ) {
+                            std::cout << "joined buff : " 
+                                << map[fds[i].fd].append(buff);
+                            std::cout.flush();
+                            map.erase(fds[i].fd);
+                        }
+                        else {1
+                            std::cout << "buff is : " << buff;
+                            std::cout.flush();
+                        }
                     }
+                    res--;
                 } else if (((fds[i].revents & POLLHUP) == POLLHUP
                             || (fds[i].revents & POLLERR) == POLLERR)
                             && fds[i].fd != listenFd) {
                     std::cout << geTime() << " | client disconnected " << std::endl;
                     close(fds[i].fd);
+                    map.erase(fds[i].fd);
                     fds.erase(fds.begin() + i);
                     nfds--; // decrement number of file descriptors in pollfd
+                    res--;
                 }
             }
+        } else if (res < 0) {
+            std::cerr << "Error poll() : an error occured" << std::endl;
+            std::cerr.flush();
         }
     }
 }
-
-// /*
-//   int ret = 0;
-//         if ((ret = poll(fds.data(), nfds, 1000)) == -1) {
-//                 std::cerr << "Error poll() : " << std::endl;
-//         }
-//         struct sockaddr_in  cltAddr;
-//         socklen_t cltAddrLen = sizeof(cltAddr);
-//         memset(&cltAddr, 0, sizeof(cltAddr));
-        
-//         int cfd = accept(listenFd, (sockaddr *)&cltAddr, &cltAddrLen);
-//         if (cfd != -1) {
-//             fcntl(cfd, F_SETFL, O_NONBLOCK);
-
-//             /* Sets fd and events for poll */
-//             memset(&newConnection, 0, sizeof(newConnection));
-//             newConnection.fd = cfd;
-//             newConnection.events = POLLIN | POLLOUT;
-//             fds.push_back(newConnection);
-
-//             fcntl(fds.back().fd, F_SETFL, O_NONBLOCK);
-            
-//             /* Storing  */
-//             clientsFds.push_back(std::make_pair(cfd, cltAddr));
-//             clientWelcomeMessage(cltAddr, listenPort, cfd);
-//             printNewClientInfoOnServerSide(cltAddr);
-//             nfds++; // number of pollfd struct +1
-//             continue ;
-//         }
-//         for (unsigned long i = 0; i < fds.size(); i++) {
-//             if (((fds[i].revents & POLLIN) == POLLIN)
-//                 && (fds[i].revents & POLLHUP) != POLLHUP) {
-//                 memset(buff, 0, sizeof(buff));
-                
-//                 recv(fds[i].fd, buff, sizeof(buff), 0);
-//                 // read(fds[i].fd, buff, BUFFER_SIZE);
-//                 // if (bytes == 0) {
-//                 //     std::cout << "read() : Client closed connection" << std::endl;
-//                 //     fds[i].revents = POLLERR;
-//                 // } else {
-//                     std::cout << "buff is : " << buff << std::endl;
-//             } 
-//         }
-// */
