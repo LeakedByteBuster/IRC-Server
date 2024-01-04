@@ -1,15 +1,5 @@
-#include "InputOutput.hpp"
-#include "Server.hpp"
 #include <climits>
-
-/*
-    parseInput();
-    initServer();
-    checkClientInput(); // PASS, USERNAME....
-    checkIfValidCommand();
-    ...
-
-*/
+#include "Server.hpp"
 
 static int  parseInput(const char *s, std::string pass)
 {

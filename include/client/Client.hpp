@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <arpa/inet.h>
-#include "InputOutput.hpp"
 
 /*
     - Each client is distinguished from other clients by a unique nickname
@@ -35,35 +34,27 @@ public :
     void    mode(/* int mode */){}
 };
 
-class   Person {
-public :
-    // virtual void    sendMsg(/* private message */) = 0;
-    // virtual void    sendMsg(/* message to a channel */) = 0;
+class   Client : public Operator{
 
-protected :
+public :
     /* operator priviligies */
-    Operator                    operRole;
     bool                        isOperator;
     /* client info */
     std::string                 nickname;
     std::string                 username;
     std::string                 hostname;
-    /* Connection infos */
+    // /* Connection infos */
     struct sockaddr_in          hints;
     int                         fd;
-};
-
-
-class   Client : public Person {
 
 public :
     Client();
     Client(std::string port, std::string password);
     Client& operator=(Client &rhs);
-    ~Client();
+    virtual ~Client();
 
-    // virtual void    sendMsg(/* private message */) {};
-    // virtual void    sendMsg(/* message to a channel */) {};
+    virtual void    sendMsg(int/* private message */) {};
+    virtual void    sendMsg(char/* message to a channel */) {};
 };
 
 #endif // CLIENT_HPP

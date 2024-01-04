@@ -2,7 +2,8 @@
 
 Client::Client()
 {
-    std::cout << "Error [Client class]: use parameterized constructor" << std::endl;
+    memset(&hints, 0, sizeof(hints));
+    fd = 0;
 }
 
 Client::Client(std::string , std::string )

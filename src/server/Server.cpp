@@ -1,6 +1,3 @@
-#include <map>
-#include <utility>
-#include <poll.h>
 #include "Server.hpp"
 
 /* -------------------------------------------------------------------------- */
@@ -63,11 +60,8 @@ Server::~Server()
 {
     close(listenFd);
 
-#define IT_ELEMENT std::vector<std::pair<int, struct sockaddr_in> >::iterator
-
-    for (IT_ELEMENT it = clientsFds.begin(); it != clientsFds.end(); it++) {
-            if (close(it->first) == -1)
-                throw std::runtime_error("Error close()");
+    for (unsigned long i = 0; i < clients.size(); i++) {
+        close(clients[i].fd);
     }
 }
 
@@ -88,10 +82,10 @@ const std::string &     Server::getPassword() const {
     return (this->password);
 }
 
-const std::vector<std::pair<int, struct sockaddr_in> >  &
-        Server::getClientsFds() const {
-    return (this->clientsFds);
-}
+// const std::vector<std::pair<int, struct sockaddr_in> >  &
+//         Server::getClientsFds() const {
+//     return (this->clientsFds);
+// }
 
 /* -------------------------------------------------------------------------- */
 /*                               Server Methods                               */
@@ -124,95 +118,85 @@ int Server::isPollReady(std::vector<struct pollfd> &fds, nfds_t &nfds)
     return (ret);
 }
 
+//  returns 0 if connection is done successfully, otherwise 0 is returned
+bool    Server::addNewClient(std::vector<struct pollfd> &fds, nfds_t *nfds, int &fdsLeft)
+{
+    Client      clt;
+    socklen_t   sockLen = 0; // used for accept()
+
+    memset(&clt.hints, 0, sizeof(clt.hints));
+    sockLen = sizeof(clt.hints);
+    if ((clt.fd = accept(listenFd, (sockaddr *)&clt.hints, &sockLen)) == -1) {
+        fdsLeft--;
+        std::cerr << "Error accept() : " << strerror(errno) << std::endl;
+        return (EXIT_FAILURE);
+    }
+
+    if (fcntl(clt.fd, F_SETFL, O_NONBLOCK) == -1) {
+        std::cerr << "Error fcntl() : undefined error" << std::endl;
+        fdsLeft--;
+        return (EXIT_FAILURE);
+    }
+
+    Server::addNewPollfd(clt.fd, fds, *nfds);
+    printNewClientInfoOnServerSide(clt.hints);
+    clientWelcomeMessage(clt.fd);
+
+    clients.push_back(clt);
+
+    fdsLeft--;
+    return (EXIT_SUCCESS);
+}
+
 //  Accepts incoming connections
 void            Server::handleIncomingConnections()
 {
-    std::map<int, std::string>  map;
+    std::map<int, std::string>  map; // used as a buff when "\n" is not found
     std::vector<struct pollfd>  fds; // holds all connection accepted
-    struct  sockaddr_in         cltAddr; // used for accept()
     std::string                 buff; // for recv()
     ssize_t                     bytes; // for recv()
     nfds_t                      nfds = 0; // size of fds vector
-    socklen_t                   sockLen = 0; // used for accept()
-    int                         cltFd = 0; // used for fd returned by accept
 
     buff.resize(1024);
 
     //  add the server socket fd to the pollfd vector
     Server::addNewPollfd(listenFd, fds, nfds);
 
-    int res = 0;
+    int fdsLeft = 0;
     while (1) {
-        if ((res = isPollReady(fds, nfds))) {
+        if ((fdsLeft = isPollReady(fds, nfds))) {
 
             //  Checks if there is a new connection to accept
             if (isNewConnection(fds[0], listenFd)) {
-                memset(&cltAddr, 0, sizeof(cltAddr));
-                sockLen = sizeof(cltAddr);
-                if ((cltFd = accept( // error case
-                                listenFd,
-                                (sockaddr *)&cltAddr,
-                                &sockLen)) == -1 ) {
-                    std::cerr << "Error accept() : " << strerror(errno)
-                        << std::endl;
+                if ( addNewClient(fds, &nfds, fdsLeft)) {
+                    // continue ;
                 }
-                if (fcntl(cltFd, F_SETFL, O_NONBLOCK) == -1) {
-                    std::cerr << "Error fcntl() : undefined error" << std::endl;
-                }
-                Server::addNewPollfd(cltFd, fds, nfds);
-                printNewClientInfoOnServerSide(cltAddr);
-                clientWelcomeMessage(cltFd);
-
-                clientsFds.push_back(std::make_pair(cltFd, cltAddr));
-                res--;
             }
 
-            for (unsigned long i = 1; i < nfds && res > 0; i++) {
-   
-                if (((fds[i].revents & POLLIN) == POLLIN)
-                    && (fds[i].revents & POLLHUP) != POLLHUP) {
+            for (unsigned long i = 1; i < nfds && fdsLeft > 0; i++) {
+                
+                if (isReadable(fds[i])) {
    
                     memset((void *)buff.data(), 0, sizeof(buff));
-
                     bytes = recv(fds[i].fd, (void *)buff.data(), sizeof(buff), 0);
                     if (bytes == -1) {
                         std::cout << "Error recv(): an error occured" << std::endl;
                         std::cout.flush();
                     } else if (bytes > 0) {
-
-                        if (buff.find('\n') == std::string::npos) {
-                            std::pair<std::map<int, std::string>::iterator,bool> itRet;
-                            itRet = map.insert(std::pair<int, std::string>(fds[i].fd, buff));
-                            if (itRet.second == false) {
-                                map[fds[i].fd].append(buff); // join buff
-                            }
-                        } 
-                        else if ( !map.empty()
-                                    && buff.find('\n') != std::string::npos 
-                                    && !map[fds[i].fd].empty() ) {
-                            std::cout << "joined buff : " 
-                                << map[fds[i].fd].append(buff);
-                            std::cout.flush();
-                            map.erase(fds[i].fd);
-                        }
-                        else {1
-                            std::cout << "buff is : " << buff;
-                            std::cout.flush();
-                        }
+                        isIncompleteMsg(buff, map, fds, i);
                     }
-                    res--;
-                } else if (((fds[i].revents & POLLHUP) == POLLHUP
-                            || (fds[i].revents & POLLERR) == POLLERR)
-                            && fds[i].fd != listenFd) {
+                    fdsLeft--;
+
+                } else if (isError(fds[i].revents, fds[i].fd, listenFd)) {
                     std::cout << geTime() << " | client disconnected " << std::endl;
                     close(fds[i].fd);
                     map.erase(fds[i].fd);
                     fds.erase(fds.begin() + i);
                     nfds--; // decrement number of file descriptors in pollfd
-                    res--;
+                    fdsLeft--;
                 }
             }
-        } else if (res < 0) {
+        } else if (fdsLeft < 0) {
             std::cerr << "Error poll() : an error occured" << std::endl;
             std::cerr.flush();
         }
