@@ -61,8 +61,8 @@ private :
     const in_port_t             listenPort;
 	// listenning fd (not const because it is set after socket is created)
     int                         listenFd;
-    //  list of clients connected to the server
-    std::vector<Client>         clients;
+    //  list of clients connected to the server || Nickname, Client class
+    std::map<int, Client>   clients;
 };
 
                 //  configure address, port, protocol... of the listening socket.
@@ -76,13 +76,13 @@ void            printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr
                 //  returns current local time
 std::string     geTime();
                 //  Checks if fd.revents == POLLIN
-bool            isReadable(const struct pollfd &fd, int listenFd);
+bool            isReadable(const struct pollfd &fd);
                 //  checks if fd.revents == POLLERR | POLLHUP
 bool            isError(int revents, int fd, int listenFd);
                 //  checks if (revents == POLLIN) && (fd == server fd)
 bool     	    isNewConnection(const struct pollfd &fd, int srvfd);
                 //	checks if msg revceived has a '\n'
-void            isIncompleteMsg(std::string buff, std::map<int, std::string> &map, 
+void            ReadIncomingMsg(std::string buff, std::map<int, std::string> &map, 
                         const std::vector<struct pollfd>  &fds, unsigned long &i);
 
 #endif // SERVER_HPP

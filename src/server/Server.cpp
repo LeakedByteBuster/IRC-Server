@@ -40,7 +40,9 @@ Server::Server(const in_port_t portNum, std::string password) :
         throw std::runtime_error("Error listen() : " + 
             static_cast<std::string>(strerror(errno)));
     }
-    serverWelcomeMessage(sockAddr, sfd);
+    #if defined(LOG)
+        serverWelcomeMessage(sockAddr, sfd);
+    #endif  // LOG
 }
 
 Server::Server(Server &rhs) : password(rhs.password), listenPort(rhs.listenPort),
@@ -58,13 +60,17 @@ Server& Server::operator=(Server &rhs)
 
 Server::~Server()
 {
-    close(listenFd);
-
-    for (unsigned long i = 0; i < clients.size(); i++) {
-        close(clients[i].fd);
+    //  Close server fd
+    if (close(listenFd) == -1) {
+        std::cerr << "Error close() : " << strerror(errno) << std::endl;
+    }
+    //  Close all clients fd
+    std::map<int, Client>::iterator it = clients.begin();
+    for (; it != clients.end(); it++) {
+        if (close(it->second.fd) == -1)
+            std::cerr << "Error close() : " << strerror(errno) << std::endl;
     }
 }
-
 
 /* -------------------------------------------------------------------------- */
 /*                             Setters & Getters                              */
@@ -82,16 +88,11 @@ const std::string &     Server::getPassword() const {
     return (this->password);
 }
 
-// const std::vector<std::pair<int, struct sockaddr_in> >  &
-//         Server::getClientsFds() const {
-//     return (this->clientsFds);
-// }
-
 /* -------------------------------------------------------------------------- */
 /*                               Server Methods                               */
 /* -------------------------------------------------------------------------- */
 
-//  Adds the socket fd to a vector<struct pollfd>
+//  Adds the socket fd to the vector<struct pollfd>
 void    Server::addNewPollfd(int fd, std::vector<struct pollfd> &fds, nfds_t &nfds)
 {
     struct pollfd   newSock;
@@ -124,6 +125,7 @@ bool    Server::addNewClient(std::vector<struct pollfd> &fds, nfds_t *nfds, int 
     Client      clt;
     socklen_t   sockLen = 0; // used for accept()
 
+    //  Accepting incoming connection
     memset(&clt.hints, 0, sizeof(clt.hints));
     sockLen = sizeof(clt.hints);
     if ((clt.fd = accept(listenFd, (sockaddr *)&clt.hints, &sockLen)) == -1) {
@@ -131,19 +133,23 @@ bool    Server::addNewClient(std::vector<struct pollfd> &fds, nfds_t *nfds, int 
         std::cerr << "Error accept() : " << strerror(errno) << std::endl;
         return (EXIT_FAILURE);
     }
-
+    //  Setting the client fd to NON_BLOCKING mode
     if (fcntl(clt.fd, F_SETFL, O_NONBLOCK) == -1) {
         std::cerr << "Error fcntl() : undefined error" << std::endl;
         fdsLeft--;
         return (EXIT_FAILURE);
     }
-
+    //  Add client fd to the poll of file descriptors
     Server::addNewPollfd(clt.fd, fds, *nfds);
-    printNewClientInfoOnServerSide(clt.hints);
-    clientWelcomeMessage(clt.fd);
 
-    clients.push_back(clt);
+    #if defined(LOG)
+        printNewClientInfoOnServerSide(clt.hints);
+        clientWelcomeMessage(clt.fd);
+    #endif  // LOG
 
+    //  Push the new client to map<> in the server
+    clients.insert(std::pair<int, Client>(clt.fd, clt));
+    // Decrement number of fds returned by poll()
     fdsLeft--;
     return (EXIT_SUCCESS);
 }
@@ -173,32 +179,40 @@ void            Server::handleIncomingConnections()
                 }
             }
 
-            for (unsigned long i = 1; i < nfds && fdsLeft > 0; i++) {
+            for (unsigned long i = 1; (i < nfds) && (fdsLeft > 0); i++) {
                 // if (isReadable(fds[i], listenFd) && isRegistred())
-                if (isReadable(fds[i], listenFd)) {
-   
+                if (isReadable(fds[i])) {
+                    //  Read from client file descriptor
                     memset((void *)buff.data(), 0, sizeof(buff));
                     bytes = recv(fds[i].fd, (void *)buff.data(), sizeof(buff), 0);
                     if (bytes == -1) {
                         std::cout << "Error recv(): an error occured" << std::endl;
                         std::cout.flush();
                     } else if (bytes > 0) {
-                        isIncompleteMsg(buff, map, fds, i);
+                        ReadIncomingMsg(buff, map, fds, i);
                     }
                     fdsLeft--;
 
                 } else if (isError(fds[i].revents, fds[i].fd, listenFd)) {
-                    std::cout << geTime() << " | client disconnected " << std::endl;
+
+                    #if defined(LOG)
+                        std::cout << geTime() << " | client disconnected " << std::endl;
+                    #endif // LOG
+
+                    //  Close client file descriptor
                     close(fds[i].fd);
+                    // remove client from list clients that may have a buff not complete
                     map.erase(fds[i].fd);
+                    // delete client from vector given to poll()
                     fds.erase(fds.begin() + i);
-                    nfds--; // decrement number of file descriptors in pollfd
+                    // delete client from list of clients in server
+                    clients.erase(clients[i].fd);
+                    // decrement number of file descriptors in pollfd
+                    nfds--;
+                    // decrement number of file descriptors handeled
                     fdsLeft--;
                 }
             }
-        } else if (fdsLeft < 0) {
-            std::cerr << "Error poll() : an error occured" << std::endl;
-            std::cerr.flush();
         }
     }
 }

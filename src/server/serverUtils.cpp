@@ -12,10 +12,10 @@ bool    isNewConnection(const struct pollfd &fd, int srvfd)
     return (0);
 }
 
-bool    isReadable(const struct pollfd &fd, int listenFd)
+bool    isReadable(const struct pollfd &fd)
 {
     return (((fd.revents & POLLIN) == POLLIN) 
-                && ((fd.revents & POLLHUP) != POLLHUP) && (fd.fd != listenFd));
+                && ((fd.revents & POLLHUP) != POLLHUP));
 }
 
 bool    isError(int revents, int fd, int listenFd) {
@@ -33,7 +33,7 @@ void    initSockAddrStruct(struct sockaddr_in *sock, unsigned short lport)
     sock->sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 }
 
-void    isIncompleteMsg(std::string buff, 
+void    ReadIncomingMsg(std::string buff, 
     std::map<int, std::string> &map, const std::vector<struct pollfd>  &fds,
         unsigned long &i)
 {
@@ -48,14 +48,19 @@ void    isIncompleteMsg(std::string buff,
     // if client sent a '\n' but he has already a buff stored in map
     else if ( !map.empty() && (buff.find('\n') != std::string::npos)
                 && !map[fds[i].fd].empty() ) {
-        std::cout << "joined buff : " << map[fds[i].fd].append(buff);
-        std::cout.flush();
+        #if defined(LOG)
+            std::cout << "joined buff : " << map[fds[i].fd].append(buff);
+            std::cout.flush();
+        #endif // LOG
         map.erase(fds[i].fd);
     }
     //  the client sent a '\n' and he has no left buff 
     else {
-        std::cout << "buff is : " << buff;
-        std::cout.flush();
+        #if defined(LOG)
+            std::cout << "buff is : " << buff;
+            std::cout.flush();
+        #endif // LOG
+
     }
 }
 

@@ -30,6 +30,8 @@ NC ='\033[0m'
 ifeq ($(build), tests)
 	SRC=$(shell find tests -type f -name "*.cpp")
 	NAME=testIRC
+else ifeq ($(build), log)
+	CXXFLAGS+=-DLOG
 endif
 
 all : $(NAME)
