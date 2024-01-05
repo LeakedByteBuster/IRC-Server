@@ -43,7 +43,6 @@ public :
     const unsigned short &      getListenPort() const;
     const int &                 getListenFd() const;
     const std::string &         getPassword() const;
-    const std::vector<std::pair<int, struct sockaddr_in> >  &    getClientsFds() const;
 
             //  Accepts clients connections
     void    handleIncomingConnections();
@@ -77,11 +76,11 @@ void            printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr
                 //  returns current local time
 std::string     geTime();
                 //  Checks if fd.revents == POLLIN
-bool            isReadable(const struct pollfd &fd);
+bool            isReadable(const struct pollfd &fd, int listenFd);
                 //  checks if fd.revents == POLLERR | POLLHUP
 bool            isError(int revents, int fd, int listenFd);
                 //  checks if (revents == POLLIN) && (fd == server fd)
-bool     	isNewConnection(const struct pollfd &fd, int srvfd);
+bool     	    isNewConnection(const struct pollfd &fd, int srvfd);
                 //	checks if msg revceived has a '\n'
 void            isIncompleteMsg(std::string buff, std::map<int, std::string> &map, 
                         const std::vector<struct pollfd>  &fds, unsigned long &i);
