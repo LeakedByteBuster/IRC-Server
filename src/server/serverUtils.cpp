@@ -12,13 +12,15 @@ bool    isNewConnection(const struct pollfd &fd, int srvfd)
     return (0);
 }
 
-bool    isReadable(const struct pollfd &fd)
+bool    isReadable(const struct pollfd &fd, int listenFd)
 {
-    return (((fd.revents & POLLIN) == POLLIN) && ((fd.revents & POLLHUP) != POLLHUP));
+    return (((fd.revents & POLLIN) == POLLIN) 
+                && ((fd.revents & POLLHUP) != POLLHUP) && (fd.fd != listenFd));
 }
 
 bool    isError(int revents, int fd, int listenFd) {
-    return (((revents & POLLHUP) == POLLHUP || (revents & POLLERR) == POLLERR) && fd != listenFd);
+    return (((revents & POLLHUP) == POLLHUP 
+                || (revents & POLLERR) == POLLERR) && fd != listenFd);
 }
 
 static const char *    getBigMsg();

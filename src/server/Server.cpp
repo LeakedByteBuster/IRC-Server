@@ -174,8 +174,8 @@ void            Server::handleIncomingConnections()
             }
 
             for (unsigned long i = 1; i < nfds && fdsLeft > 0; i++) {
-                
-                if (isReadable(fds[i])) {
+                // if (isReadable(fds[i], listenFd) && isRegistred())
+                if (isReadable(fds[i], listenFd)) {
    
                     memset((void *)buff.data(), 0, sizeof(buff));
                     bytes = recv(fds[i].fd, (void *)buff.data(), sizeof(buff), 0);

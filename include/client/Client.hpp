@@ -37,15 +37,17 @@ public :
 class   Client : public Operator{
 
 public :
+    /* doe */
+    bool                isRegistred;
     /* operator priviligies */
-    bool                        isOperator;
+    bool                isOperator;
     /* client info */
-    std::string                 nickname;
-    std::string                 username;
-    std::string                 hostname;
+    std::string         nickname;
+    std::string         username;
+    std::string         hostname;
     // /* Connection infos */
-    struct sockaddr_in          hints;
-    int                         fd;
+    struct sockaddr_in  hints;
+    int                 fd;
 
 public :
     Client();
