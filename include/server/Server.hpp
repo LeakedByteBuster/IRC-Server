@@ -13,6 +13,7 @@
 #include <arpa/inet.h> // inet_aton(), htons()
 #include <sys/errno.h> // errno()
 #include <poll.h> // poll()
+#include <netdb.h> // getaddinfo()
 
 /* I/O */
 #include <iostream> // std::cout...
@@ -35,7 +36,7 @@ class   Server {
 public :
 
     //	creates a TCP, IPv4, Passive socket
-    Server(const in_port_t portNum, std::string password);
+    Server(std::string portNum, std::string password);
     Server(Server &rhs);
     Server& operator=(Server &rhs);
     ~Server();
@@ -65,8 +66,6 @@ private :
     std::map<int, Client>   clients;
 };
 
-                //  configure address, port, protocol... of the listening socket.
-void            initSockAddrStruct(struct sockaddr_in *sock, unsigned short lport);
                 //  prints date, time, host, ip and port in STDOUT
 void            serverWelcomeMessage(const struct sockaddr_in &srvSock, int sfd);
                 //  prints on client side

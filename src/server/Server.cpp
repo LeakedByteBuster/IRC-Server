@@ -1,48 +1,76 @@
 #include "Server.hpp"
+#include <cstring>
 
 /* -------------------------------------------------------------------------- */
 /*                            Server constructors                             */
 /* -------------------------------------------------------------------------- */
 
 //   Creates a TCP, IPv4, Passive socket
-Server::Server(const in_port_t portNum, std::string password) : 
-                                password(password), listenPort(portNum)
+Server::Server(std::string portNum, std::string password) : 
+                                password(password), listenPort(htons(atoi(portNum.data())))
 {
-    // used for bind function
-    struct sockaddr_in  sockAddr;
     // For setsockopt(), the parameter should be non-zero to enable a boolean option
     int optVal = 1;
-    //  creates server socket and store fd
-    int sfd = socket(SOCK_DOMAIN, SOCK_STREAM, 0);
-    if (sfd == -1) {
-        throw std::runtime_error("Error socket() : " + static_cast<std::string>
-            (strerror(errno)));
+    
+    struct addrinfo  hints, *res, *res0;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_flags = AI_PASSIVE | AI_CANONNAME;
+    hints.ai_socktype = SOCK_STREAM;
+    // hints.ai_protocol = IPPROTO_TCP;
+    int error = 0;
+
+    if ((error = getaddrinfo(NULL, portNum.data(), (const struct addrinfo *)&hints, &res0)) != 0) {
+        throw std::runtime_error("Error getaddrinfo() : " 
+            + static_cast<std::string>(gai_strerror(error)));
+        std::cerr.flush();
     }
-    listenFd = sfd; //  listenFd variable is used to close fd in destructor
-    //  Makes all I/O non blocking
-    if (fcntl(listenFd, F_SETFL, O_NONBLOCK) == -1) {
-        std::cerr << "Error fcntl() : " << std::endl;
+    int check = 1;
+    for (res = res0; res != NULL; res = res->ai_next) {
+        //  creates server socket and store fd
+        int sfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        if (sfd == -1) {
+            std::cerr.flush();
+            continue ;
+        }
+        // set socket option. SO_REUSEADDR : enables local address reuse
+        if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &optVal, sizeof(optVal)) == -1) {
+            close(sfd);
+            continue ;
+        }
+
+        // bind the listenning socket to a specified port and address
+        if (bind(sfd, res->ai_addr, res->ai_addrlen) == -1) {
+            close(sfd);
+            continue ;
+        }
+        listenFd = sfd; //  listenFd variable is used to close fd in destructor
+        //  Makes all I/O non blocking
+        if (fcntl(listenFd, F_SETFL, O_NONBLOCK) == -1) {
+            throw std::runtime_error("Error fcntl() : " + 
+                static_cast<std::string>(strerror(errno)));
+        }
+
+        // Marks the socket as a passive socket
+        if (listen(listenFd, BACKLOG) == -1) {
+            throw std::runtime_error("Error listen() : " + 
+                static_cast<std::string>(strerror(errno)));
+        }
+
+        #if defined(LOG)
+            std::cout   << geTime() << std::endl;
+            std::cout << "Canonical name : " << res->ai_canonname << std::endl;
+            serverWelcomeMessage(*(reinterpret_cast<sockaddr_in*>(res->ai_addr)), sfd);
+        #endif  // LOG
+
+        check = 0;
+        break ;
     }
 
-    // set socket option. SO_REUSEADDR : enables local address reuse
-    if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &optVal, sizeof(optVal))) {
-        throw std::runtime_error("Error setsocketopt() : " + 
-            static_cast<std::string>(strerror(errno)));
-    }
-    // bind the listenning socket to a specified port and address
-    initSockAddrStruct(&sockAddr, listenPort);
-    if (bind(sfd, (sockaddr *)&sockAddr, sizeof(sockAddr)) == -1) {
-       throw std::runtime_error("Error setsocketopt() : " + 
-            static_cast<std::string>(strerror(errno)));
-    }
-    // Marks the socket as a passive socket
-    if (listen(sfd, BACKLOG) == -1) {
-        throw std::runtime_error("Error listen() : " + 
-            static_cast<std::string>(strerror(errno)));
-    }
-    #if defined(LOG)
-        serverWelcomeMessage(sockAddr, sfd);
-    #endif  // LOG
+    freeaddrinfo(res0);
+    if (check)
+        throw std::runtime_error("global Error");
+
 }
 
 Server::Server(Server &rhs) : password(rhs.password), listenPort(rhs.listenPort),
