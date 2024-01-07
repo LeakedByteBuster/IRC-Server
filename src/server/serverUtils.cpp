@@ -1,17 +1,33 @@
-#include <iostream>
-#include <string>
 #include <time.h> // time()
 #include "Server.hpp"
 
 static const char *    getBigMsg();
 
-void    initSockAddrStruct(struct sockaddr_in *sock, unsigned short lport) 
+/* -------------------------------------------------------------------------- */
+/*                          Sockets helper functions                          */
+/* -------------------------------------------------------------------------- */
+
+bool    isNewConnection(const struct pollfd &fd, int srvfd)
 {
-    memset(sock, 0, sizeof(*sock));
-    sock->sin_family = SOCK_DOMAIN;
-    sock->sin_port = lport;
-    sock->sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    if (((fd.revents & POLLIN) == POLLIN) && (fd.fd == srvfd))
+        return (1);
+    return (0);
 }
+
+bool    isReadable(const struct pollfd &fd)
+{
+    return (((fd.revents & POLLIN) == POLLIN) 
+                && ((fd.revents & POLLHUP) != POLLHUP));
+}
+
+bool    isError(int revents, int fd, int listenFd) {
+    return (((revents & POLLHUP) == POLLHUP 
+                || (revents & POLLERR) == POLLERR) && fd != listenFd);
+}
+
+/* -------------------------------------------------------------------------- */
+/*                             Printing functions                             */
+/* -------------------------------------------------------------------------- */
 
 //  Returns local current time
 std::string  geTime()
@@ -25,17 +41,19 @@ std::string  geTime()
 
 void    serverWelcomeMessage(const struct sockaddr_in &srvSock, int)
 {
-    char    buff[512];
+    // struct protoent *p = getprotobyname(inet_ntoa(srvSock.sin_addr));
+    struct hostent *d = gethostbyname(inet_ntoa(srvSock.sin_addr));
 
-    if (gethostname(buff, sizeof(buff)) == -1){
-        std::cerr << "Warning gethostname() : " << strerror(errno) << std::endl;
+    if (d != NULL){
+        std::cout   << "host : " << d->h_name << std::endl;
+        for (int i = 0; d->h_addr_list[i] != NULL; ++i) {
+            char *ip = inet_ntoa(*((struct in_addr *)d->h_addr_list[i]));
+            std::cout << "IP   : " << ip << std::endl;
+        }
+        std::cout << "Port : " << ntohs(srvSock.sin_port) << std::endl;
+        return ;
     }
-
-    std::cout   << geTime() << std::endl
-                << "host : " << buff << std::endl
-                << "IP   : " << inet_ntoa(srvSock.sin_addr) << std::endl
-                << "Port : " << ntohs(srvSock.sin_port)
-                << std::endl << std::endl;
+    std::cerr << "Warning gethostbyname() : " << strerror(errno) << std::endl;
 }
 
 void    clientWelcomeMessage(unsigned short cfd)
@@ -53,25 +71,12 @@ void    clientWelcomeMessage(unsigned short cfd)
 void    printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr)
 {
     std::cout   << geTime() << " |"
-                << " new connection ==> IP : " << inet_ntoa(cltAddr.sin_addr)
-                << " | port : " << ntohs(cltAddr.sin_port)
+                << " new connection ==> IP : " 
+                << inet_ntoa(cltAddr.sin_addr)
+                << " | port : "
+                << ntohs(cltAddr.sin_port)
                 << std::endl;
 }
-
-bool    isNewConnection(const struct pollfd &fd, int srvfd)
-{
-    if (((fd.revents & POLLIN) == POLLIN) && (fd.fd == srvfd))
-        return (1);
-    return (0);
-}
-
-bool    isReadable(const struct pollfd &fd)
-{
-    if ((fd.revents & POLLIN) == POLLIN)
-        return (1);
-    return (0);
-}
-
 
 static const char *    getBigMsg()
 {

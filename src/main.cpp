@@ -1,15 +1,5 @@
-#include "InputOutput.hpp"
-#include "Server.hpp"
 #include <climits>
-
-/*
-    parseInput();
-    initServer();
-    checkClientInput(); // PASS, USERNAME....
-    checkIfValidCommand();
-    ...
-
-*/
+#include "Server.hpp"
 
 static int  parseInput(const char *s, std::string pass)
 {
@@ -34,7 +24,7 @@ int main(int ac, char **av)
             throw std::invalid_argument("Error : ./irc <port> <password>");
 
         parseInput(av[1], av[2]);
-        Server  srv(htons(atoi(av[1])), static_cast<std::string>(av[2]));
+        Server  srv(av[1], static_cast<std::string>(av[2]));
         srv.handleIncomingConnections();
 
     } catch (std::invalid_argument &e) {
