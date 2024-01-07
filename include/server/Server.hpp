@@ -54,6 +54,12 @@ public :
             //  returns 0 if connection is done successfully, otherwise 0 is returned
     bool    addNewClient(std::vector<struct pollfd> &fds, nfds_t *nfds, int &fdsLeft);
 
+    void    userRegistration(int fd, std::string &str);
+
+            //	checks if msg revceived has a '\n'
+    void    ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
+                                const std::vector<struct pollfd>  &fds, unsigned long &i);
+
 private :
 
 	// server's password
@@ -63,7 +69,7 @@ private :
 	// listenning fd (not const because it is set after socket is created)
     int                         listenFd;
     //  list of clients connected to the server || Nickname, Client class
-    std::map<int, Client>   clients;
+    std::map<int, Client>       clients;
 };
 
                 //  prints date, time, host, ip and port in STDOUT
@@ -80,8 +86,5 @@ bool            isReadable(const struct pollfd &fd);
 bool            isError(int revents, int fd, int listenFd);
                 //  checks if (revents == POLLIN) && (fd == server fd)
 bool     	    isNewConnection(const struct pollfd &fd, int srvfd);
-                //	checks if msg revceived has a '\n'
-void            ReadIncomingMsg(std::string buff, std::map<int, std::string> &map, 
-                        const std::vector<struct pollfd>  &fds, unsigned long &i);
 
 #endif // SERVER_HPP

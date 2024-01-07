@@ -25,37 +25,6 @@ bool    isError(int revents, int fd, int listenFd) {
                 || (revents & POLLERR) == POLLERR) && fd != listenFd);
 }
 
-void    ReadIncomingMsg(std::string buff, 
-    std::map<int, std::string> &map, const std::vector<struct pollfd>  &fds,
-        unsigned long &i)
-{
-    //  if buff doesn't have '\n' at the end
-    if (buff.find('\n') == std::string::npos) {
-        std::pair<std::map<int, std::string>::iterator,bool> itRet;
-        itRet = map.insert(std::pair<int, std::string>(fds[i].fd, buff));
-        if (itRet.second == false) {
-            map[fds[i].fd].append(buff); // join buff
-        }
-    } 
-    // if client sent a '\n' but he has already a buff stored in map
-    else if ( !map.empty() && (buff.find('\n') != std::string::npos)
-                && !map[fds[i].fd].empty() ) {
-        #if defined(LOG)
-            std::cout << "joined buff : " << map[fds[i].fd].append(buff);
-            std::cout.flush();
-        #endif // LOG
-        map.erase(fds[i].fd);
-    }
-    //  the client sent a '\n' and he has no left buff 
-    else {
-        #if defined(LOG)
-            std::cout << "buff is : " << buff;
-            std::cout.flush();
-        #endif // LOG
-
-    }
-}
-
 /* -------------------------------------------------------------------------- */
 /*                             Printing functions                             */
 /* -------------------------------------------------------------------------- */

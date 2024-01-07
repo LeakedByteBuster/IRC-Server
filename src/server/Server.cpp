@@ -1,5 +1,7 @@
 #include "Server.hpp"
 #include <cstring>
+#include "registrationCommands.hpp"
+
 
 /* -------------------------------------------------------------------------- */
 /*                            Server constructors                             */
@@ -182,6 +184,85 @@ bool    Server::addNewClient(std::vector<struct pollfd> &fds, nfds_t *nfds, int 
     return (EXIT_SUCCESS);
 }
 
+//  Parse PASS, NICK, USER commands
+bool    parseRegistrationCommands(std::vector<std::string> &str, Client &client, const std::string &pass)
+{
+    for (unsigned long i = 0; i < str.size(); i++) {
+        str[i].erase('\n');
+        switch (i + 1)
+        {
+        case 1:
+            parsePass(client, str[i], pass);
+            break;
+        case 2:
+            parseNick(client, str[i]);
+            break;
+        case 3:
+            parseUser(client, str[i]);
+            break;
+        }
+    }
+    return (0);
+}
+
+// used for capturing all 3 lines of registration at once
+std::map<int, std::vector<std::string> >    gbuff;
+void    Server::userRegistration(int fd, std::string &str)
+{
+    //  int : client socket fd || vector of strings : PASS, USER, NICK
+
+    std::vector<std::string> string;
+    string.push_back(str);
+    std::pair<std::map<int, std::vector<std::string> >::iterator, bool>  it;
+    it = gbuff.insert(std::pair<int, std::vector<std::string> >(fd, string));
+
+    if (it.second == false) {
+        
+        gbuff[fd].push_back(str);
+        if (gbuff[fd].size() == 3) { // recv() read are 3 lines
+            try  {
+                parseRegistrationCommands(gbuff[fd], clients[fd], password);
+                clients[fd].isRegistred = 1;
+            } catch (std::exception &e) {
+                std::cout << e.what() << std::endl;
+                gbuff.erase(fd);
+            }
+        } // not yet read 3 lines
+    }
+    return ;
+}
+
+void    Server::ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
+                            const std::vector<struct pollfd>  &fds, unsigned long &i)
+{
+    //  if buff doesn't have '\n' at the end
+    if (buff.rfind('\n') == std::string::npos) {
+        std::pair<std::map<int, std::string>::iterator,bool> itRet;
+        itRet = map.insert(std::pair<int, std::string>(fds[i].fd, buff));
+        if (itRet.second == false) {
+            map[fds[i].fd].append(buff); // join buff
+        }
+        return ;
+    } 
+    // if client sent a '\n' but he has already a buff stored in map
+    else if ( !map.empty() && (buff.find('\n') != std::string::npos)
+                && !map[fds[i].fd].empty() ) {
+        #if defined(LOG)
+            std::cout << "joined buff : " << map[fds[i].fd].append(buff);
+            std::cout.flush();
+        #endif // LOG
+        buff = map[fds[i].fd].append(buff);
+        // userRegistration(fds[i].fd, map[fds[i].fd].append(buff));
+        map.erase(fds[i].fd);
+    }
+    //  the client sent a '\n' and he has no left buff 
+    #if defined(LOG)
+        std::cout << "buff is : " << buff;
+        std::cout.flush();
+    #endif // LOG
+    userRegistration(fds[i].fd, buff);
+}
+
 //  Accepts incoming connections
 void            Server::handleIncomingConnections()
 {
@@ -226,6 +307,8 @@ void            Server::handleIncomingConnections()
                     #if defined(LOG)
                         std::cout << geTime() << " | client disconnected " << std::endl;
                     #endif // LOG
+
+                    gbuff.erase(fds[i].fd);
 
                     //  Close client file descriptor
                     close(fds[i].fd);
