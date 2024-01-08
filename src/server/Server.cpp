@@ -260,11 +260,9 @@ void    Server::ReadIncomingMsg(std::string buff, std::map<int, std::string> &ma
         std::cout << "buff is : " << buff;
         std::cout.flush();
     #endif // LOG
-    userRegistration(fds[i].fd, buff);
+    // userRegistration(fds[i].fd, buff);
     HandleIncomingMsg(commands,buff);
-    printf("%d",commands[0].compare("join"));
 }
-
 //  Accepts incoming connections
 void            Server::handleIncomingConnections()
 {

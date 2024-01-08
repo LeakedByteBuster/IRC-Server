@@ -20,3 +20,7 @@ Client::~Client()
 {
 
 }
+// Client::sendMsg (char * msg)
+// {
+
+// }
