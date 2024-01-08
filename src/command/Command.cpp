@@ -6,7 +6,7 @@ std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &co
     std :: string        token;
     std::string        tmp;
     
-    std :: getline(ss,token);
+    std :: getline(ss,token,'\n');
     std::stringstream   parser(token);
         while (getline(parser,tmp,' ')) {
             commands.push_back(tmp);
@@ -15,12 +15,32 @@ std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &co
 }
 
 
-void execute_commmand(std :: vector<std :: string> &commands,int id)
+void execute_commmand(Server *sev,std :: vector<std :: string> &commands,int id)
 {
-    (void) id;
-    for(size_t i = 0;i < commands.size();i++)
+    if(!commands.empty())
     {
-        std :: cout <<">>"<< commands[i]<<"<<"<< std ::endl;
+        std :: string first_argument = commands[0];
+        std::map<int,Client>::iterator it = sev->clients.find(id);
+        //int regi = it->second.isRegistred;
+        if(it == sev->clients.end())
+        {
+            std :: cout << "No such a client\n";
+        }
+            if(!first_argument.compare("SEND"))
+            {
+                send_file(sev,commands,id);
+            }
     }
-    std :: cout << "---------------" << std :: endl;
+    
+}
+
+void send_file(Server *sev,std :: vector<std :: string> & commands,int id)
+{
+    std::fstream FileName;
+    std::map<int,Client>::iterator it = sev->clients.find(id);
+    if(commands.size() < 4)
+    {
+        it->second.sendMsg(id,ERR_NEEDMOREPARAMS);
+    }
+    if(FileName.open(commands[1].c_str(),std:: ios::in))
 }

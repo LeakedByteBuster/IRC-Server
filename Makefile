@@ -4,7 +4,7 @@ TESTS_NAME = testIRC
 
 CXX = c++
 
-CXXFLAGS = -Wall -Werror -Wextra -fsanitize=address
+CXXFLAGS = -Wall -Werror -Wextra -g -fsanitize=address
 
 STD = -std=c++98
 

@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <arpa/inet.h>
+#include "File.hpp"
+
 
 /*
     - Each client is distinguished from other clients by a unique nickname
@@ -49,14 +51,17 @@ public :
     struct sockaddr_in  hints;
     int                 fd;
 
+    std :: vector<file> Files;
+
 public :
     Client();
     Client(std::string port, std::string password);
     Client& operator=(Client &rhs);
     virtual ~Client();
 
-    virtual void    sendMsg(int/* private message */) {};
+    // send message to other user
+    void    sendMsg(int id,std :: string msg);
     virtual void    sendMsg(char/* message to a channel */) {};
-};
 
+};
 #endif // CLIENT_HPP

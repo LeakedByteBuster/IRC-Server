@@ -59,8 +59,10 @@ public :
 
             //	checks if msg revceived has a '\n'
     void    ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
-                                const std::vector<struct pollfd>  &fds, unsigned long &i);
+                                const std::vector<struct pollfd>  &fds, unsigned long &i, std :: vector<std :: string> &commands);
 
+    //  list of clients connected to the server || Nickname, Client class
+    std::map<int, Client>       clients;
 private :
 
 	// server's password
@@ -69,8 +71,9 @@ private :
     const in_port_t             listenPort;
 	// listenning fd (not const because it is set after socket is created)
     int                         listenFd;
-    //  list of clients connected to the server || Nickname, Client class
-    std::map<int, Client>       clients;
+
+    // make class command a friend to server class to get client id from class command
+    friend class command;
 };
 
                 //  prints date, time, host, ip and port in STDOUT
@@ -86,6 +89,8 @@ bool            isReadable(const struct pollfd &fd);
                 //  checks if fd.revents == POLLERR | POLLHUP
 bool            isError(int revents, int fd, int listenFd);
                 //  checks if (revents == POLLIN) && (fd == server fd)
-bool     	    isNewConnection(const struct pollfd &fd, int srvfd);
+bool     	isNewConnection(const struct pollfd &fd, int srvfd);
+
+
 
 #endif // SERVER_HPP

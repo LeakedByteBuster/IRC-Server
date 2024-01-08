@@ -233,7 +233,7 @@ void    Server::userRegistration(int fd, std::string &str)
 }
 
 void    Server::ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
-                            const std::vector<struct pollfd>  &fds, unsigned long &i,std :: vector<std :: string> &commands)
+                            const std::vector<struct pollfd>  &fds, unsigned long &i, std :: vector<std :: string> &commands)
 {
     //  if buff doesn't have '\n' at the end
     if (buff.rfind('\n') == std::string::npos) {
@@ -252,7 +252,7 @@ void    Server::ReadIncomingMsg(std::string buff, std::map<int, std::string> &ma
             std::cout.flush();
         #endif // LOG
         buff = map[fds[i].fd].append(buff);
-        // userRegistration(fds[i].fd, map[fds[i].fd].append(buff));
+        userRegistration(fds[i].fd, map[fds[i].fd].append(buff));
         map.erase(fds[i].fd);
     }
     //  the client sent a '\n' and he has no left buff 
@@ -260,9 +260,8 @@ void    Server::ReadIncomingMsg(std::string buff, std::map<int, std::string> &ma
         std::cout << "buff is : " << buff;
         std::cout.flush();
     #endif // LOG
-    userRegistration(fds[i].fd, buff);
-    HandleIncomingMsg(commands,buff);
-    printf("%d",commands[0].compare("join"));
+        HandleIncomingMsg(commands,buff);
+        // .... 
 }
 
 //  Accepts incoming connections
@@ -301,9 +300,8 @@ void            Server::handleIncomingConnections()
                         std::cout.flush();
                     } else if (bytes > 0) {
                         std :: vector<std :: string> commands;
-                       ReadIncomingMsg(buff, map, fds, i,commands);
-                       execute_commmand(commands,fds[i].fd);
-
+                       ReadIncomingMsg(buff, map, fds, i, commands);
+                       execute_commmand(this,commands,fds[i].fd);
                        
                     }
                     fdsLeft--;
