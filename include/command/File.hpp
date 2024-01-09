@@ -1,5 +1,7 @@
+#pragma once
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 // file has three member sender which the name of client that send the file
 // and reciever the client that recive the file
@@ -11,15 +13,19 @@ class file
     std :: string const sender;
     std :: string const receiver;
     std :: string const filename;
+    std :: fstream * f;
 
     public :
 
     // constructor
-    file(std :: string const Filename,std :: string const Sender,std :: string Receiver) : filename(Filename),sender(Sender),receiver(Receiver){};
+    file(std :: fstream  * F,std :: string const Filename,std :: string const Sender,std :: string Receiver) :sender(Sender),receiver(Receiver),filename(Filename),f(F)
+    {
+    };
 
     //getters
     std :: string getFilname(){return filename;};
     std :: string getReceiver(){return receiver;};
     std :: string getSender(){return sender;};
-    ~file();
+    std :: fstream * getstream(){return f;};
+    ~file(){};
 };

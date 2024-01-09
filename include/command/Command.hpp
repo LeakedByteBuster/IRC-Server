@@ -4,7 +4,7 @@
 #include <vector>
 #include <map>
 #include <sstream>
-
+#include "File.hpp"
 #include "Errors.hpp"
 
 class Server;
