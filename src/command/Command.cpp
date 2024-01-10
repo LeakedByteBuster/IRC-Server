@@ -1,5 +1,7 @@
 #include "Command.hpp"
 
+
+//split command into vector of string to check it
 std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &commands,std :: string msg)
 {
     std::stringstream   ss(msg);
@@ -15,6 +17,7 @@ std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &co
 }
 
 
+// check command if it's valide and exucte it
 void execute_commmand(Server *sev,std :: vector<std :: string> &commands,int id)
 {
     if(!commands.empty())
@@ -30,10 +33,15 @@ void execute_commmand(Server *sev,std :: vector<std :: string> &commands,int id)
             {
                 send_file(sev,commands,id);
             }
+            else if(!first_argument.compare("PRIVMSG"))
+            {
+                send_msg(sev,commands,id);
+            }
     }
     
 }
 
+//search for a client by his nickname 
 int search_a_client(Server *sev,std :: string NickName)
 {
     std::map<int,Client>::iterator it = sev->clients.begin();
@@ -47,8 +55,8 @@ int search_a_client(Server *sev,std :: string NickName)
     }
     return(0);
 }
-#include <fstream>
 
+//send func by nickname 
 void send_file(Server *sev,std :: vector<std :: string> & commands,int id)
 {
     std :: fstream FileName;
@@ -75,5 +83,10 @@ void send_file(Server *sev,std :: vector<std :: string> & commands,int id)
         it->second.sendMsg(id,"No Such a client\n");
         return;
     }
+    
+}
+
+void send_msg(Server srv,std::vector<std::string> command,int id)
+{
     
 }
