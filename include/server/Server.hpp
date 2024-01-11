@@ -26,12 +26,13 @@
 /* static headers */
 #include "Client.hpp"
 #include "Command.hpp"
-
+// #include "channel.hpp"
 #define SOCK_DOMAIN AF_INET
 #define BACKLOG SOMAXCONN
 #define POLL_TIMEOUT    0 // timeout used for poll(2) || NON_BLOCKING mode
 #define BUFFER_SIZE     4096 // buffer size used for tmp reading variables
 
+// class channel;
 class   Server {
 
 public :
@@ -45,6 +46,8 @@ public :
     const unsigned short &      getListenPort() const;
     const int &                 getListenFd() const;
     const std::string &         getPassword() const;
+               //get channel map 
+      std::map<std::vector<std::string>, std::vector<Client> > getChannelMap() const;   
 
             //  Accepts clients connections
     void    handleIncomingConnections();
@@ -60,7 +63,8 @@ public :
             //	checks if msg revceived has a '\n'
     void    ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
                                 const std::vector<struct pollfd>  &fds, unsigned long &i,std::vector<std :: string> & commands);
-
+        //execute commands 
+        void execute_commmand(std :: vector<std :: string> &commands,int id);
 private :
 
 	// server's password
@@ -71,6 +75,8 @@ private :
     int                         listenFd;
     //  list of clients connected to the server || Nickname, Client class
     std::map<int, Client>       clients;
+        // map of channels and clients for each channel
+       const std::map<std::vector<std::string>, std::vector<Client> > channelMap;
 };
 
                 //  prints date, time, host, ip and port in STDOUT

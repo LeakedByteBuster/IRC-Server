@@ -1,0 +1,15 @@
+/*
+ join command
+
+parse join #jkjkff,#jvkjvkjvv 111 22
+check if the channel are created 
+{
+    check if it's the first client make it as operator 
+    
+}
+else 
+{
+    check if the client have privleges
+    if so add it to map off channels in server 
+}
+*/

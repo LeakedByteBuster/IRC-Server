@@ -116,7 +116,12 @@ const int &             Server::getListenFd() const {
 
 const std::string &     Server::getPassword() const {
     return (this->password);
+
 }
+
+std::map<std::vector<std::string>, std::vector<Client> > Server::getChannelMap()const{
+    return (this->channelMap);
+};   
 
 /* -------------------------------------------------------------------------- */
 /*                               Server Methods                               */
@@ -293,14 +298,18 @@ void            Server::handleIncomingConnections()
                 if (isReadable(fds[i])) {
                     //  Read from client file descriptor
                     memset((void *)buff.data(), 0, sizeof(buff));
-                    bytes = recv(fds[i].fd, (void *)buff.data(), sizeof(buff), 0);
+                    // bytes = recv(fds[i].fd, (void *)buff.data(), sizeof(buff), 0);
+                    char ptr[1024];
+                    bytes = recv(fds[i].fd, (void *)ptr, sizeof(ptr) - 1, 0);
+                    ptr[bytes] = 0;
                     if (bytes == -1) {
                         std::cout << "Error recv(): an error occured" << std::endl;
                         std::cout.flush();
                     } else if (bytes > 0) {
+                        buff =ptr;
                         std :: vector<std :: string> commands;
-                       ReadIncomingMsg(buff, map, fds, i,commands);
-                       execute_commmand(commands,fds[i].fd);
+                        ReadIncomingMsg(buff, map, fds, i,commands);
+                        execute_commmand(commands,fds[i].fd);
 
                        
                     }
