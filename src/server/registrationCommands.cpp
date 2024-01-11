@@ -8,7 +8,7 @@
 
 void    parsePass(Client &clt, std::string str, const std::string &pass)
 {
-    std::cout << "PASS : " << str << std::endl;
+    std::cout << "PASS : '" << str << "'" << std::endl;
 
     std::stringstream           ss(str);
     std::vector<std::string>    tokens;
@@ -19,11 +19,7 @@ void    parsePass(Client &clt, std::string str, const std::string &pass)
     }
 
     /*
-    
-    
-    THE SENDMSG() FUNCTION SHOULD BE STATIC
-    
-    
+        THE SENDMSG() FUNCTION SHOULD BE STATIC
     */
     if (tokens[0].compare("PASS") != 0) {
         clt.sendMsg(clt, LogError::passErrors(clt.nickname, LogError::PASS_NOT_SUPLLIED));
@@ -32,7 +28,7 @@ void    parsePass(Client &clt, std::string str, const std::string &pass)
     
     for (; i < tokens.size(); i++)
         ;
-    if (tokens[i-1].compare(pass) != 0) {
+    if (!tokens[i-1].empty() && tokens[i-1].compare(pass) != 0) {
         clt.sendMsg(clt, LogError::passErrors(clt.nickname, LogError::INCORRECT_PASS));
         return ;
     }

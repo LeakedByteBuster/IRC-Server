@@ -25,6 +25,21 @@ bool    isError(int revents, int fd, int listenFd) {
                 || (revents & POLLERR) == POLLERR) && fd != listenFd);
 }
 
+/* splits the buff, '\n' is the delim */
+std::vector<std::string>    splitByLines(std::string buff) {
+    std::stringstream   ss(buff);
+    std::string         line;
+    std::vector<std::string> strings;
+
+    while (std::getline(ss, line)) {
+        strings.push_back(line);
+        #if defined(LOG)
+            std::cout << "line in isNewLine() : '" << line << "' | " << line.size() << std::endl;
+        #endif // LOG
+    }
+    return (strings);
+}
+
 /* -------------------------------------------------------------------------- */
 /*                             Printing functions                             */
 /* -------------------------------------------------------------------------- */
