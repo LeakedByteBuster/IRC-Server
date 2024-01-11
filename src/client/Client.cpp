@@ -46,8 +46,8 @@ void    Client::sendMsg(const Client &target, std::string msg)
     }
 }
 
-void    Client::sendMsg(const Channels &, const std::string &) 
-{
+// void    Client::sendMsg(const Channels &, const std::string &) 
+// {
     /*
     for (all clients in channel) {
         if (bytes = send(target.fd, msg.data(), msg.size(), 0) == -1) {
@@ -56,4 +56,4 @@ void    Client::sendMsg(const Channels &, const std::string &)
         if (bytes )
     }
     */
-}
+// }

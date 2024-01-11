@@ -56,7 +56,7 @@ public :
     virtual ~Client();
 
     void    sendMsg(const Client &target, std::string msg);
-    void    sendMsg(const Channels &target, const std::string &msg);
+    // void    sendMsg(const Channels &target, const std::string &msg);
 };
 
 #endif // CLIENT_HPP
