@@ -37,7 +37,7 @@ public :
     void    mode(/* int mode */){}
 };
 
-class   Client : public Operator{
+class   Client : public Operator {
 
 public :
     /* doe */
@@ -60,9 +60,8 @@ public :
     Client& operator=(Client &rhs);
     virtual ~Client();
 
-    // send message to other user
-    void    sendMsg(int id,std :: string msg);
-    virtual void    sendMsg(char/* message to a channel */) {};
-
+    void    sendMsg(const Client &target, std::string msg);
+    // void    sendMsg(const Channels &target, const std::string &msg);
 };
+
 #endif // CLIENT_HPP

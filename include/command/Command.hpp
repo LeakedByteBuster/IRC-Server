@@ -13,4 +13,5 @@ std :: vector<std :: string> HandleIncomingMsg(std :: vector<std :: string> & co
 // compare first string in vector too see if is a valid command
 void execute_commmand(Server *sev,std :: vector<std :: string> & commands,int id);
 void send_file(Server *sev,std :: vector<std :: string> & commands,int id);
+void get_file(Server *srv,std :: vector<std :: string> command,int id);
 #include "Server.hpp"

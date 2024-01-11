@@ -59,7 +59,8 @@ public :
 
             //	checks if msg revceived has a '\n'
     void    ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
-                                const std::vector<struct pollfd>  &fds, unsigned long &i, std :: vector<std :: string> &commands);
+                                const std::vector<struct pollfd>  &fds, unsigned long &i
+                                , std :: vector<std :: string> &commands);
 
     //  list of clients connected to the server || Nickname, Client class
     std::map<int, Client>       clients;

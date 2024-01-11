@@ -29,13 +29,17 @@ void execute_commmand(Server *sev,std :: vector<std :: string> &commands,int id)
         {
             std :: cout << "No such a client\n";
         }
-            if(!first_argument.compare("SEND"))
+            if(!first_argument.compare("SENDFILE"))
             {
                 send_file(sev,commands,id);
             }
             else if(!first_argument.compare("PRIVMSG"))
             {
-                send_msg(sev,commands,id);
+                // send_msg(sev,commands,id);
+            }
+            else if(!first_argument.compare("GETFILE"))
+            {
+                get_file(sev,commands,id);
             }
     }
     
@@ -57,36 +61,57 @@ int search_a_client(Server *sev,std :: string NickName)
 }
 
 //send func by nickname 
+// SYNTAXE SEND FILENAME  RECIEVER
 void send_file(Server *sev,std :: vector<std :: string> & commands,int id)
 {
     std :: fstream FileName;
     std :: string line;
     std::map<int,Client>::iterator it = sev->clients.find(id);
-    if(commands.size() < 4)
+    if(commands.size() < 3)
     {
-        it->second.sendMsg(id,ERR_NEEDMOREPARAMS);
+        it->second.sendMsg(it->second,ERR_NEEDMOREPARAMS);
         return;
     }
     FileName.open(commands[1].c_str(),std::ios::in);
     if(!FileName.is_open())
     {
-        it->second.sendMsg(id,"No Such file in your /DIR\n");
-        return;
-    }
-    if(commands[2].compare(it->second.nickname))
-    {
-        it->second.sendMsg(id,"the NickName u set for sender Don't match ur Nickname\n");
+        it->second.sendMsg(it->second,"No Such file in your /DIR\n");
         return;
     }
     if(!search_a_client(sev,commands[3]))
     {
-        it->second.sendMsg(id,"No Such a client\n");
+        it->second.sendMsg(it->second,"No Such a client\n");
         return;
     }
+    file fl(&FileName,commands[1].c_str(),it->second.nickname,commands[3].c_str());
+    it->second.Files.push_back(fl);
     
 }
 
-void send_msg(Server srv,std::vector<std::string> command,int id)
+// void send_msg(Server *srv,std::vector<std::string> command,int id)
+// {
+    
+// }
+
+
+// GET FILENAME SENDER 
+void get_file(Server *srv,std :: vector<std :: string> command,int id)
 {
+    std::map<int,Client>::iterator it = srv->clients.find(id);
+    if(command.size() < 3)
+    {
+        it->second.sendMsg(it->second,ERR_NEEDMOREPARAMS);
+        return;
+    }
+    else if(command[1].empty())
+    {
+        it->second.sendMsg(it->second,"FILENAME NOT FOUND\n");
+        return;
+    }
+    if(!search_a_client(srv,command[2]))
+    {
+        it->second.sendMsg(it->second,"No Such a client\n");
+        return;
+    }
     
 }
