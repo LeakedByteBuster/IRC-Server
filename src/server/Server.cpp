@@ -216,9 +216,7 @@ void    Server::userRegistration(int fd, std::vector<std::string> string)
         
         for (size_t i = 0; i < string.size(); i++) {
             if (!string[i].empty() && string[i].compare("\n") != 0)
-            // if (gbuff[fd].at(i).empty())
                 gbuff[fd].push_back(string[i]);
-                // std::cout << "Here : " << string[i] << " | "<< gbuff[fd].size() << std::endl;
             }
 
         if (gbuff[fd].size() >= 3) {
@@ -237,13 +235,9 @@ void    Server::userRegistration(int fd, std::vector<std::string> string)
     return ;
 }
 
-void    Server::ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
-                            const std::vector<struct pollfd>  &fds, unsigned long &i,std :: vector<std :: string> &)
+std::pair<std::string, bool>    Server::ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
+                            const std::vector<struct pollfd>  &fds, unsigned long &i)
 {
-    #if defined(LOG)
-        std::cout << "buff is : " << buff;
-        std::cout.flush();
-    #endif // LOG
 
     //  if buff doesn't have '\n' at the end
     if (buff.rfind('\n') == std::string::npos) {
@@ -252,7 +246,7 @@ void    Server::ReadIncomingMsg(std::string buff, std::map<int, std::string> &ma
         if (itRet.second == false) {
             map[fds[i].fd].append(buff); // join buff
         }
-        return ;
+        return (make_pair(static_cast<std::string>(""), 0));
     } 
     // if client sent a '\n' but he has already a buff stored in map
     else if ( !map.empty() && (buff.find('\n') != std::string::npos)
@@ -261,12 +255,12 @@ void    Server::ReadIncomingMsg(std::string buff, std::map<int, std::string> &ma
         map.erase(fds[i].fd);
     }
 
-    std::vector<std::string> strings = splitByLines(buff);
+    #if defined(LOG)
+        std::cout << "buff in ReadIncomingMsg() : " << buff;
+        std::cout.flush();
+    #endif // LOG
 
-    if (!strings[0].empty()) { /* SHOULD CHANGE THIS AND PUT IN WHILE BELOW*/
-        userRegistration(fds[i].fd, strings);
-        // HandleIncomingMsg(commands,buff);
-    }
+    return (make_pair(buff, 1));
 }
 
 //  Accepts incoming connections
@@ -289,9 +283,7 @@ void            Server::handleIncomingConnections()
 
             //  Checks if there is a new connection to accept
             if (isNewConnection(fds[0], listenFd)) {
-                if ( addNewClient(fds, &nfds, fdsLeft)) {
-                    // continue ;
-                }
+                addNewClient(fds, &nfds, fdsLeft);
             }
 
             for (unsigned long i = 1; (i < nfds) && (fdsLeft > 0); i++) {
@@ -308,15 +300,21 @@ void            Server::handleIncomingConnections()
                         std::cout << "Error recv(): an error occured" << std::endl;
                         std::cout.flush();
                     } else if (bytes > 0) {
-                        if (!buff.empty() && buff.compare("\n") != 0) {
-                            buff =ptr;
-                            std :: vector<std :: string> commands;
-                            ReadIncomingMsg(buff, map, fds, i,commands);
-
-                        }
-                        // if (clients[fds[i].fd].isRegistred == 1) {
-                            //  execute_commmand(commands,fds[i].fd);
-                        // }
+                            buff = ptr;
+                            std::pair<std::string, bool>    str;
+                            str = ReadIncomingMsg(buff, map, fds, i);
+                            if (str.second == 1) {
+                                std::vector<std::string> strings = splitByLines(str.first);
+                                if ((clients[fds[i].fd].isRegistred == 0) 
+                                    && !strings[0].empty()) {
+                                    userRegistration(fds[i].fd, strings);
+                                }
+                                // std :: vector<std :: string> commands;
+                                // HandleIncomingMsg(commands, buff);
+                                // if (clients[fds[i].fd].isRegistred == 1) {
+                                //      execute_commmand(commands,fds[i].fd);
+                                // }
+                            }
 
                     }
                     fdsLeft--;

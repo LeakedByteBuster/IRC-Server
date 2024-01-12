@@ -8,7 +8,7 @@
 
 void    parsePass(Client &clt, std::string str, const std::string &pass)
 {
-    std::cout << "PASS : '" << str << "'" << std::endl;
+    std::cout << "PASS parsePass(): '" << str << "'" << std::endl;
 
     std::stringstream           ss(str);
     std::vector<std::string>    tokens;

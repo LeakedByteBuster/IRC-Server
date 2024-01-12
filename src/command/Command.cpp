@@ -1,6 +1,6 @@
 #include "Command.hpp"
 
-std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &commands,std :: string msg)
+std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &commands, std :: string msg)
 {
     std::stringstream   ss(msg);
     std :: string        token;
