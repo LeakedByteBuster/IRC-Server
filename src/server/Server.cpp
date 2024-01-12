@@ -119,9 +119,9 @@ const std::string &     Server::getPassword() const {
 
 }
 
-std::map<std::vector<std::string>, std::vector<Client> > Server::getChannelMap()const{
-    return (this->channelMap);
-};   
+// std::map<std::vector<std::string>, std::vector<Client> > Server::getChannelMap()const{
+//     return (this->channelMap);
+// };   
 
 /* -------------------------------------------------------------------------- */
 /*                               Server Methods                               */
@@ -309,14 +309,15 @@ void            Server::handleIncomingConnections()
                         buff =ptr;
                         std :: vector<std :: string> commands;
                         ReadIncomingMsg(buff, map, fds, i,commands);
-                        execute_commmand(commands,fds[i].fd);
+                        execute_commmand(this->channelsInServer,commands,fds[i].fd);
 
-                       
+                       puts("1");
                     }
                     fdsLeft--;
 
                 } else if (isError(fds[i].revents, fds[i].fd, listenFd)) {
 
+                    puts("2");
                     #if defined(LOG)
                         std::cout << geTime() << " | client disconnected " << std::endl;
                     #endif // LOG

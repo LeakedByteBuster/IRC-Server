@@ -4,11 +4,29 @@ channel::channel()
 {
 
 }
-channel::channel(Client  &client)
+channel::channel(int id,std::string name,std::string key ,bool isoperator)
 {
-	(void)client;
-}
+	this->id_clients_in_channel.push_back (id);
+    this->name = name;
+    this->key = key;
+    this->keyMode = 0 ;
+    this->inviteMode = 0;
+    this->limitMode = 0;
+    this->topicMode = 0;
+    this->limit = 10 ;
+    this->operatorMode = isoperator;
+    std::cout << "channel created by " << id << "\n";
 
+}
+//getters and setters
+	int channel::getLimit(void) const  {return this->limit;}
+    const std::string & channel::getKey (void) const {return this->key;}
+	bool channel::getInviteMode (void) const{return this->inviteMode;}
+	bool channel::gettopicMode (void) const{return this->topicMode;}
+	bool channel::getkeyMode (void) const{return this->keyMode;}
+	bool channel::getOperatorMode (void) const{return this->operatorMode;}
+	bool channel::getLimitMode (void) const {return this->inviteMode;}
+    std::vector <int> channel::get_id_clients_in_channel() const {return this->id_clients_in_channel;}
 channel::~channel()
 {
 }
@@ -18,7 +36,6 @@ bool is_duplicated(std::vector<std::string>& channel_names)
     std::set<std::string> unique_channels;
     for (std::vector<std::string>::iterator it = channel_names.begin(); it != channel_names.end(); ++it){
         if (!unique_channels.insert(*it).second) {
-            // std::cout << "Channel is duplicated" << std::endl;
             return true;
         }
     }

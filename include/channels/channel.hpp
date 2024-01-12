@@ -34,17 +34,23 @@ private:
 	int limit;
 	
 	bool inviteMode;
-	bool topicMde;
+	bool topicMode;
 	bool keyMode;
 	bool operatorMode;
 	bool limitMode;
 public:
 	channel();
-	channel(Client  &client);
+	channel(int id,std::string name,std::string key ,bool isoperator);
 	~channel() ;
-	std::string & getKey (void) ;
-	std::string & getName (void) ;
-	std::string & getTopic (void) ;
+	std::vector <int> get_id_clients_in_channel() const ;
+	const std::string & getKey (void) const;
+	std::string & getTopic (void) const  ;
+	int getLimit(void) const ;
+	bool getInviteMode (void) const;
+	bool gettopicMode (void) const;
+	bool getOperatorMode (void) const;
+	bool getkeyMode (void) const;
+	bool getLimitMode (void) const ;
 	void setKey (std::string key) ;
 	void setName (std::string name) ;
 	void setTopic (std::string topic) ;

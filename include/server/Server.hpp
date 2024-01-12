@@ -26,13 +26,13 @@
 /* static headers */
 #include "Client.hpp"
 #include "Command.hpp"
-// #include "channel.hpp"
+#include "channel.hpp"
 #define SOCK_DOMAIN AF_INET
 #define BACKLOG SOMAXCONN
 #define POLL_TIMEOUT    0 // timeout used for poll(2) || NON_BLOCKING mode
 #define BUFFER_SIZE     4096 // buffer size used for tmp reading variables
 
-// class channel;
+class channel;
 class   Server {
 
 public :
@@ -46,25 +46,25 @@ public :
     const unsigned short &      getListenPort() const;
     const int &                 getListenFd() const;
     const std::string &         getPassword() const;
-               //get channel map 
-      std::map<std::vector<std::string>, std::vector<Client> > getChannelMap() const;   
+	       //get channel map 
+	std::map<std::string,channel>  & getChannelMap ()const; 
 
-            //  Accepts clients connections
+	std::map<std::string,channel> channelsInServer;
+	    //  Accepts clients connections
     void    handleIncomingConnections();
-            //  Add socket fd to the vector and increment nfds by 1
+	    //  Add socket fd to the vector and increment nfds by 1
     void    addNewPollfd(int fd, std::vector<struct pollfd> &fds, nfds_t &nfds);
-            //  checks if checks if there is a revents in one of the fds
+	    //  checks if checks if there is a revents in one of the fds
     int     isPollReady(std::vector<struct pollfd> &fds, nfds_t &nfds);
-            //  returns 0 if connection is done successfully, otherwise 0 is returned
+	    //  returns 0 if connection is done successfully, otherwise 0 is returned
     bool    addNewClient(std::vector<struct pollfd> &fds, nfds_t *nfds, int &fdsLeft);
 
     void    userRegistration(int fd, std::string &str);
 
-            //	checks if msg revceived has a '\n'
+	    //	checks if msg revceived has a '\n'
     void    ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
-                                const std::vector<struct pollfd>  &fds, unsigned long &i,std::vector<std :: string> & commands);
-        //execute commands 
-        void execute_commmand(std :: vector<std :: string> &commands,int id);
+				const std::vector<struct pollfd>  &fds, unsigned long &i,std::vector<std :: string> & commands);
+	//execute commands 
 private :
 
 	// server's password
@@ -75,23 +75,24 @@ private :
     int                         listenFd;
     //  list of clients connected to the server || Nickname, Client class
     std::map<int, Client>       clients;
-        // map of channels and clients for each channel
-       const std::map<std::vector<std::string>, std::vector<Client> > channelMap;
 };
+	void execute_commmand(std::map<std::string,channel> & channelsInServer,std :: vector<std :: string> &commands,int id);
+	// map that had name of channels as key and class channel as value
+	
 
-                //  prints date, time, host, ip and port in STDOUT
+		//  prints date, time, host, ip and port in STDOUT
 void            serverWelcomeMessage(const struct sockaddr_in &srvSock, int sfd);
-                //  prints on client side
+		//  prints on client side
 void            clientWelcomeMessage(unsigned short cfd);
-                //  print IP and host of connected client on server side
+		//  print IP and host of connected client on server side
 void            printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr);
-                //  returns current local time
+		//  returns current local time
 std::string     geTime();
-                //  Checks if fd.revents == POLLIN
+		//  Checks if fd.revents == POLLIN
 bool            isReadable(const struct pollfd &fd);
-                //  checks if fd.revents == POLLERR | POLLHUP
+		//  checks if fd.revents == POLLERR | POLLHUP
 bool            isError(int revents, int fd, int listenFd);
-                //  checks if (revents == POLLIN) && (fd == server fd)
+		//  checks if (revents == POLLIN) && (fd == server fd)
 bool     	    isNewConnection(const struct pollfd &fd, int srvfd);
 
 #endif // SERVER_HPP
