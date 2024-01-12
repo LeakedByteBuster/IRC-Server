@@ -54,7 +54,6 @@ void    parseNick(Client & client, std::string str)
     }
         client.nickname = tokens[1].c_str();
 
-        std::cout << "NICK : " << client.nickname << std::endl;
     
 }
 

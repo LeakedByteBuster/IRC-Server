@@ -249,7 +249,7 @@ void    Server::userRegistration(int fd, std::string &str)
 }
 
 void    Server::ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
-                            const std::vector<struct pollfd>  &fds, unsigned long &i,std :: vector<std :: string> &)
+                            const std::vector<struct pollfd>  &fds, unsigned long &i,std :: vector<std :: string> &commands)
 {
     //  if buff doesn't have '\n' at the end
     if (buff.rfind('\n') == std::string::npos) {
@@ -271,8 +271,8 @@ void    Server::ReadIncomingMsg(std::string buff, std::map<int, std::string> &ma
         std::cout.flush();
     #endif // LOG
     
-    userRegistration(fds[i].fd, buff);
-    // HandleIncomingMsg(commands,buff);
+    // userRegistration(fds[i].fd, buff);
+    HandleIncomingMsg(commands,buff);
 }
 
 //  Accepts incoming connections
@@ -316,13 +316,12 @@ void            Server::handleIncomingConnections()
                         buff =ptr;
                         std :: vector<std :: string> commands;
                         ReadIncomingMsg(buff, map, fds, i,commands);
-                        clients[fds[i].fd].isRegistred =1;
-                        if (clients[fds[i].fd].isRegistred == 1) {
-                            puts("here");
+                        // clients[fds[i].fd].isRegistred =1;
+                        // if (clients[fds[i].fd].isRegistred == 1) {
                              execute_commmand(this,commands,fds[i].fd);
                         }
 
-                    }
+                    // }
                     fdsLeft--;
 
                 } else if (isError(fds[i].revents, fds[i].fd, listenFd)) {

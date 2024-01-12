@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <arpa/inet.h>
-#include "File.hpp"
+#include "TFile.hpp"
 #include <vector>
 
 
@@ -52,7 +52,7 @@ public :
     struct sockaddr_in  hints;
     int                 fd;
 
-    std :: vector<file> Files;
+    std :: vector<TFile> Files;
 
 public :
     Client();

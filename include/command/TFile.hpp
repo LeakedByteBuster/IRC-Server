@@ -3,22 +3,22 @@
 #include <sstream>
 #include <fstream>
 
-// file has three member sender which the name of client that send the file
+// file has four member sender which the name of client that send the file
 // and reciever the client that recive the file
-// and the filename
+// and the filename and stream of file
 
-class file
+class TFile
 {
     private:
     std :: string const sender;
     std :: string const receiver;
     std :: string const filename;
-    std :: fstream * f;
+    std::FILE *  fd;
 
     public :
 
     // constructor
-    file(std :: fstream  * F,std :: string const Filename,std :: string const Sender,std :: string Receiver) :sender(Sender),receiver(Receiver),filename(Filename),f(F)
+    TFile(std::FILE *Fd,std :: string const Filename,std :: string const Sender,std :: string Receiver) :sender(Sender),receiver(Receiver),filename(Filename),fd(Fd)
     {
     };
 
@@ -26,6 +26,6 @@ class file
     std :: string getFilname(){return filename;};
     std :: string getReceiver(){return receiver;};
     std :: string getSender(){return sender;};
-    std :: fstream * getstream(){return f;};
-    ~file(){};
+    std::FILE*  getstream(){return fd;};
+    ~TFile(){};
 };

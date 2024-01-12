@@ -4,7 +4,9 @@
 #include <vector>
 #include <map>
 #include <sstream>
-#include "File.hpp"
+#include <fstream>
+#include <unistd.h>
+#include "TFile.hpp"
 #include "Errors.hpp"
 
 class Server;
@@ -14,4 +16,6 @@ std :: vector<std :: string> HandleIncomingMsg(std :: vector<std :: string> & co
 void execute_commmand(Server *sev,std :: vector<std :: string> & commands,int id);
 void send_file(Server *sev,std :: vector<std :: string> & commands,int id);
 void get_file(Server *srv,std :: vector<std :: string> command,int id);
+int search_a_file(Client clt,std :: string sender);
+void creat_file(Client clt,std :: string sender,std :: string filename);
 #include "Server.hpp"
