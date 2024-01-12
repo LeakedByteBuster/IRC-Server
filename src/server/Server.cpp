@@ -287,11 +287,9 @@ void            Server::handleIncomingConnections()
             }
 
             for (unsigned long i = 1; (i < nfds) && (fdsLeft > 0); i++) {
-                // if (isReadable(fds[i], listenFd) && isRegistred())
                 if (isReadable(fds[i])) {
                     //  Read from client file descriptor
                     memset((void *)buff.data(), 0, sizeof(buff));
-                    // bytes = recv(fds[i].fd, (void *)buff.data(), sizeof(buff), 0);
                     char ptr[4096];
                     memset(ptr, 0, sizeof(ptr));
                     bytes = recv(fds[i].fd, (void *)ptr, sizeof(ptr) - 1, 0);
@@ -305,13 +303,13 @@ void            Server::handleIncomingConnections()
                             str = ReadIncomingMsg(buff, map, fds, i);
                             if (str.second == 1) {
                                 std::vector<std::string> strings = splitByLines(str.first);
-                                if ((clients[fds[i].fd].isRegistred == 0) 
-                                    && !strings[0].empty()) {
+                                if ((clients[fds[i].fd].isRegistred == 0)
+                                        && strings.size() > 0) {
                                     userRegistration(fds[i].fd, strings);
                                 }
-                                // std :: vector<std :: string> commands;
-                                // HandleIncomingMsg(commands, buff);
-                                // if (clients[fds[i].fd].isRegistred == 1) {
+                                // else if (clients[fds[i].fd].isRegistred == 1 && strings.size() > 0) {
+                                    // std :: vector<std :: string> commands;
+                                    // HandleIncomingMsg(commands, strings);
                                 //      execute_commmand(commands,fds[i].fd);
                                 // }
                             }

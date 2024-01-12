@@ -32,7 +32,8 @@ std::vector<std::string>    splitByLines(std::string buff) {
     std::vector<std::string> strings;
 
     while (std::getline(ss, line)) {
-        strings.push_back(line);
+        if (!line.empty())
+            strings.push_back(line);
         #if defined(LOG)
             std::cout << "line in isNewLine() : '" << line << "' | " << line.size() << std::endl;
         #endif // LOG
