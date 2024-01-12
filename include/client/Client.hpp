@@ -54,9 +54,6 @@ public :
     Client(std::string port, std::string password);
     Client& operator=(Client &rhs);
     virtual ~Client();
-
-    void    sendMsg(const Client &target, std::string msg);
-    // void    sendMsg(const Channels &target, const std::string &msg);
 };
 
 #endif // CLIENT_HPP

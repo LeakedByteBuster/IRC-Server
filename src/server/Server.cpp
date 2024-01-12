@@ -249,7 +249,7 @@ std::pair<std::string, bool>    Server::ReadIncomingMsg(std::string buff, std::m
         return (make_pair(static_cast<std::string>(""), 0));
     } 
     // if client sent a '\n' but he has already a buff stored in map
-    else if ( !map.empty() && (buff.find('\n') != std::string::npos)
+    if ( !map.empty() && (buff.find('\n') != std::string::npos)
                 && !map[fds[i].fd].empty() ) {
         buff = map[fds[i].fd].append(buff);
         map.erase(fds[i].fd);
@@ -344,3 +344,33 @@ void            Server::handleIncomingConnections()
         }
     }
 }
+
+void    Server::sendMsg(const Client &target, std::string msg)
+{
+    if (msg.size() > 0) { 
+        msg.append("\r\n");
+
+        ssize_t bytes;
+        if ((bytes = send(target.fd, msg.data(), msg.size(), 0)) == -1) {
+            std::cerr << "Error : " << strerror(errno) << std::endl;
+        }
+        if ((unsigned long)bytes != msg.size()) {
+            std::cerr << "Warning : data loss : buff = " << msg.size() 
+                << " sent = " << bytes << std::endl;
+        }
+    } else {
+        std::cerr << "Error sendMsg() : error message is empty";
+    }
+}
+
+// void    Client::sendMsg(const Channels &, const std::string &) 
+// {
+    /*
+    for (all clients in channel) {
+        if (bytes = send(target.fd, msg.data(), msg.size(), 0) == -1) {
+            std::cerr << "Error : " << strerror(errno) << std::endl;
+        }
+        if (bytes )
+    }
+    */
+// }

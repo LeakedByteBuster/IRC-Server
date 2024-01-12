@@ -1,9 +1,8 @@
 #include <iostream>
 #include <sstream>
-#include <vector>
 #include "registrationCommands.hpp"
-#include "Client.hpp"
 #include "Errors.hpp"
+#include "Server.hpp"
 
 
 void    parsePass(Client &clt, std::string str, const std::string &pass)
@@ -18,22 +17,19 @@ void    parsePass(Client &clt, std::string str, const std::string &pass)
         tokens.push_back(token);
     }
 
-    /*
-        THE SENDMSG() FUNCTION SHOULD BE STATIC
-    */
     if (tokens[0].compare("PASS") != 0) {
-        clt.sendMsg(clt, LogError::passErrors(clt.nickname, LogError::PASS_NOT_SUPLLIED));
+        Server::sendMsg(clt, LogError::passErrors(clt.nickname, LogError::PASS_NOT_SUPLLIED));
         return ;
     }
     
     for (; i < tokens.size(); i++)
         ;
     if (!tokens[i-1].empty() && tokens[i-1].compare(pass) != 0) {
-        clt.sendMsg(clt, LogError::passErrors(clt.nickname, LogError::INCORRECT_PASS));
+        Server::sendMsg(clt, LogError::passErrors(clt.nickname, LogError::INCORRECT_PASS));
         return ;
     }
 
-    clt.sendMsg(clt, LogError::passErrors(clt.nickname, LogError::CORRECT_PASS));
+    Server::sendMsg(clt, LogError::passErrors(clt.nickname, LogError::CORRECT_PASS));
 }
 
 void    parseNick(Client &, std::string str)
