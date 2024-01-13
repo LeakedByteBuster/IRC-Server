@@ -3,6 +3,7 @@
 #include<set>
 #include<fstream>
 // #include "client.hpp"
+// std::vector<int> channel::get_id_clients_in_channel;
 std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &commands,std :: string msg)
 {
     std::stringstream   ss(msg);
@@ -17,7 +18,13 @@ std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &co
     return(commands);
 }
 
-
+void sendError(int fd, std::string error,std::string prefix)
+{
+    std::string msg = prefix + error;
+    int i = write (fd,msg.c_str(),msg.size());
+    if (i == -1)
+        std::cout << "write Error \n";
+}
 
         // if (key.length ()<4)
         //     std::cout << "PASS must be more than 4 characters\n";
@@ -52,19 +59,15 @@ std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &co
 
 // }
 
-int check_is_valid(std::string name,std::string key, std::map<std::string,channel> &channelsInServer)
+int check_is_valid(std::string name,std::string key, std::map<std::string,channel> &channelsInServer,int id )
 {
-     channel& foundChannel = channelsInServer[name];
-        if (foundChannel.getKey()== key)
-        {
-            // Key matches the channelKey attribute
-            return 1;
-        }
-        else
-        {
-            // Key does not match the channelKey attribute
-            return 0;
-        }
+    channel& foundChannel = channelsInServer[name];
+    if (foundChannel.getKey().compare (key) == 0)
+        return 1;
+    else 
+        sendError(id,ERR_BADCHANNELKEY,name);
+    return 0;
+       
 }
 int check_modes (std::string name,std::map<std::string,channel> &channelsInServer)
 {
@@ -74,55 +77,67 @@ int check_modes (std::string name,std::map<std::string,channel> &channelsInServe
     else 
         return (0);
 }
-int check_limit (std::string name,std::map<std::string,channel> &channelsInServer)
+int check_limit (std::string name,std::map<std::string,channel> &channelsInServer,int id )
 {
     channel& foundChannel = channelsInServer[name];
-    if (static_cast<int>(foundChannel.get_id_clients_in_channel().size())<foundChannel.getLimit())
-        return (1);
-    else 
+    std::__1::vector<int> vector_ids = foundChannel.get_id_clients_in_channel();
+    std::__1::vector<int> ::iterator it =std::find(vector_ids .begin() ,vector_ids .end(),id);
+    for (size_t i =0; i <vector_ids.size();i++)
+        std::cout << "vec >>> " <<vector_ids[i] << "\n";
+    if (it!=vector_ids .end())
+    {
+        std::cout << "already in channel\n" << name << "\n";
         return (0);
-}
+    }
+    if (static_cast<int>(vector_ids.size()+1)>foundChannel.getLimit())
+    {
+        std::cout << "cant access  channel limit  \n";
+        return (0);
+    }
 
+    // }
+    return (1);
+}
 
 void parse_command(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, int id)
 {
-
     std::map<std::vector<std::string>,std::vector<std::string> > channel_keys;
     if (!commands.empty())
     {
         if (commands.front() == "JOIN" || commands.front() == "join")
         {
-            channel_keys = parse_join_command(commands);
+            channel_keys = parse_join_command(commands,id);
             if (!channel_keys.empty ())
             {
             std::map<std::vector<std::string>,std::vector<std::string> > ::iterator it = channel_keys.begin();
                 if (it!= channel_keys.end())
                 {
                     for (std::vector<std::string>::const_iterator nameIt = it->first.begin(), keyIt = it->second.begin(); \
-                    nameIt != it->first.end() || keyIt != it->second.end(); \
-                    ++nameIt)
+                        nameIt != it->first.end() || keyIt != it->second.end(); ++nameIt)
                     {
                             std::string lol = keyIt != it->second.end() ? *keyIt : ""; 
-
-                    std::cout << "channelname == " << *nameIt << "           keys : " << *keyIt ;
-                    
-                    // for (std::vector<std::string>::size_type i = 0; i < keys.size(); ++i) 
-                    // {
-                    //     std::cout << keys[i] << " ";
-                    // }
-                    std::cout << "\n";
-
                         if (channelsInServer.find (*nameIt)!=  channelsInServer.end()) //channel already exists
                         {
-                            if (check_is_valid(*nameIt,*keyIt,channelsInServer)&& check_limit(*nameIt,channelsInServer) && check_modes(*nameIt,channelsInServer) )
-                                std::cout << "joined channel succesfly \n";
+                            // std::cout << "channelname == " << *nameIt << "           keys : " << *keyIt ;
+                            // // std::cout << "\n";
+
+                            if (check_is_valid(*nameIt,*keyIt,channelsInServer,id)&& check_limit(*nameIt,channelsInServer,id) && check_modes(*nameIt,channelsInServer))
+                                {
+                                   std::vector<int>& channelData = channelsInServer[*nameIt].get_id_clients_in_channel();
+                                   channelData.push_back (id);
+                                    channelData.insert(channelData.end(), 0, id);
+                                   for (unsigned long i = 0; i < channelsInServer[*nameIt].get_id_clients_in_channel().size(); i++) {
+                                        std::cout << "id : " << *nameIt << " value ==> " <<  channelsInServer[*nameIt].get_id_clients_in_channel()[i] << std::endl;
+                                   }
+                                    // std::cout << "client :"  << id <<"joined channel succesfly \n";
+                                }
                             else 
-                                std::cout << "invalid key \n";
+                                sendError(id,ERR_BADCHANNELKEY,"111112");
 
                         }
                         else //new channel
                         {
-                            std::cout <<"not found \n";
+                            // std::cout <<"not found \n";
                             std::string lol = keyIt != it->second.end() ? *keyIt : ""; 
                             channel a(id,*nameIt,*keyIt ,1);
                             channelsInServer[*nameIt] = a;
@@ -132,14 +147,14 @@ void parse_command(std::vector<std::string> & commands, std::map<std::string,cha
                     }
                     std::cout << "\n";
                 }
-            }
             else
             {
-            std::cout << "erroor f chi blassa\n";
+                sendError(id,ERR_BADCHANNELKEY,"");
+            }
             // else 
             //     channel a(id,,)
 
-            }
+            // }
         }
     }
     // else if (firstCommand == "KICK")
@@ -149,13 +164,15 @@ void parse_command(std::vector<std::string> & commands, std::map<std::string,cha
     // else if (firstCommand == "INVITE")
     //     check_channel_name (commands);
     else 
-         std::cout << "command not found \n";
+        sendError(id,"command not found \n","");
 }
-void execute_commmand(std::map<std::string,channel> &channelsInServer, 
-    std :: vector<std :: string> &commands,int id)
+}
+
+
+void execute_commmand(std::map<std::string,channel> &channelsInServer, std :: vector<std :: string> &commands,int id)
 {
-    // std::cout << commands <<"\n"
     parse_command(commands,channelsInServer,id);
+    // std::cout << commands <<"\n"
 //     for(size_t i = 0;i < commands.size();i++)
 //     {
 //         std :: cout <<">>"<< commands[i]<<"<<"<< std ::endl;

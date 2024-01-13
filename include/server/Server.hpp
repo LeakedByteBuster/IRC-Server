@@ -47,9 +47,10 @@ public :
     const int &                 getListenFd() const;
     const std::string &         getPassword() const;
 	       //get channel map 
-	std::map<std::string,channel>  & getChannelMap ()const; 
+	std::map<std::string, channel>  & getChannelMap ()const; 
 
-	std::map<std::string,channel> channelsInServer;
+	std::map<std::string, channel> channelsInServer;
+
 	    //  Accepts clients connections
     void    handleIncomingConnections();
 	    //  Add socket fd to the vector and increment nfds by 1

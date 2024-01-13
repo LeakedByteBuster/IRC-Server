@@ -9,18 +9,18 @@
 #include "vector"
 #include<set>
 #include"../client/Client.hpp"
-#define ERR_NEEDMOREPARAMS ":Not enough parameters"
-#define ERR_NOSUCHCHANNEL ":No such channel"
-#define ERR_TOOMANYCHANNELS ":You have joined too many channels"
-#define ERR_BADCHANNELKEY ":Cannot join channel (+k)"
-#define ERR_BANNEDFROMCHAN ":Cannot join channel (+b)"
-#define ERR_CHANNELISFULL ":Cannot join channel (+l)"
-#define ERR_INVITEONLYCHAN ":Cannot join channel (+i)"
-#define ERR_BADCHANMASK ":Bad Channel Mask"
-#define RPL_TOPIC ":"
-#define RPL_TOPICWHOTIME " : "
-#define RPL_NAMREPLY ": "
-#define RPL_ENDOFNAMES ":End of /NAMES list"
+#define ERR_NEEDMOREPARAMS "  : Not enough parameters\n"
+#define ERR_NOSUCHCHANNEL ":No such channel\n"
+#define ERR_TOOMANYCHANNELS ":You have joined too many channels\n"
+#define ERR_BADCHANNELKEY ":Cannot join channel (+k)\n"
+#define ERR_BANNEDFROMCHAN ":Cannot join channel (+b)\n"
+#define ERR_CHANNELISFULL ":Cannot join channel (+l)\n"
+#define ERR_INVITEONLYCHAN ":Cannot join channel (+i)\n"
+#define ERR_BADCHANMASK ":Bad Channel Mask\n"
+#define RPL_TOPIC ":TOPIC\n"
+#define RPL_TOPICWHOTIME " : TOPICTIME \n"
+#define RPL_NAMREPLY ": NAMERPLY\n"
+#define RPL_ENDOFNAMES ":End of /NAMES list \n"
 
 class server;
 class Client;
@@ -41,8 +41,8 @@ private:
 public:
 	channel();
 	channel(int id,std::string name,std::string key ,bool isoperator);
-	~channel() ;
-	std::vector <int> get_id_clients_in_channel() const ;
+	~channel();
+	std::vector <int> &get_id_clients_in_channel (void);
 	const std::string & getKey (void) const;
 	std::string & getTopic (void) const  ;
 	int getLimit(void) const ;
@@ -58,7 +58,7 @@ public:
 };
 	std::vector<std::string>  check_key(std::string &line) ;
 	std::vector<std::string> parse_channel_key (std::string &key);
-	std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(std::vector<std::string> & commands);
+	std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(std::vector<std::string> & commands,int id);
 	int  parse_channel_name_token (std::string token);
 	bool is_duplicated(std::vector<std::string>& channel_names);
-
+	void sendError(int fd, std::string error,std::string prefix);

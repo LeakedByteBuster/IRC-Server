@@ -6,19 +6,20 @@ channel::channel()
 }
 channel::channel(int id,std::string name,std::string key ,bool isoperator)
 {
-	this->id_clients_in_channel.push_back (id);
+	this->id_clients_in_channel.push_back(id);
     this->name = name;
     this->key = key;
     this->keyMode = 0 ;
     this->inviteMode = 0;
     this->limitMode = 0;
     this->topicMode = 0;
-    this->limit = 10 ;
+    this->limit = 2 ;
     this->operatorMode = isoperator;
     std::cout << "channel created by " << id << "\n";
 
 }
 //getters and setters
+    std::vector <int>& channel::get_id_clients_in_channel (void){return this->id_clients_in_channel;}
 	int channel::getLimit(void) const  {return this->limit;}
     const std::string & channel::getKey (void) const {return this->key;}
 	bool channel::getInviteMode (void) const{return this->inviteMode;}
@@ -26,7 +27,6 @@ channel::channel(int id,std::string name,std::string key ,bool isoperator)
 	bool channel::getkeyMode (void) const{return this->keyMode;}
 	bool channel::getOperatorMode (void) const{return this->operatorMode;}
 	bool channel::getLimitMode (void) const {return this->inviteMode;}
-    std::vector <int> channel::get_id_clients_in_channel() const {return this->id_clients_in_channel;}
 channel::~channel()
 {
 }
@@ -46,7 +46,6 @@ int  parse_channel_name_token (std::string token)
 {
     std::vector<std::string> channel_names;
 
-    // std::cout << "i >> token [i] : " <<token<<"\n";
     if (token[0] == '#' && isalnum (token[1]))
     {
     
@@ -63,7 +62,6 @@ int  parse_channel_name_token (std::string token)
 
 int check_is_valid_key(std::string & line)
 {
-
     if (line.length () < 4)
         return (0);
     for (size_t i =1 ; i < line.length () ;i++)
@@ -79,7 +77,6 @@ std::vector<std::string> parse_channel_key (std::string &key)
     std::vector<std::string> valid_keys;
     std::stringstream ss(key);
     std::string line;
-    // std::cout << "line: " << line << "\n";
     if (key.back() == ',')
            return std::vector<std::string>();
     while (std::getline (ss,line,','))
@@ -126,13 +123,14 @@ std::vector<std::string> parse_channel(const std::string& str)
     return channel_names;
 }
 
-std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(std::vector<std::string> & commands)
+std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(std::vector<std::string> & commands,int id)
 {
     std::map<std::vector<std::string>,std::vector<std::string> > channels_keys;
     std::vector<std::string>validChannels;
     if (commands.size()==1)
     {
-        std::cout <<ERR_NEEDMOREPARAMS<<std::endl;
+        
+        sendError(id ,ERR_NEEDMOREPARAMS,commands[0]);
         return std::map<std::vector<std::string>,std::vector<std::string> >();
     }
     else if (commands.size()== 2)
@@ -146,6 +144,7 @@ std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(
         }
         else 
         {
+            // sendError(id ,ERR_BADCHANMASK);
             std::cout << ERR_BADCHANMASK << std::endl;
              return std::map<std::vector<std::string>,std::vector<std::string> >();
         }
@@ -154,9 +153,6 @@ std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(
     {
         validChannels =  parse_channel (commands[1]);
         std::vector<std::string> valid_keys =parse_channel_key (commands[2]);
-        // std::cout << "channels size : " << validChannels.size() << "\n";
-        // std::cout << "key size : " << valid_keys.size() << "\n";
-
         if (!valid_keys.empty() &&  validChannels.size() >= valid_keys.size())
         {
             channels_keys.insert(std::make_pair(validChannels, valid_keys));
@@ -165,13 +161,13 @@ std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(
         }
         else
         {
-             std::cout << "BAD channel key\n";
+            sendError(id ,ERR_BADCHANNELKEY,"1");
             return std::map<std::vector<std::string>,std::vector<std::string> >();
         }
     }
     else 
     {
-        std::cout <<ERR_NEEDMOREPARAMS<<std::endl;
+        // sendError(id ,ERR_NEEDMOREPARAMS);
         return std::map<std::vector<std::string>,std::vector<std::string> >();
     }
     // Client::sendmsg(ERR_NEEDMOREPARAMS);

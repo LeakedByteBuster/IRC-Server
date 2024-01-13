@@ -310,8 +310,6 @@ void            Server::handleIncomingConnections()
                         std :: vector<std :: string> commands;
                         ReadIncomingMsg(buff, map, fds, i,commands);
                         execute_commmand(this->channelsInServer,commands,fds[i].fd);
-
-                       puts("1");
                     }
                     fdsLeft--;
 
