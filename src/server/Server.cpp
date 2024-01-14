@@ -309,7 +309,7 @@ void            Server::handleIncomingConnections()
                         buff =ptr;
                         std :: vector<std :: string> commands;
                         ReadIncomingMsg(buff, map, fds, i,commands);
-                        execute_commmand(this->channelsInServer,commands,fds[i].fd);
+                        this->execute_commmand(commands,fds[i].fd);
                     }
                     fdsLeft--;
 

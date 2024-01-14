@@ -65,7 +65,10 @@ public :
 	    //	checks if msg revceived has a '\n'
     void    ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
 				const std::vector<struct pollfd>  &fds, unsigned long &i,std::vector<std :: string> & commands);
+	
 	//execute commands 
+	void execute_commmand(std :: vector<std :: string> &commands,int id);
+	 void parse_kick_command (std::vector<std::string> & commands,int id);
 private :
 
 	// server's password
@@ -77,7 +80,7 @@ private :
     //  list of clients connected to the server || Nickname, Client class
     std::map<int, Client>       clients;
 };
-	void execute_commmand(std::map<std::string,channel> & channelsInServer,std :: vector<std :: string> &commands,int id);
+	// void execute_commmand(std::map<std::string,channel> & channelsInServer,std :: vector<std :: string> &commands,int id);
 	// map that had name of channels as key and class channel as value
 	
 

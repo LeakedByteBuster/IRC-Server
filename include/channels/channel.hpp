@@ -9,20 +9,20 @@
 #include "vector"
 #include<set>
 #include"../client/Client.hpp"
-#define ERR_NEEDMOREPARAMS "  : Not enough parameters\n"
-#define ERR_NOSUCHCHANNEL ":No such channel\n"
+#define ERR_NEEDMOREPARAMS "461  : Not enough parameters\n"
+#define ERR_NOSUCHCHANNEL "403 :No such channel\n"
 #define ERR_TOOMANYCHANNELS ":You have joined too many channels\n"
-#define ERR_BADCHANNELKEY ":Cannot join channel (+k)\n"
-#define ERR_BANNEDFROMCHAN ":Cannot join channel (+b)\n"
-#define ERR_CHANNELISFULL ":Cannot join channel (+l)\n"
+#define ERR_BADCHANNELKEY "475 :Cannot join channel (+k)\n"
+// #define ERR_BANNEDFROMCHAN ":Cannot join channel (+b)\n"
+#define ERR_CHANNELISFULL "471:Cannot join channel (+l)\n"
 #define ERR_INVITEONLYCHAN ":Cannot join channel (+i)\n"
-#define ERR_BADCHANMASK ":Bad Channel Mask\n"
-#define RPL_TOPIC ":TOPIC\n"
-#define RPL_TOPICWHOTIME " : TOPICTIME \n"
+#define ERR_BADCHANMASK "476:Bad Channel Mask\n"
+#define RPL_TOPIC "332:TOPIC\n"
+#define RPL_TOPICWHOTIME " 333 : TOPICTIME \n"
 #define RPL_NAMREPLY ": NAMERPLY\n"
 #define RPL_ENDOFNAMES ":End of /NAMES list \n"
 
-class server;
+// class server;
 class Client;
 class channel
 {

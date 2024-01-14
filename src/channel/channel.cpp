@@ -15,7 +15,8 @@ channel::channel(int id,std::string name,std::string key ,bool isoperator)
     this->topicMode = 0;
     this->limit = 2 ;
     this->operatorMode = isoperator;
-    std::cout << "channel created by " << id << "\n";
+   
+    // std::cout << " << id << "\n";
 
 }
 //getters and setters
@@ -62,8 +63,8 @@ int  parse_channel_name_token (std::string token)
 
 int check_is_valid_key(std::string & line)
 {
-    if (line.length () < 4)
-        return (0);
+    // if (line.length () < 4)
+    //     return (0);
     for (size_t i =1 ; i < line.length () ;i++)
     {
         if (!isalnum (line [i]) || (line[i] == ',' &&!isalnum(line[i+1])))
