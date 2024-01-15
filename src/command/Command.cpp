@@ -47,6 +47,10 @@ void execute_commmand(Server *sev,std :: vector<std :: string> &commands,int id)
                 it->second.nickname = commands[1].c_str();
                 // std :: cout <<" >>> "<< it->second.nickname << std::endl;
             }
+            else if(!!first_argument.compare("PRVMSG"))
+            {
+                prv_msg(sev,commands,id);
+            }
     }
     
 }
@@ -174,4 +178,22 @@ void creat_file(Client clt,std :: string sender,std :: string filename)
         myfile << line;
     }
     
+}
+
+void prv_msg(Server *srv,std::vector<std :: string>command,int id)
+{
+    int i = 0;
+    std::map<int,Client>::iterator it = srv->clients.find(id);
+    if(command.size() < 3)
+    {
+        it->second.sendMsg(it->second,ERR_NEEDMOREPARAMS);
+        return;
+    }
+    for(;command[i][0] != ':';i++)
+    {
+        if(!search_a_client(srv,command[i]))
+        {
+            it->second.sendMsg(it->second,command[i] + ERR_NOSUCHNICK);
+        }
+    }
 }

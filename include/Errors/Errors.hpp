@@ -24,6 +24,7 @@
 #define ERR_NOSUCHNICK ":No such nick/channel"
 #define ERR_NORECIPIENT ":No recipient given"
 #define ERR_NOTEXTTOSEND ":No text to send"
+#define ERR_NOSUCHNICK " :No such nick/channel"
 
 #define IRC_NAME    ":ircCamel.localhost "
 
