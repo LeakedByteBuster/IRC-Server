@@ -42,6 +42,7 @@ class   Client : public Operator {
 public :
     /* doe */
     bool                isRegistred;
+    bool                isPass;
     /* operator priviligies */
     bool                isOperator;
     /* client info */

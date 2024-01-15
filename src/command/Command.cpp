@@ -49,7 +49,7 @@ void execute_commmand(Server *sev,std :: vector<std :: string> &commands,int id)
             }
             else if(!!first_argument.compare("PRVMSG"))
             {
-                prv_msg(sev,commands,id);
+                // prv_msg(sev,commands,id);
             }
     }
     

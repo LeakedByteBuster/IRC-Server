@@ -55,12 +55,14 @@ public :
             //  returns 0 if connection is done successfully, otherwise 0 is returned
     bool    addNewClient(std::vector<struct pollfd> &fds, nfds_t *nfds, int &fdsLeft);
 
-    void    userRegistration(int fd, std::string &str);
+    void    userRegistration(int fd, std::vector<std::string> string);
 
             //	checks if msg revceived has a '\n'
-    void    ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
-                                const std::vector<struct pollfd>  &fds, unsigned long &i
-                                , std :: vector<std :: string> &commands);
+    std::pair<std::string, bool>   ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
+                                const std::vector<struct pollfd>  &fds, unsigned long &i);
+
+    static void    sendMsg(const Client &target, std::string msg);
+    // void    sendMsg(const Channels &target, const std::string &msg);
 
     //  list of clients connected to the server || Nickname, Client class
     std::map<int, Client>       clients;
@@ -90,8 +92,8 @@ bool            isReadable(const struct pollfd &fd);
                 //  checks if fd.revents == POLLERR | POLLHUP
 bool            isError(int revents, int fd, int listenFd);
                 //  checks if (revents == POLLIN) && (fd == server fd)
-bool     	isNewConnection(const struct pollfd &fd, int srvfd);
+bool            isNewConnection(const struct pollfd &fd, int srvfd);
 
-
+std::vector<std::string>     splitByLines(std::string buff);
 
 #endif // SERVER_HPP

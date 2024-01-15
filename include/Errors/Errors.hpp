@@ -16,12 +16,11 @@
 
 #define ERR_NONICKNAMEGIVEN ":No nickname given"
 #define ERR_ERRONEUSNICKNAME ":Erroneus nickname"
-#define ERR_NICKNAMEINUSE ":Nickname is already in use"
+// #define ERR_NICKNAMEINUSE ":Nickname is already in use"
 
 
 //PRVMSG
 
-#define ERR_NOSUCHNICK ":No such nick/channel"
 #define ERR_NORECIPIENT ":No recipient given"
 #define ERR_NOTEXTTOSEND ":No text to send"
 #define ERR_NOSUCHNICK " :No such nick/channel"
@@ -42,11 +41,38 @@ public :
         /*
             S <-   :irc.example.com 001 <nick> :Welcome to the ExampleNet Internet Relay Chat Network <nick>
         */
-       CORRECT_PASS
+       CORRECT_PASS,
+
+       INVALID_NICKNAME,
+       ERR_NICKNAMEINUSE,
+       ERR_ALREADYREGISTRED
 
     };
 
     static std::string    passErrors(const std::string &clt, short type);
+
+    /*
+    Connection registration with nick-in-use:
+        C  ->  NICK ben
+        C  ->  USER b 0 * :Benno!
+        S <-   :irc.example.com 433 * ben :Nickname is already in use.
+        C  ->  NICK ben-
+        S <-   :irc.example.com 001 ben- :Welcome to the ExampleNet Internet Relay Chat Network ben-
+    
+    Invalid nickname :
+        C  ->  nick 345gman!
+        S <-   :irc.example.com 432 george 345gman! :Erroneous Nickname
+
+    Series of nickname changes seen by another user on the network :
+        S <-   :ben-!~b@localhost NICK :dan
+        S <-   :dan!~b@localhost NICK :danny
+        S <-   :danny!~b@localhost NICK :george
+
+    Silently truncated nickname during registration
+    Silently truncated nickname after registration
+
+    */
+    static std::string    nickErrors(const std::string &clt, short type);
 
 };
 
