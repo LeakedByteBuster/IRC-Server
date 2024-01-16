@@ -32,24 +32,24 @@ void execute_commmand(Server *sev,std :: vector<std :: string> &commands,int id)
 
             if(!first_argument.compare("SENDFILE"))
             {
-                send_file(sev,commands,id);
-            }
-            else if(!first_argument.compare("PRIVMSG"))
-            {
-                // send_msg(sev,commands,id);
+                send_file(sev,commands,it->second);
             }
             else if(!first_argument.compare("GETFILE"))
             {
-                get_file(sev,commands,id);
+                get_file(sev,commands,it->second);
             }
             else if (!first_argument.compare("NICK"))
             {
                 it->second.nickname = commands[1].c_str();
                 // std :: cout <<" >>> "<< it->second.nickname << std::endl;
             }
-            else if(!!first_argument.compare("PRVMSG"))
+            else if(!first_argument.compare("PRVMSG"))
             {
                 // prv_msg(sev,commands,id);
+            }
+            else
+            {
+                it->second.sendMsg(it->second,"COMMAND NOT FOUND !!!");
             }
     }
     
@@ -71,30 +71,36 @@ int search_a_client(Server *sev,std :: string NickName)
 
 //send func by nickname 
 // SYNTAXE SENDFILE FILENAME  RECIEVER
-void send_file(Server *sev,std :: vector<std :: string> & commands,int id)
+void send_file(Server *sev,std :: vector<std :: string> & commands,Client cl)
 {
     std :: FILE  *FileName;
     int fd = search_a_client(sev,commands[2]);
-    std::map<int,Client>::iterator it = sev->clients.find(id);
+
     if(commands.size() < 3)
     {
-        it->second.sendMsg(it->second,ERR_NEEDMOREPARAMS);
+        cl.sendMsg(cl,ERR_NEEDMOREPARAMS);
         return;
     }
     FileName = fopen(commands[1].c_str(),"rb"); 
     if(!FileName)
     {
-        it->second.sendMsg(it->second,"No Such file in your /DIR");
+        cl.sendMsg(cl,"No Such file in your /DIR");
         return;
     }
     if(!fd)
     {
-        it->second.sendMsg(it->second,"No Such a client");
+        cl.sendMsg(cl,"No Such a client");
         return;
     }
-    TFile fl(FileName,commands[1].c_str(),it->second.nickname,commands[2].c_str());
+    TFile fl(FileName,commands[1].c_str(),cl.nickname,commands[2].c_str());
     std::map<int,Client>::iterator rec = sev->clients.find(fd);
     rec->second.Files.push_back(fl);
+    if (fseek(FileName, 0, SEEK_SET) != 0) {
+        perror("Error setting file position");
+        fclose(FileName);
+        return;
+    }
+    // fclose(FileName);
     
 }
 
@@ -105,36 +111,35 @@ void send_file(Server *sev,std :: vector<std :: string> & commands,int id)
 
 
 // SYNTAXE : GETFILE FILENAME SENDER 
-void get_file(Server *srv,std :: vector<std :: string> command,int id)
+void get_file(Server *srv,std :: vector<std :: string> command,Client cl)
 {
-    std::map<int,Client>::iterator it = srv->clients.find(id);
     if(command.size() < 3)
     {
-        it->second.sendMsg(it->second,ERR_NEEDMOREPARAMS);
+        cl.sendMsg(cl,ERR_NEEDMOREPARAMS);
         return;
     }
     else if(command[1].empty())
     {
-        it->second.sendMsg(it->second,"FILENAME NOT FOUND\n");
+        cl.sendMsg(cl,"FILENAME NOT FOUND\n");
         return;
     }
     else if(!search_a_client(srv,command[2]))
     {
-        it->second.sendMsg(it->second,"NO SUCH A CLIENT\n");
+        cl.sendMsg(cl,"NO SUCH A CLIENT\n");
         return;
     }
-    else if(it->second.Files.empty())
+    else if(cl.Files.empty())
     {
-        it->second.sendMsg(it->second,"NO SUCH A FILE TO GET IT !!!\n");
+        cl.sendMsg(cl,"NO SUCH A FILE TO GET IT !!!\n");
     }
-    else if(!search_a_file(it->second,command[2].c_str()))
+    else if(!search_a_file(cl,command[2].c_str()))
     {
-        it->second.sendMsg(it->second,"NO SUCH A FILE TO GET IT FROM SENDER!!!\n");
+        cl.sendMsg(cl,"NO SUCH A FILE TO GET IT FROM SENDER!!!\n");
     }
     else
     {
         // client,sender,filename
-        creat_file(it->second,command[2],command[1]);
+        creat_file(cl,command[2],command[1]);
     }
     
 }
@@ -157,7 +162,7 @@ void creat_file(Client clt,std :: string sender,std :: string filename)
 {
     FILE * fd;
     std :: vector<TFile>::iterator it = clt.Files.begin();
-    char line[2048];
+    char line[100];
     std::fstream myfile;
 
     for(; it != clt.Files.end();it++)
@@ -167,16 +172,25 @@ void creat_file(Client clt,std :: string sender,std :: string filename)
             fd = it->getstream();
         }   
     }
-    myfile.open("transferd_" + filename,std::ios::binary | std::ios::out);
-    if(myfile.is_open())
+
+    myfile.open("transferd_" + filename,std::ios::out | std::ios::binary);
+    if(!myfile.is_open() && !myfile.good())
     {
         std :: cout << "C 'ant open file "<<std::endl;
     }
-    while(std::fread(line,1,2048,fd) > 0)
+    while(std::fread(line,sizeof(char),sizeof(line)-1,fd) > 0 && feof(fd))
     {
-        std :: cout << "downlaod file";
-        myfile << line;
+            myfile << line;
     }
+    if (feof(fd)) {
+        printf("\nEnd of file reached.\n");
+    } else if (ferror(fd)) {
+        perror("Error reading from file");
+    }
+
+
+    myfile.close();
+    clt.Files.clear();
     
 }
 

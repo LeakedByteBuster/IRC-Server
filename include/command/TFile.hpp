@@ -10,15 +10,15 @@
 class TFile
 {
     private:
-    std :: string const sender;
-    std :: string const receiver;
-    std :: string const filename;
+    std :: string  sender;
+    std :: string  receiver;
+    std :: string  filename;
     std::FILE *  fd;
 
     public :
 
-    // constructor
-    TFile(std::FILE *Fd,std :: string const Filename,std :: string const Sender,std :: string Receiver) :sender(Sender),receiver(Receiver),filename(Filename),fd(Fd)
+    // ructor
+    TFile(std::FILE *Fd,std :: string  Filename,std :: string  Sender,std :: string Receiver) :sender(Sender),receiver(Receiver),filename(Filename),fd(Fd)
     {
     };
 

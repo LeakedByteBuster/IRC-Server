@@ -49,7 +49,6 @@ void    parseNick(std::map<int, Client> &clients, Client &clt, std::string str)
         <number>     ::= '0' ... '9'
         <special>    ::= '-' | '[' | ']' | '\' | '`' | '^' | '{' | '}'
     */
-    std::cout << "parseNick(): " << str << std::endl;
 
     std::vector<std::string>    tokens = splitBySpace(str);
     if (tokens.size() != 2) {
@@ -91,9 +90,9 @@ void    parseNick(std::map<int, Client> &clients, Client &clt, std::string str)
     Server::sendMsg(clt, LogError::passErrors(clt.nickname, LogError::CORRECT_PASS));
 }
 
-void    parseUser(Client &, std::string str)
+void    parseUser(Client &, std::string)
 {
-    std::cout << "parsePass(): " << str << std::endl;
+    // std::cout << "parsePass(): " << str << std::endl;
 
     // client sent all the information correctly, sending welcome message
 }
