@@ -69,7 +69,6 @@ int search_a_client(Server *sev,std :: string NickName)
     return(0);
 }
 
-//send func by nickname 
 // SYNTAXE SENDFILE FILENAME  RECIEVER
 void send_file(Server *sev,std :: vector<std :: string> & commands,Client cl)
 {
@@ -81,33 +80,25 @@ void send_file(Server *sev,std :: vector<std :: string> & commands,Client cl)
         cl.sendMsg(cl,ERR_NEEDMOREPARAMS);
         return;
     }
+    //open file both binary and text
     FileName = fopen(commands[1].c_str(),"rb"); 
     if(!FileName)
     {
-        cl.sendMsg(cl,"No Such file in your /DIR");
+        cl.sendMsg(cl,"ERROR FILETRANSFER : No Such file in your /DIR");
         return;
     }
+    //if not found reciever 
     if(!fd)
     {
-        cl.sendMsg(cl,"No Such a client");
+        cl.sendMsg(cl,"ERROR FILETRANSFER : No Such a client");
         return;
     }
+    // creat object file and push it in client vector of files
     TFile fl(FileName,commands[1].c_str(),cl.nickname,commands[2].c_str());
     std::map<int,Client>::iterator rec = sev->clients.find(fd);
     rec->second.Files.push_back(fl);
-    if (fseek(FileName, 0, SEEK_SET) != 0) {
-        perror("Error setting file position");
-        fclose(FileName);
-        return;
-    }
-    // fclose(FileName);
-    
 }
 
-// void send_msg(Server *srv,std::vector<std::string> command,int id)
-// {
-    
-// }
 
 
 // SYNTAXE : GETFILE FILENAME SENDER 
@@ -120,25 +111,28 @@ void get_file(Server *srv,std :: vector<std :: string> command,Client cl)
     }
     else if(command[1].empty())
     {
-        cl.sendMsg(cl,"FILENAME NOT FOUND\n");
+        cl.sendMsg(cl,"ERROR FILETRANSFER : FILENAME NOT FOUND\n");
         return;
     }
+    // if c'ant find the sender of file
     else if(!search_a_client(srv,command[2]))
     {
-        cl.sendMsg(cl,"NO SUCH A CLIENT\n");
+        cl.sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A CLIENT\n");
         return;
     }
+    // if there is no files in client vector files
     else if(cl.Files.empty())
     {
-        cl.sendMsg(cl,"NO SUCH A FILE TO GET IT !!!\n");
+        cl.sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A FILE TO GET IT !!!\n");
     }
+    // if there is no file from sender
     else if(!search_a_file(cl,command[2].c_str()))
     {
-        cl.sendMsg(cl,"NO SUCH A FILE TO GET IT FROM SENDER!!!\n");
+        cl.sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A FILE TO GET IT FROM SENDER!!!\n");
     }
     else
     {
-        // client,sender,filename
+        // creat file in reciever /dir 
         creat_file(cl,command[2],command[1]);
     }
     
@@ -160,9 +154,9 @@ int  search_a_file(Client clt,std :: string sender)
 
 void creat_file(Client clt,std :: string sender,std :: string filename)
 {
+    int file_size;
     FILE * fd;
     std :: vector<TFile>::iterator it = clt.Files.begin();
-    char line[100];
     std::fstream myfile;
 
     for(; it != clt.Files.end();it++)
@@ -172,25 +166,31 @@ void creat_file(Client clt,std :: string sender,std :: string filename)
             fd = it->getstream();
         }   
     }
-
+    //determine size of file
+        int prev = ftell(fd);
+        std::fseek(fd,0,SEEK_END);
+        file_size = ftell(fd);
+        std::fseek(fd,prev,SEEK_SET);
+        char *line = new char[file_size];
+    // open the new file in client /dir
     myfile.open("transferd_" + filename,std::ios::out | std::ios::binary);
-    if(!myfile.is_open() && !myfile.good())
+    if(myfile.is_open() == 0)
     {
-        std :: cout << "C 'ant open file "<<std::endl;
+        clt.sendMsg(clt,"C 'ant open file ");
+        myfile.close();
+        clt.Files.erase(it);
     }
-    while(std::fread(line,sizeof(char),sizeof(line)-1,fd) > 0 && feof(fd))
+    // read from sender file 
+    int readbytes = fread(line,1,file_size,fd);
+    if(readbytes == -1)
     {
-            myfile << line;
+        clt.sendMsg(clt,"C'ant read from file");
+        myfile.close();
+        clt.Files.erase(it);
     }
-    if (feof(fd)) {
-        printf("\nEnd of file reached.\n");
-    } else if (ferror(fd)) {
-        perror("Error reading from file");
-    }
-
-
+    myfile.write(line,file_size);
     myfile.close();
-    clt.Files.clear();
+    clt.Files.erase(it);
     
 }
 
