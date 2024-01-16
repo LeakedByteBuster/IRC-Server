@@ -45,7 +45,7 @@ void execute_commmand(Server *sev,std :: vector<std :: string> &commands,int id)
             }
             else if(!first_argument.compare("PRVMSG"))
             {
-                // prv_msg(sev,commands,id);
+                prv_msg(sev,commands,it->second);
             }
             else
             {
@@ -178,7 +178,7 @@ void creat_file(Client clt,std :: string sender,std :: string filename)
     {
         clt.sendMsg(clt,"C 'ant open file ");
         myfile.close();
-        clt.Files.erase(it);
+        clt.Files.clear();
     }
     // read from sender file 
     int readbytes = fread(line,1,file_size,fd);
@@ -186,28 +186,27 @@ void creat_file(Client clt,std :: string sender,std :: string filename)
     {
         clt.sendMsg(clt,"C'ant read from file");
         myfile.close();
-        clt.Files.erase(it);
+        clt.Files.clear();
     }
     myfile.write(line,file_size);
     myfile.close();
-    clt.Files.erase(it);
+    clt.Files.clear();
     
 }
 
-void prv_msg(Server *srv,std::vector<std :: string>command,int id)
+void prv_msg(Server *srv,std::vector<std :: string>command,Client clt)
 {
     int i = 0;
-    std::map<int,Client>::iterator it = srv->clients.find(id);
     if(command.size() < 3)
     {
-        it->second.sendMsg(it->second,ERR_NEEDMOREPARAMS);
+        clt.sendMsg(clt,ERR_NEEDMOREPARAMS);
         return;
     }
     for(;command[i][0] != ':';i++)
     {
         if(!search_a_client(srv,command[i]))
         {
-            it->second.sendMsg(it->second,command[i] + ERR_NOSUCHNICK);
+            clt.sendMsg(clt,command[i] + ERR_NOSUCHNICK);
         }
     }
 }
