@@ -30,7 +30,7 @@ std::string    LogError::passErrors(const std::string &nick, short type)
     case INCORRECT_PASS :
         return (getPassError(nick));
 
-    case CORRECT_PASS :
+    case REGISTERED_SUCCESS :
     /*
     S <-   :irc.example.com 001 <nick> :Welcome to the ExampleNet Internet Relay Chat Network <nick>
     */
@@ -59,7 +59,7 @@ std::string    LogError::passErrors(const std::string &nick, short type)
 std::string    LogError::nickErrors(const std::string &nick, short type)
 {
     std::string error;
-    
+
     switch (type)
     {
     case LogError::INVALID_NICKNAME :

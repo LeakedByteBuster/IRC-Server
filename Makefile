@@ -4,7 +4,7 @@ TESTS_NAME = testIRC
 
 CXX = c++
 
-CXXFLAGS = -Wall -Werror -Wextra #-fsanitize=address
+CXXFLAGS = -Wall -Werror -Wextra
 
 STD = -std=c++98
 
@@ -32,6 +32,8 @@ ifeq ($(build), tests)
 	NAME=testIRC
 else ifeq ($(build), log)
 	CXXFLAGS+=-DLOG
+else ifeq ($(build), sani)
+	CXXFLAGS+=-fsanitize=address
 endif
 
 all : $(NAME)

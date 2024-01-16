@@ -215,7 +215,7 @@ void    Server::userRegistration(int fd, std::vector<std::string> string)
     if ((it.second == false) || (string.size() >= 3)) {
         
         for (size_t i = 0; i < string.size(); i++) {
-            if (!string[i].empty() && string[i].compare("\n") != 0)
+            if (!string[i].empty())
                 gbuff[fd].push_back(string[i]);
             }
 

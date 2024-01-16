@@ -20,13 +20,15 @@ bool    isReadable(const struct pollfd &fd)
                 && ((fd.revents & POLLHUP) != POLLHUP));
 }
 
-bool    isError(int revents, int fd, int listenFd) {
+bool    isError(int revents, int fd, int listenFd)
+{
     return (((revents & POLLHUP) == POLLHUP 
                 || (revents & POLLERR) == POLLERR) && fd != listenFd);
 }
 
 /* splits the buff, '\n' is the delim */
-std::vector<std::string>    splitByLines(std::string buff) {
+std::vector<std::string>    splitByLines(std::string buff)
+{
     std::stringstream   ss(buff);
     std::string         line;
     std::vector<std::string> strings;
@@ -34,9 +36,6 @@ std::vector<std::string>    splitByLines(std::string buff) {
     while (std::getline(ss, line)) {
         if (!line.empty())
             strings.push_back(line);
-        #if defined(LOG)
-            std::cout << "line in isNewLine() : '" << line << "' | " << line.size() << std::endl;
-        #endif // LOG
     }
     return (strings);
 }
