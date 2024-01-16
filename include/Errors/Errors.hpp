@@ -4,6 +4,27 @@
 #include <string>
 #include "Client.hpp"
 
+
+
+
+//password 
+#define ERR_PASSWDMISMATCH ":Password incorrect"
+#define ERR_NEEDMOREPARAMS ":Not enough parameters"
+#define ERR_ALREADYREGISTERED ":You may not reregister"
+
+// nick_name
+
+#define ERR_NONICKNAMEGIVEN ":No nickname given"
+#define ERR_ERRONEUSNICKNAME ":Erroneus nickname"
+// #define ERR_NICKNAMEINUSE ":Nickname is already in use"
+
+
+//PRVMSG
+
+#define ERR_NORECIPIENT ":No recipient given"
+#define ERR_NOTEXTTOSEND ":No text to send"
+#define ERR_NOSUCHNICK " :No such nick/channel"
+
 #define IRC_NAME    ":ircCamel.localhost "
 
 /****************************   PASS    ***********************************/

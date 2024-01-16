@@ -222,7 +222,7 @@ void    Server::userRegistration(int fd, std::vector<std::string> string)
         if (gbuff[fd].size() >= 3) {
             try  {
                 parseRegistrationCommands(clients, gbuff[fd], clients[fd], password);
-                // clients[fd].isRegistred = 1;
+                clients[fd].isRegistred = 1;
                 gbuff.erase(fd);
 
             } catch (std::exception &e) {
@@ -232,6 +232,7 @@ void    Server::userRegistration(int fd, std::vector<std::string> string)
         }
 
     }
+
     return ;
 }
 
@@ -308,14 +309,13 @@ void            Server::handleIncomingConnections()
                                 if ((clients[fds[i].fd].isRegistred == 0)
                                         && strings.size() > 0) {
                                     userRegistration(fds[i].fd, strings);
+                                } else if (clients[fds[i].fd].isRegistred == 1 
+                                    && strings.size() > 0) {
+                                    std :: vector<std :: string> commands;
+                                    HandleIncomingMsg(commands, str.first);
+                                     execute_commmand(this,commands,fds[i].fd);
                                 }
-                                // else if (clients[fds[i].fd].isRegistred == 1 && strings.size() > 0) {
-                                    // std :: vector<std :: string> commands;
-                                    // HandleIncomingMsg(commands, strings);
-                                //      execute_commmand(commands,fds[i].fd);
-                                // }
                             }
-
                     }
                     fdsLeft--;
 

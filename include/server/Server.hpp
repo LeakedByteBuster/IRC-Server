@@ -64,6 +64,8 @@ public :
     static void    sendMsg(const Client &target, std::string msg);
     // void    sendMsg(const Channels &target, const std::string &msg);
 
+    //  list of clients connected to the server || Nickname, Client class
+    std::map<int, Client>       clients;
 private :
 
 	// server's password
@@ -72,8 +74,9 @@ private :
     const in_port_t             listenPort;
 	// listenning fd (not const because it is set after socket is created)
     int                         listenFd;
-    //  list of clients connected to the server || Nickname, Client class
-    std::map<int, Client>       clients;
+
+    // make class command a friend to server class to get client id from class command
+    friend class command;
 };
 
                 //  prints date, time, host, ip and port in STDOUT

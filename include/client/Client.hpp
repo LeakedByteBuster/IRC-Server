@@ -3,6 +3,9 @@
 
 #include <iostream>
 #include <arpa/inet.h>
+#include "TFile.hpp"
+#include <vector>
+
 
 /*
     - Each client is distinguished from other clients by a unique nickname
@@ -50,11 +53,16 @@ public :
     struct sockaddr_in  hints;
     int                 fd;
 
+    std :: vector<TFile> Files;
+
 public :
     Client();
     Client(std::string port, std::string password);
     Client& operator=(Client &rhs);
     virtual ~Client();
+
+    void    sendMsg(const Client &target, std::string msg);
+    // void    sendMsg(const Channels &target, const std::string &msg);
 };
 
 #endif // CLIENT_HPP

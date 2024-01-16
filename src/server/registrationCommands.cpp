@@ -103,7 +103,6 @@ void    parseNick(std::map<int, Client> &clients, Client &clt, std::string str)
 */
 void    parseUser(Client &, std::string str)
 {
-
     std::cout << "parsePass(): " << str << std::endl;
 
     // client sent all the information correctly, sending welcome message
