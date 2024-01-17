@@ -8,7 +8,8 @@ Registration :
     - user is not deleted correctly when is disconnected 
 
 Bot :
-    - Jokes, time
+    - Jokes, time, WELCOME
+    - Class bot and its methods in server side
 
 SEGFAULT :
     ...
