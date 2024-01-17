@@ -7,25 +7,17 @@
 
 
 
-//password 
-#define ERR_PASSWDMISMATCH ":Password incorrect"
+// //password 
+// #define ERR_PASSWDMISMATCH ":Password incorrect"
 #define ERR_NEEDMOREPARAMS ":Not enough parameters"
-#define ERR_ALREADYREGISTERED ":You may not reregister"
+// #define ERR_ALREADYREGISTERED ":You may not reregister"
 
-// nick_name
-
-#define ERR_NONICKNAMEGIVEN ":No nickname given"
-#define ERR_ERRONEUSNICKNAME ":Erroneus nickname"
-// #define ERR_NICKNAMEINUSE ":Nickname is already in use"
-
-
-//PRVMSG
+// //PRVMSG
 
 #define ERR_NORECIPIENT ":No recipient given"
 #define ERR_NOTEXTTOSEND ":No text to send"
 #define ERR_NOSUCHNICK " :No such nick/channel"
 
-#define IRC_NAME    ":ircCamel.localhost "
 
 /****************************   PASS    ***********************************/
 /* PASS_NOT_SUPLLIED, INCORRECT_PASS
@@ -62,22 +54,25 @@
     S <-   :dan!~b@localhost NICK :danny
     S <-   :danny!~b@localhost NICK :george
 */
+
+#define IRC_NAME    ":ircCamel.localhost "
+
 class   LogError {
 public :
-    enum    PASS {
-
-        PASS_NOT_SUPLLIED,
+    enum    ErrorsTypes {
+        
         INCORRECT_PASS,
-
-       INVALID_NICKNAME,
-       ERR_NICKNAMEINUSE,
-       ERR_ALREADYREGISTRED, 
-
-       REGISTERED_SUCCESS
+        ERR_ERRONEUSNICKNAME,
+        ERR_ERRONEUSUSERNAME,
+        ERR_NICKNAMEINUSE,
+        ERR_NONICKNAMEGIVEN,
+        ERR_NEEDMOREPARAM,
+        ERR_ALREADYREGISTRED,
+        REGISTERED_SUCCESS
     };
 
-    static std::string    passErrors(const std::string &clt, short type);
-    static std::string    nickErrors(const std::string &clt, short type);
+    static std::string  getError(const std::string &clt, short type);
+    static std::string  registrationSuccess(const std::string &nick);
 
 };
 

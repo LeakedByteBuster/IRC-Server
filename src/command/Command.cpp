@@ -1,4 +1,5 @@
 #include "Command.hpp"
+#include "registrationCommands.hpp"
 
 
 //split command into vector of string to check it
@@ -18,7 +19,7 @@ std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &co
 
 
 // check command if it's valide and exucte it
-void execute_commmand(Server *sev,std :: vector<std :: string> &commands,int id)
+void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, int id)
 {
     if(!commands.empty())
     {
@@ -40,8 +41,15 @@ void execute_commmand(Server *sev,std :: vector<std :: string> &commands,int id)
             }
             else if (!first_argument.compare("NICK"))
             {
-                it->second.nickname = commands[1].c_str();
-                // std :: cout <<" >>> "<< it->second.nickname << std::endl;
+                try {
+                    std::string buff;
+                    for (unsigned long i = 0; i < commands.size(); i++) {
+                        if (i != 0)
+                            buff = buff.append(" ");
+                        buff = buff.append(commands[i]);
+                    }
+                    parseNick(sev->clients, it->second, buff);
+                } catch (std::exception &e) { }
             }
             else if(!first_argument.compare("PRVMSG"))
             {
@@ -77,20 +85,20 @@ void send_file(Server *sev,std :: vector<std :: string> & commands,Client cl)
 
     if(commands.size() < 3)
     {
-        cl.sendMsg(cl,ERR_NEEDMOREPARAMS);
+        Server::sendMsg(cl, ERR_NEEDMOREPARAMS);
         return;
     }
     //open file both binary and text
     FileName = fopen(commands[1].c_str(),"rb"); 
     if(!FileName)
     {
-        cl.sendMsg(cl,"ERROR FILETRANSFER : No Such file in your /DIR");
+        Server::sendMsg(cl,"ERROR FILETRANSFER : No Such file in your /DIR");
         return;
     }
     //if not found reciever 
     if(!fd)
     {
-        cl.sendMsg(cl,"ERROR FILETRANSFER : No Such a client");
+        Server::sendMsg(cl,"ERROR FILETRANSFER : No Such a client");
         return;
     }
     // creat object file and push it in client vector of files
@@ -106,29 +114,29 @@ void get_file(Server *srv,std :: vector<std :: string> command,Client cl)
 {
     if(command.size() < 3)
     {
-        cl.sendMsg(cl,ERR_NEEDMOREPARAMS);
+        Server::sendMsg(cl,ERR_NEEDMOREPARAMS);
         return;
     }
     else if(command[1].empty())
     {
-        cl.sendMsg(cl,"ERROR FILETRANSFER : FILENAME NOT FOUND\n");
+        Server::sendMsg(cl,"ERROR FILETRANSFER : FILENAME NOT FOUND\n");
         return;
     }
     // if c'ant find the sender of file
     else if(!search_a_client(srv,command[2]))
     {
-        cl.sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A CLIENT\n");
+        Server::sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A CLIENT\n");
         return;
     }
     // if there is no files in client vector files
     else if(cl.Files.empty())
     {
-        cl.sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A FILE TO GET IT !!!\n");
+        Server::sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A FILE TO GET IT !!!\n");
     }
     // if there is no file from sender
     else if(!search_a_file(cl,command[2].c_str()))
     {
-        cl.sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A FILE TO GET IT FROM SENDER!!!\n");
+        Server::sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A FILE TO GET IT FROM SENDER!!!\n");
     }
     else
     {
@@ -177,7 +185,7 @@ void creat_file(Client clt,std :: string sender,std :: string filename)
         }
         catch(std::bad_alloc &e)
         {
-            std :: cerr << e.what() << std :: endl; 
+            std :: cerr << e.what() << std :: endl;
         }
     // open the new file in client /dir
     myfile.open("transferd_" + filename,std::ios::out | std::ios::binary);
@@ -207,14 +215,14 @@ void prv_msg(Server *srv,std::vector<std :: string>command,int id)
     std::map<int,Client>::iterator it = srv->clients.find(id);
     if(command.size() < 3)
     {
-        it->second.sendMsg(it->second,ERR_NEEDMOREPARAMS);
+       Server::sendMsg(it->second,ERR_NEEDMOREPARAMS);
         return;
     }
     for(;command[i][0] != ':';i++)
     {
         if(!search_a_client(srv,command[i]))
         {
-            it->second.sendMsg(it->second,command[i] + ERR_NOSUCHNICK);
+           Server::sendMsg(it->second,command[i] + ERR_NOSUCHNICK);
         }
     }
 }

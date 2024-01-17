@@ -47,6 +47,7 @@ public :
     bool                isOperator;
     /* client info */
     std::string         nickname;
+    std::string         realname;
     std::string         username;
     std::string         hostname;
     // /* Connection infos */

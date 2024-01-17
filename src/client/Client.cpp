@@ -21,13 +21,6 @@ Client::~Client()
 
 }
 
-/*
-//  getClientInfo (Client &clt) {
-    str = (['!' <user> ] ['@' <host> ])
-    return (str)
-}
-*/
-
 void    Client::sendMsg(const Client &target, std::string msg)
 {
     if (msg.size() > 0) { 
