@@ -1,7 +1,7 @@
 #include "Client.hpp"
 #include <sys/socket.h>
 
-Client::Client() : isRegistred(0), isPass(0), isOperator(0), fd(0)
+Client::Client() : isRegistred(0), isOperator(0), fd(0)
 {
     memset(&hints, 0, sizeof(hints));
 }
