@@ -357,7 +357,7 @@ void    Server::sendMsg(const Client &target, std::string msg)
         if ((bytes = send(target.fd, msg.data(), msg.size(), 0)) == -1) {
             std::cerr << "Error sendMsg(): " << strerror(errno) << std::endl;
         }
-        if (static_cast<unsigned long>(bytes) != msg.size()) {
+        else if (static_cast<unsigned long>(bytes) != msg.size()) {
             std::cerr << "Warning sendMsg: data loss : input = " << msg.size() 
                 << " sent = " << bytes << std::endl;
         }
