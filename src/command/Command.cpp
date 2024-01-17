@@ -1,4 +1,5 @@
 #include "Command.hpp"
+#include "Errors.hpp"
 #include "registrationCommands.hpp"
 
 
@@ -21,46 +22,59 @@ std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &co
 // check command if it's valide and exucte it
 void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, int id)
 {
-    if(!commands.empty())
-    {
+    int res = 0;
+
+    if(!commands.empty()) {
+
         std :: string first_argument = commands[0];
         std::map<int,Client>::iterator it = sev->clients.find(id);
-        //int regi = it->second.isRegistred;
-        if(it == sev->clients.end())
-        {
-            std :: cout << "No such a client\n";
+        
+        if(it == sev->clients.end()) {
+            std :: cout << "No such client" << std::endl;
         }
+        
+        res =     (first_argument.compare("SENDFILE") == 0) * 1 \
+                + (first_argument.compare("GETFILE") == 0)  * 2 \
+                + (first_argument.compare("NICK") == 0)     * 3 \
+                + (first_argument.compare("PASS") == 0)     * 4 \
+                + (first_argument.compare("USER") == 0)     * 4 \
+                + (first_argument.compare("PRVMSG") == 0)   * 5 ;
 
-            if(!first_argument.compare("SENDFILE"))
-            {
-                send_file(sev,commands,it->second);
-            }
-            else if(!first_argument.compare("GETFILE"))
-            {
-                get_file(sev,commands,it->second);
-            }
-            else if (!first_argument.compare("NICK"))
-            {
-                try {
-                    std::string buff;
-                    for (unsigned long i = 0; i < commands.size(); i++) {
-                        if (i != 0)
-                            buff = buff.append(" ");
-                        buff = buff.append(commands[i]);
-                    }
-                    parseNick(sev->clients, it->second, buff);
-                } catch (std::exception &e) { }
-            }
-            else if(!first_argument.compare("PRVMSG"))
-            {
-                // prv_msg(sev,commands,id);
-            }
-            else
-            {
-                it->second.sendMsg(it->second,"COMMAND NOT FOUND !!!");
-            }
-    }
-    
+        switch (res)
+        {
+        case 1:
+            send_file(sev,commands,it->second);
+            break;
+        
+        case 2:
+            get_file(sev,commands,it->second);
+            break;
+        
+        case 3:
+            try {
+                std::string buff;
+                for (unsigned long i = 0; i < commands.size(); i++) {
+                    if (i != 0)
+                        buff = buff.append(" ");
+                    buff = buff.append(commands[i]);
+                }
+                parseNick(sev->clients, it->second, buff);
+            } catch (std::exception &e) { }
+            break;
+        
+        case 4:
+            Server::sendMsg(it->second, LogError::getError(it->second.nickname, LogError::ERR_ALREADYREGISTRED));
+            break;
+        
+        case 5:
+            // prv_msg(sev,commands,id);
+            break;
+        
+        default:
+            Server::sendMsg(it->second,": COMMAND NOT FOUND !!!");
+            break;
+        }
+    }   
 }
 
 //search for a client by his nickname 
