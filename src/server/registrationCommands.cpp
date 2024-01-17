@@ -31,10 +31,6 @@ void    parsePass(Client &clt, std::string str, const std::string &pass)
         Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NEEDMOREPARAM));
         throw std::invalid_argument("");
     }
-    // if (clt.isPass && tokens[0].compare("PASS") == 0) {
-    //     Server::sendMsg(clt, LogError::passErrors(clt.nickname, LogError::ERR_ALREADYREGISTRED));
-    //     throw std::invalid_argument("");
-    // }
     if (tokens[0].compare("PASS") != 0) {
         Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NEEDMOREPARAM));
         throw std::invalid_argument("");
@@ -115,11 +111,6 @@ void    parseUser(Client &clt, std::string str)
         std::cout << "parseUser(): " << str << std::endl;
     #endif  // DEBUG
 
-    if (clt.isRegistred) {
-        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_ALREADYREGISTRED));
-        throw std::invalid_argument("");
-    }
-
     std::vector<std::string> tokens = splitBySpace(str);
     
     // checks if parameter number is > 5
@@ -160,7 +151,6 @@ void    parseUser(Client &clt, std::string str)
         throw std::invalid_argument("");
     }
     rname = rname.substr(i, rname.size());
-    std::cout << "rname ==>" << rname << std::endl;
     //  set username and realname for the client
     if (tokens[1].size() > 9)
         str = tokens[1].substr(0, 9);
