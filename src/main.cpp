@@ -7,7 +7,6 @@ static int  parseInput(const char *s, std::string pass)
     long res = strtol(s, &endptr, 10);
     if ((endptr && *endptr != '\0') || (res > USHRT_MAX)
         || (res < 0)) {
-        std::cout << s << " |  " << endptr << std::endl;
         throw std::invalid_argument("Error : invalid port number");
     }
 

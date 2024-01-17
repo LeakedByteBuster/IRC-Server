@@ -19,7 +19,6 @@ Server::Server(std::string portNum, std::string password) :
     hints.ai_family = AF_INET;
     hints.ai_flags = AI_PASSIVE | AI_CANONNAME;
     hints.ai_socktype = SOCK_STREAM;
-    // hints.ai_protocol = IPPROTO_TCP;
     int error = 0;
 
     if ((error = getaddrinfo(NULL, portNum.data(), (const struct addrinfo *)&hints, &res0)) != 0) {
