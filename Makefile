@@ -2,6 +2,8 @@ NAME = ircserv
 
 TESTS_NAME = testIRC
 
+BOT_NAME = botIRC
+
 CXX = c++
 
 CXXFLAGS = -Wall -Werror -Wextra
@@ -29,9 +31,12 @@ NC ='\033[0m'
 #	$> make re build=tests
 ifeq ($(build), tests)
 	SRC=$(shell find tests -type f -name "*.cpp")
-	NAME=testIRC
+	NAME=$(TESTS_NAME)
 else ifeq ($(build), log)
 	CXXFLAGS+=-DLOG
+else ifeq ($(build), bot)
+	SRC=$(shell find IRCbot -type f -name "*.cpp")
+	NAME=$(BOT_NAME)
 else ifeq ($(build), sani)
 	CXXFLAGS+=-fsanitize=address
 endif
@@ -55,6 +60,9 @@ fclean : clean
 
 fcleanTest : 
 	@ $(RM) $(TESTS_NAME)
+
+fcleanbot :
+	@ $(RM) $(BOT_NAME)
 
 re : fclean all
 
