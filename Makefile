@@ -2,6 +2,8 @@ NAME = ircserv
 
 TESTS_NAME = testIRC
 
+BONUS = bot
+
 CXX = c++
 
 CXXFLAGS = -Wall -Werror -Wextra  -g -fsanitize=address
@@ -44,6 +46,8 @@ $(OBJ_DIR)/%.o : %.cpp
 #	@ printf $(HYEL)"[+]"$(HWHT)" COMPILING"$(HYEL)" ⤐  "$(HWHT)"%s\n"$(NC) $(notdir $<)
 	$(CXX) $(STD) $(CXXFLAGS) $(INCLUDE) -MMD -o $@ -c $<
 	@ printf $(NC)
+
+
 
 clean :
 	@ $(RM) $(OBJ_DIR)
