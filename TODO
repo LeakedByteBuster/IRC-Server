@@ -4,16 +4,26 @@ Registration :
     - send new nick to all users in channels in which user is in
     - error "you may not reregister" PASS, USER "ERR_ALREADYREGISTRED"
     - parse with and without ":"
-    - check number of spaces in user
-    - user is not deleted correctly when is disconnected
-    - count number of spaces in NICK and PASS
+    - check number of spaces in user, NICK, and PASS
+    - user is not deleted correctly when is disconnected 
 
 Bot :
     - Jokes, time
 
 SEGFAULT :
-    - line = new char[file_size];
+    ...
+    line = new char[file_size];
+    ...
 
 LimeChat :
     - Error sendMsg(): Socket operation on non-socket
-        Warning sendMsg: data loss : input = 85 sent = -1
+        (happens sometimes after send nick command)
+
+
+
+PASS 3
+NICK marouane
+USER fouadi 0 * Mushi
+
+
+
