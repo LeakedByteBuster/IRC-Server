@@ -1,0 +1,30 @@
+define "debug" in Makefile
+
+Registration :
+    - send new nick to all users in channels in which user is in
+    - error "you may not reregister" PASS, USER "ERR_ALREADYREGISTRED"
+    - parse with and without ":"
+    - check number of spaces in user, NICK, and PASS
+    - user is not deleted correctly when is disconnected 
+
+Bot :
+    - Jokes, time, WELCOME
+    - Class bot and its methods in server side
+
+SEGFAULT :
+    ...
+    line = new char[file_size];
+    ...
+
+LimeChat :
+    - Error sendMsg(): Socket operation on non-socket
+        (happens sometimes after send nick command)
+
+
+
+PASS 3
+NICK marouane
+USER fouadi 0 * Mushi
+
+
+

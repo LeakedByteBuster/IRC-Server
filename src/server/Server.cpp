@@ -19,7 +19,6 @@ Server::Server(std::string portNum, std::string password) :
     hints.ai_family = AF_INET;
     hints.ai_flags = AI_PASSIVE | AI_CANONNAME;
     hints.ai_socktype = SOCK_STREAM;
-    // hints.ai_protocol = IPPROTO_TCP;
     int error = 0;
 
     if ((error = getaddrinfo(NULL, portNum.data(), (const struct addrinfo *)&hints, &res0)) != 0) {
@@ -71,7 +70,7 @@ Server::Server(std::string portNum, std::string password) :
 
     freeaddrinfo(res0);
     if (check)
-        throw std::runtime_error("global Error");
+        throw std::runtime_error("Error getaddrinfo");
 
 }
 
@@ -181,6 +180,7 @@ bool    Server::addNewClient(std::vector<struct pollfd> &fds, nfds_t *nfds, int 
     clients.insert(std::pair<int, Client>(clt.fd, clt));
     // Decrement number of fds returned by poll()
     fdsLeft--;
+
     return (EXIT_SUCCESS);
 }
 
@@ -215,23 +215,26 @@ void    Server::userRegistration(int fd, std::vector<std::string> string)
     if ((it.second == false) || (string.size() >= 3)) {
         
         for (size_t i = 0; i < string.size(); i++) {
-            if (!string[i].empty() && string[i].compare("\n") != 0)
+            if (!string[i].empty())
                 gbuff[fd].push_back(string[i]);
             }
 
         if (gbuff[fd].size() >= 3) {
             try  {
                 parseRegistrationCommands(clients, gbuff[fd], clients[fd], password);
-                // clients[fd].isRegistred = 1;
+                clients[fd].isRegistred = 1;
                 gbuff.erase(fd);
 
             } catch (std::exception &e) {
                 // std::cout << e.what() << std::endl;
+                clients[fd].nickname.clear();
+                clients[fd].realname.clear();
                 gbuff.erase(fd);
             }
         }
 
     }
+
     return ;
 }
 
@@ -303,19 +306,18 @@ void            Server::handleIncomingConnections()
                             buff = ptr;
                             std::pair<std::string, bool>    str;
                             str = ReadIncomingMsg(buff, map, fds, i);
-                            // if (str.second == 1) {
-                            //     std::vector<std::string> strings = splitByLines(str.first);
-                            //     if ((clients[fds[i].fd].isRegistred == 0)
-                            //             && strings.size() > 0) {
-                            //         userRegistration(fds[i].fd, strings);
-                            //     }
-                            //     else if (clients[fds[i].fd].isRegistred == 1 && strings.size() > 0) {
+                            if (str.second == 1) { // '\n' is in the message
+                                std::vector<std::string> strings = splitByLines(str.first);
+                                if ((clients[fds[i].fd].isRegistred == 0)
+                                        && strings.size() > 0) {
+                                    userRegistration(fds[i].fd, strings);
+                                } else if (clients[fds[i].fd].isRegistred == 1 
+                                    && strings.size() > 0) {
                                     std :: vector<std :: string> commands;
                                     HandleIncomingMsg(commands, str.first);
-                                     execute_commmand(this,commands,fds[i].fd);
-                                // }
-                            // }
-
+                                    execute_commmand(this, commands, fds[i].fd);
+                                }
+                            }
                     }
                     fdsLeft--;
 
@@ -326,7 +328,6 @@ void            Server::handleIncomingConnections()
                     #endif // LOG
 
                     gbuff.erase(fds[i].fd);
-
                     //  Close client file descriptor
                     close(fds[i].fd);
                     // remove client from list clients that may have a buff not complete
@@ -334,7 +335,7 @@ void            Server::handleIncomingConnections()
                     // delete client from vector given to poll()
                     fds.erase(fds.begin() + i);
                     // delete client from list of clients in server
-                    clients.erase(clients[i].fd);
+                    clients.erase(fds[i].fd);
                     // decrement number of file descriptors in pollfd
                     nfds--;
                     // decrement number of file descriptors handeled
@@ -353,14 +354,14 @@ void    Server::sendMsg(const Client &target, std::string msg)
 
         ssize_t bytes;
         if ((bytes = send(target.fd, msg.data(), msg.size(), 0)) == -1) {
-            std::cerr << "Error : " << strerror(errno) << std::endl;
+            std::cerr << "Error sendMsg(): " << strerror(errno) << std::endl;
         }
-        if ((unsigned long)bytes != msg.size()) {
-            std::cerr << "Warning : data loss : buff = " << msg.size() 
+        else if (static_cast<unsigned long>(bytes) != msg.size()) {
+            std::cerr << "Warning sendMsg: data loss : input = " << msg.size() 
                 << " sent = " << bytes << std::endl;
         }
     } else {
-        std::cerr << "Error sendMsg() : error message is empty";
+        std::cerr << "Error sendMsg() : sending an empty message" << std::endl;
     }
 }
 

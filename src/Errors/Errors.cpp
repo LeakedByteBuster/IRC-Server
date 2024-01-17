@@ -1,4 +1,5 @@
 #include "Errors.hpp"
+#include "Server.hpp"
 
 static  std::string getPassError (const std::string &nick) 
 {
@@ -8,80 +9,75 @@ static  std::string getPassError (const std::string &nick)
     str.append(nick + static_cast<std::string>(" "));
     str.append (
         ":Password Incorrect\n"
-        "ERROR :Closing Link: localhost (Bad Password)"
     );
     return (str);
 }
 
-std::string    LogError::passErrors(const std::string &nick, short type)
+std::string LogError::registrationSuccess(const std::string &nick)
 {
-    std::string str;
+    /* REGISTERED_SUCCESS
 
-    switch (type)
-    {
-        /*
-            S <-   :irc.example.com 464 <NICK> :Password Incorrect
-            S <-   ERROR :Closing Link: localhost (Bad Password)
-            <connection gets terminated by the server>
-        */
-    case PASS_NOT_SUPLLIED :
-        return (getPassError(nick));
-    
-    case INCORRECT_PASS :
-        return (getPassError(nick));
-
-    case CORRECT_PASS :
-    /*
     S <-   :irc.example.com 001 <nick> :Welcome to the ExampleNet Internet Relay Chat Network <nick>
     */
-        str = IRC_NAME + static_cast<std::string>("001 ");
-        str.append(nick + static_cast<std::string>(" "));
-        str.append(
-            ":Welcome to the Camel Internet Relay Chat Network " + nick
-        );
-        break;
+    std::string str;
 
-    case ERR_ALREADYREGISTRED :
-        str = IRC_NAME + static_cast<std::string>("462 ");
-        str.append(nick + static_cast<std::string>(" "));
-        str.append(
-            ":You may not reregister " + nick
-        );
-        break ;
-
-    default:
-        std::cerr << "Warning : Unknown type " << type << std::endl;
-    }
+    str = IRC_NAME + static_cast<std::string>("001 ");
+    str.append(nick + static_cast<std::string>(" "));
+    str.append(
+        ":Welcome to the Camel Internet Relay Chat Network " + nick
+    );
 
     return (str);
 }
 
-std::string    LogError::nickErrors(const std::string &nick, short type)
+std::string    LogError::getError(const std::string &nick, short type)
 {
     std::string error;
-    
+
     switch (type)
     {
-    case LogError::INVALID_NICKNAME :
-        /*  S <-   :irc.example.com 432 george 345gman! :Erroneous Nickname */
+    case LogError::INCORRECT_PASS :
+        return (getPassError(nick));
+
+    case LogError::ERR_NONICKNAMEGIVEN:
+        error = IRC_NAME + static_cast<std::string>("431 * ");
+        error.append(nick + static_cast<std::string>(" "));
+        error.append(":No nickname given");
+        break ;
+
+    case LogError::ERR_ERRONEUSNICKNAME :
         error = IRC_NAME + static_cast<std::string>("432 ");
         error.append(nick + static_cast<std::string>(" "));
-        error.append(
-            ":Erroneous Nickname"
-        );
+        error.append(":Erroneous nickname");
         break;
-    
+
+    case LogError::ERR_ERRONEUSUSERNAME :
+        error = IRC_NAME + static_cast<std::string>("432 ");
+        error.append(nick + static_cast<std::string>(" "));
+        error.append(":Erroneous username");
+        break;
+
     case LogError::ERR_NICKNAMEINUSE :
-    /* S <-   :irc.example.com 433 * ben :Nickname is already in use */
         error = IRC_NAME + static_cast<std::string>("433 * ");
         error.append(nick + static_cast<std::string>(" "));
-        error.append(
-            ":Nickname is already in use"
-        );
+        error.append(":Nickname is already in use");
+        break ;
+
+    case LogError::ERR_NEEDMOREPARAM :
+        error = IRC_NAME + static_cast<std::string>("461 * ");
+        error.append(nick + static_cast<std::string>(" "));
+        error.append(":Not enough parameters");
+        break ;
+
+    case LogError::ERR_ALREADYREGISTRED :
+        error = IRC_NAME + static_cast<std::string>("462 ");
+        error.append(nick + static_cast<std::string>(" "));
+        error.append(":You may not reregister " + nick);
         break ;
 
     default:
-        break;
+        std::cerr << "Warning passErrors: Unknown type : " << type << std::endl;
     }
-    return error;
+
+    return (error);
 }

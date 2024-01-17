@@ -1,4 +1,6 @@
 #include "Command.hpp"
+#include "Errors.hpp"
+#include "registrationCommands.hpp"
 
 
 //split command into vector of string to check it
@@ -18,41 +20,61 @@ std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &co
 
 
 // check command if it's valide and exucte it
-void execute_commmand(Server *sev,std :: vector<std :: string> &commands,int id)
+void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, int id)
 {
-    if(!commands.empty())
-    {
+    int res = 0;
+
+    if(!commands.empty()) {
+
         std :: string first_argument = commands[0];
         std::map<int,Client>::iterator it = sev->clients.find(id);
-        //int regi = it->second.isRegistred;
-        if(it == sev->clients.end())
-        {
-            std :: cout << "No such a client\n";
+        
+        if(it == sev->clients.end()) {
+            std :: cout << "No such client" << std::endl;
         }
+        
+        res =     (first_argument.compare("SENDFILE") == 0) * 1 \
+                + (first_argument.compare("GETFILE") == 0)  * 2 \
+                + (first_argument.compare("NICK") == 0)     * 3 \
+                + (first_argument.compare("PASS") == 0)     * 4 \
+                + (first_argument.compare("USER") == 0)     * 4 \
+                + (first_argument.compare("PRVMSG") == 0)   * 5 ;
 
-            if(!first_argument.compare("SENDFILE"))
-            {
-                send_file(sev,commands,it->second);
-            }
-            else if(!first_argument.compare("GETFILE"))
-            {
-                get_file(sev,commands,it->second);
-            }
-            else if (!first_argument.compare("NICK"))
-            {
-                it->second.nickname = commands[1].c_str();
-                // std :: cout <<" >>> "<< it->second.nickname << std::endl;
-            }
-            else if(!first_argument.compare("PRVMSG"))
-            {
-                // prv_msg(sev,commands,it->second);
-            }
-            else
-            {
-                it->second.sendMsg(it->second,"COMMAND NOT FOUND !!!");
-            }
-    }
-    
+        switch (res)
+        {
+        case 1:
+            send_file(sev,commands,it->second);
+            break;
+        
+        case 2:
+            get_file(sev,commands,it->second);
+            break;
+        
+        case 3:
+            try {
+                std::string buff;
+                for (unsigned long i = 0; i < commands.size(); i++) {
+                    if (i != 0)
+                        buff = buff.append(" ");
+                    buff = buff.append(commands[i]);
+                }
+                parseNick(sev->clients, it->second, buff);
+            } catch (std::exception &e) { }
+            break;
+        
+        case 4:
+            Server::sendMsg(it->second, LogError::getError(it->second.nickname, LogError::ERR_ALREADYREGISTRED));
+            break;
+        
+        case 5:
+            // prv_msg(sev,commands,id);
+            break;
+        
+        default:
+            Server::sendMsg(it->second,": COMMAND NOT FOUND !!!");
+            break;
+        }
+    }   
 }
 
 //search for a client by his nickname 
@@ -77,20 +99,20 @@ void send_file(Server *sev,std :: vector<std :: string> & commands,Client cl)
 
     if(commands.size() < 3)
     {
-        cl.sendMsg(cl,ERR_NEEDMOREPARAMS);
+        Server::sendMsg(cl, ERR_NEEDMOREPARAMS);
         return;
     }
     //open file both binary and text
     FileName = fopen(commands[1].c_str(),"rb"); 
     if(!FileName)
     {
-        cl.sendMsg(cl,"ERROR FILETRANSFER : No Such file in your /DIR");
+        Server::sendMsg(cl,"ERROR FILETRANSFER : No Such file in your /DIR");
         return;
     }
     //if not found reciever 
     if(!fd)
     {
-        cl.sendMsg(cl,"ERROR FILETRANSFER : No Such a client");
+        Server::sendMsg(cl,"ERROR FILETRANSFER : No Such a client");
         return;
     }
     // creat object file and push it in client vector of files
@@ -107,29 +129,29 @@ void get_file(Server *srv,std :: vector<std :: string> command,Client cl)
 {
     if(command.size() < 3)
     {
-        cl.sendMsg(cl,ERR_NEEDMOREPARAMS);
+        Server::sendMsg(cl,ERR_NEEDMOREPARAMS);
         return;
     }
     else if(command[1].empty())
     {
-        cl.sendMsg(cl,"ERROR FILETRANSFER : FILENAME NOT FOUND\n");
+        Server::sendMsg(cl,"ERROR FILETRANSFER : FILENAME NOT FOUND\n");
         return;
     }
     // if c'ant find the sender of file
     else if(!search_a_client(srv,command[2]))
     {
-        cl.sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A CLIENT\n");
+        Server::sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A CLIENT\n");
         return;
     }
     // if there is no files in client vector files
     else if(cl.Files.empty())
     {
-        cl.sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A FILE TO GET IT !!!\n");
+        Server::sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A FILE TO GET IT !!!\n");
     }
     // if there is no file from sender
     else if(!search_a_file(cl,command[2].c_str()))
     {
-        cl.sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A FILE TO GET IT FROM SENDER!!!\n");
+        Server::sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A FILE TO GET IT FROM SENDER!!!\n");
     }
     else
     {
@@ -156,6 +178,7 @@ int  search_a_file(Client clt,std :: string sender)
 void creat_file(Client clt,std :: string sender,std :: string filename)
 {
     int file_size;
+    char *line = NULL;
     FILE * fd;
     std :: vector<TFile>::iterator it = clt.Files.begin();
     std::fstream myfile;
@@ -172,13 +195,20 @@ void creat_file(Client clt,std :: string sender,std :: string filename)
         std::fseek(fd,0,SEEK_END);
         file_size = ftell(fd);
         std::fseek(fd,prev,SEEK_SET);
-        char *line = new char[file_size];
+        try{
+            line = new char[file_size];
+        }
+        catch(std::bad_alloc &e)
+        {
+            std :: cerr << e.what() << std :: endl;
+        }
     // open the new file in client /dir
     myfile.open("transferd_" + filename,std::ios::out | std::ios::binary);
     if(myfile.is_open() == 0)
     {
         clt.sendMsg(clt,"C 'ant open file ");
         myfile.close();
+        clt.Files.clear();
         clt.Files.clear();
     }
     // read from sender file 

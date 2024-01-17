@@ -93,6 +93,9 @@ bool            isReadable(const struct pollfd &fd);
 bool            isError(int revents, int fd, int listenFd);
                 //  checks if (revents == POLLIN) && (fd == server fd)
 bool            isNewConnection(const struct pollfd &fd, int srvfd);
+                //  type=0 : <client> || type=1 : nick!~user@hostname
+std::string     getId(Client &clt, int type);
+
 
 std::vector<std::string>     splitByLines(std::string buff);
 

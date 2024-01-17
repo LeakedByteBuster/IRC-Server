@@ -42,11 +42,11 @@ class   Client : public Operator {
 public :
     /* doe */
     bool                isRegistred;
-    bool                isPass;
     /* operator priviligies */
     bool                isOperator;
     /* client info */
     std::string         nickname;
+    std::string         realname;
     std::string         username;
     std::string         hostname;
     // /* Connection infos */
