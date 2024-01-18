@@ -26,6 +26,7 @@
 /* static headers */
 #include "Client.hpp"
 #include "Command.hpp"
+#include "channel.hpp"
 
 #define SOCK_DOMAIN AF_INET
 #define BACKLOG SOMAXCONN

@@ -39,7 +39,6 @@ void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, in
                 + (first_argument.compare("PASS") == 0)     * 4 \
                 + (first_argument.compare("USER") == 0)     * 4 \
                 + (first_argument.compare("PRVMSG") == 0)   * 5 ;
-
         switch (res)
         {
         case 1:
@@ -67,7 +66,7 @@ void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, in
             break;
         
         case 5:
-            // prv_msg(sev,commands,id);
+            prv_msg(sev,commands,it->second);
             break;
         
         default:
@@ -227,22 +226,14 @@ void creat_file(Client clt,std :: string sender,std :: string filename)
     
 }
 
-// void prv_msg(Server *srv,std::vector<std :: string>command,Client clt)
-// {
-//     int i = 0;
-//     if(command.size() < 3)
-//     {
-//         clt.sendMsg(clt,ERR_NEEDMOREPARAMS);
-//         return;
-//     }
-//     for(;command[i][0] != ':';i++)
-//     {
-//         if(!search_a_client(srv,command[i]))
-//         {
-//             clt.sendMsg(clt,command[i] + ERR_NOSUCHNICK);
-//         }
-//     }
-// }
+void prv_msg(Server *,std::vector<std :: string>command,Client )
+{
+    // if(command.size() < 3)
+    // {
+    //    Server::sendMsg(clt,LogError::getError(clt.nickname,LogError::ERR_NEEDMOREPARAM));
+    // }
+    std :: cout <<"last parm :"<<command[command.size()] << std :: endl;
+}
 
 
 const char * getDownMsg()
