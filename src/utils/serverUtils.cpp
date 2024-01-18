@@ -129,3 +129,26 @@ int  parseInput(const char *port, std::string pass)
     }
     return (0);
 }
+
+void    deleteClient(std::map<int, std::string> &map, std::vector<struct pollfd> &fds, 
+            std::map<int, Client> &clients, std::map<int, std::vector<std::string> > &gbuff,
+            nfds_t &nfds, unsigned long i, int &fdsLeft)
+{
+    #if defined(LOG)
+        std::cout << geTime() << " | client disconnected " << std::endl;
+    #endif // LOG
+
+    gbuff.erase(fds[i].fd);
+    //  Close client file descriptor
+    close(fds[i].fd);
+    // remove client from list clients that may have a buff not complete
+    map.erase(fds[i].fd);
+    // delete client from vector given to poll()
+    fds.erase(fds.begin() + i);
+    // delete client from list of clients in server
+    clients.erase(fds[i].fd);
+    // decrement number of file descriptors in pollfd
+    nfds--;
+    // decrement number of file descriptors handeled
+    fdsLeft--;
+}
