@@ -184,27 +184,6 @@ bool    Server::addNewClient(std::vector<struct pollfd> &fds, nfds_t *nfds, int 
     return (EXIT_SUCCESS);
 }
 
-//  Parse PASS, NICK, USER commands
-bool    parseRegistrationCommands(std::map<int, Client> &clients, 
-            std::vector<std::string> &str, Client &client, const std::string &pass)
-{   
-    for (unsigned long i = 0; i < str.size(); i++) {
-        switch (i + 1)
-        {
-        case 1:
-            parsePass(client, str[i], pass);
-            break;
-        case 2:
-            parseNick(clients, client, str[i]);
-            break;
-        case 3:
-            parseUser(client, str[i]);
-            break;
-        }
-    }
-    return (0);
-}
-
 // used for capturing all 3 lines or more at once (for registration)
 std::map<int, std::vector<std::string> >    gbuff;
 void    Server::userRegistration(int fd, std::vector<std::string> string)

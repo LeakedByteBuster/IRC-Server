@@ -197,7 +197,7 @@ void creat_file(Client clt,std :: string sender,std :: string filename)
         try{
             line = new char[file_size];
         }
-        catch(std::bad_alloc &e)
+        catch(std::exception &e)
         {
             std :: cerr << e.what() << std :: endl;
         }

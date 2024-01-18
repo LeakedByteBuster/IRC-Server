@@ -4,17 +4,6 @@
 #include "Errors.hpp"
 #include "Server.hpp"
 
-static std::vector<std::string> splitBySpace(std::string str) {
-    std::stringstream           ss(str);
-    std::vector<std::string>    tokens;
-    std::string                 token;
-
-    while (ss >> token) {
-        tokens.push_back(token);
-    }
-    return (tokens);
-}
-
 void    parsePass(Client &clt, std::string str, const std::string &pass)
 {    
     #if defined(DEBUG)
