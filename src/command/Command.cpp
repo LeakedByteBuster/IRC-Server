@@ -99,20 +99,20 @@ void send_file(Server *sev,std :: vector<std :: string> & commands,Client cl)
 
     if(commands.size() < 3)
     {
-        Server::sendMsg(cl, ERR_NEEDMOREPARAMS);
+        Server::sendMsg(cl, LogError::getError(cl.nickname,LogError::ERR_NEEDMOREPARAM));
         return;
     }
     //open file both binary and text
     FileName = fopen(commands[1].c_str(),"rb"); 
     if(!FileName)
     {
-        Server::sendMsg(cl,"ERROR FILETRANSFER : No Such file in your /DIR");
+        Server::sendMsg(cl,LogError::getError(cl.nickname,LogError::ERR_NOSUCHFILE));
         return;
     }
     //if not found reciever 
     if(!fd)
     {
-        Server::sendMsg(cl,"ERROR FILETRANSFER : No Such a client");
+        Server::sendMsg(cl,LogError::getError(cl.nickname,LogError::ERR_NOSUCHNICK));
         return;
     }
     // creat object file and push it in client vector of files
@@ -127,31 +127,33 @@ void send_file(Server *sev,std :: vector<std :: string> & commands,Client cl)
 // SYNTAXE : GETFILE FILENAME SENDER 
 void get_file(Server *srv,std :: vector<std :: string> command,Client cl)
 {
-    if(command.size() < 3)
+    if(command.size() != 3)
     {
-        Server::sendMsg(cl,ERR_NEEDMOREPARAMS);
+        Server::sendMsg(cl,LogError::getError(cl.nickname,LogError::ERR_NEEDMOREPARAM));
         return;
     }
     else if(command[1].empty())
     {
-        Server::sendMsg(cl,"ERROR FILETRANSFER : FILENAME NOT FOUND\n");
+        Server::sendMsg(cl,LogError::getError(cl.nickname,LogError::ERR_NOSUCHFILENAME));
         return;
     }
     // if c'ant find the sender of file
     else if(!search_a_client(srv,command[2]))
     {
-        Server::sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A CLIENT\n");
+        Server::sendMsg(cl,LogError::getError(cl.nickname,LogError::ERR_NOSUCHNICK));
         return;
     }
     // if there is no files in client vector files
     else if(cl.Files.empty())
     {
-        Server::sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A FILE TO GET IT !!!\n");
+        Server::sendMsg(cl,LogError::getError(cl.nickname,LogError::ERR_NOSUCHFILENAME));
+        return;
     }
     // if there is no file from sender
     else if(!search_a_file(cl,command[2].c_str()))
     {
-        Server::sendMsg(cl,"ERROR FILETRANSFER : NO SUCH A FILE TO GET IT FROM SENDER!!!\n");
+        Server::sendMsg(cl,LogError::getError(cl.nickname,LogError::ERR_NOFILEFROMSENDER));
+        return;
     }
     else
     {
@@ -225,22 +227,22 @@ void creat_file(Client clt,std :: string sender,std :: string filename)
     
 }
 
-void prv_msg(Server *srv,std::vector<std :: string>command,Client clt)
-{
-    int i = 0;
-    if(command.size() < 3)
-    {
-        clt.sendMsg(clt,ERR_NEEDMOREPARAMS);
-        return;
-    }
-    for(;command[i][0] != ':';i++)
-    {
-        if(!search_a_client(srv,command[i]))
-        {
-            clt.sendMsg(clt,command[i] + ERR_NOSUCHNICK);
-        }
-    }
-}
+// void prv_msg(Server *srv,std::vector<std :: string>command,Client clt)
+// {
+//     int i = 0;
+//     if(command.size() < 3)
+//     {
+//         clt.sendMsg(clt,ERR_NEEDMOREPARAMS);
+//         return;
+//     }
+//     for(;command[i][0] != ':';i++)
+//     {
+//         if(!search_a_client(srv,command[i]))
+//         {
+//             clt.sendMsg(clt,command[i] + ERR_NOSUCHNICK);
+//         }
+//     }
+// }
 
 
 const char * getDownMsg()

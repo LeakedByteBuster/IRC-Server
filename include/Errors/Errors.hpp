@@ -16,7 +16,6 @@
 
 #define ERR_NORECIPIENT ":No recipient given"
 #define ERR_NOTEXTTOSEND ":No text to send"
-#define ERR_NOSUCHNICK " :No such nick/channel"
 
 
 /****************************   PASS    ***********************************/
@@ -68,7 +67,11 @@ public :
         ERR_NONICKNAMEGIVEN,
         ERR_NEEDMOREPARAM,
         ERR_ALREADYREGISTRED,
-        REGISTERED_SUCCESS
+        REGISTERED_SUCCESS,
+        ERR_NOSUCHFILE,
+        ERR_NOSUCHNICK,
+        ERR_NOSUCHFILENAME,
+        ERR_NOFILEFROMSENDER
     };
 
     static std::string  getError(const std::string &clt, short type);

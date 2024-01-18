@@ -74,7 +74,31 @@ std::string    LogError::getError(const std::string &nick, short type)
         error.append(nick + static_cast<std::string>(" "));
         error.append(":You may not reregister " + nick);
         break ;
+    
+     case LogError::ERR_NOSUCHFILE :
+        error = IRC_NAME + static_cast<std::string>("1336");
+        error.append(nick + static_cast<std::string>(" "));
+        error.append(":No such a file in /DIR");
+        break ;
 
+    case LogError::ERR_NOSUCHNICK :
+        error = IRC_NAME + static_cast<std::string>("133");
+        error.append(nick + static_cast<std::string>(" "));
+        error.append(":No such nick/channel");
+        break ;
+
+    case LogError::ERR_NOSUCHFILENAME :
+        error = IRC_NAME + static_cast<std::string>("1336");
+        error.append(nick + static_cast<std::string>(" "));
+        error.append(": /file name not found");
+        break ;
+    
+    case LogError::ERR_NOFILEFROMSENDER :
+        error = IRC_NAME + static_cast<std::string>("1335");
+        error.append(nick + static_cast<std::string>(" "));
+        error.append(": No file from sender");
+        break ;
+    
     default:
         std::cerr << "Warning passErrors: Unknown type : " << type << std::endl;
     }
