@@ -248,20 +248,18 @@ std::pair<std::string, bool>    Server::ReadIncomingMsg(std::string buff, std::m
 //  Accepts incoming connections
 void            Server::handleIncomingConnections()
 {
-    #define BYTES_TO_READ   4096
-
     std::map<int, std::string>  map; // used as a buff when "\n" is not found
     std::vector<struct pollfd>  fds; // holds all connection accepted
     std::string                 buff; // for recv()
     ssize_t                     bytes; // for recv()
     nfds_t                      nfds = 0; // size of fds vector
+    int                         fdsLeft = 0;
 
     buff.resize(BYTES_TO_READ);
 
     //  add the server socket fd to the pollfd vector
     Server::addNewPollfd(listenFd, fds, nfds);
 
-    int fdsLeft = 0;
     while (1) {
         if ((fdsLeft = isPollReady(fds, nfds))) {
 
@@ -293,6 +291,7 @@ void            Server::handleIncomingConnections()
                                 } else if (clients[fds[i].fd].isRegistred == 1 
                                     && strings.size() > 0) {
                                     std :: vector<std :: string> commands;
+
                                     HandleIncomingMsg(commands, str.first);
                                     execute_commmand(this, commands, fds[i].fd);
                                 }
@@ -301,38 +300,23 @@ void            Server::handleIncomingConnections()
                     fdsLeft--;
 
                 } else if (isError(fds[i].revents, fds[i].fd, listenFd)) {
-
-                    #if defined(LOG)
-                        std::cout << geTime() << " | client disconnected " << std::endl;
-                    #endif // LOG
-
-                    gbuff.erase(fds[i].fd);
-                    //  Close client file descriptor
-                    close(fds[i].fd);
-                    // remove client from list clients that may have a buff not complete
-                    map.erase(fds[i].fd);
-                    // delete client from vector given to poll()
-                    fds.erase(fds.begin() + i);
-                    // delete client from list of clients in server
-                    clients.erase(fds[i].fd);
-                    // decrement number of file descriptors in pollfd
-                    nfds--;
-                    // decrement number of file descriptors handeled
-                    fdsLeft--;
+                    deleteClient(map, fds, clients, gbuff, nfds, i, fdsLeft);
                 }
             }
         }
     }
-    #undef BYTES_TO_READ // BYTES_TO_READ
 }
 
 void    Server::sendMsg(const Client &target, std::string msg)
 {
     if (msg.size() > 0) { 
-        msg.append("\r\n");
-
+        
+        char    buff[BYTES_TO_READ];
         ssize_t bytes;
-        if ((bytes = send(target.fd, msg.data(), msg.size(), 0)) == -1) {
+
+        msg.append("\r\n");
+        std::strcpy(buff, msg.data());
+        if ((bytes = send(target.fd, (const void *)buff, msg.size(), 0)) == -1) {
             std::cerr << "Error sendMsg(): " << strerror(errno) << std::endl;
         }
         else if (static_cast<unsigned long>(bytes) != msg.size()) {
