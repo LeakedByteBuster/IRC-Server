@@ -67,8 +67,18 @@ public :
 				const std::vector<struct pollfd>  &fds, unsigned long &i,std::vector<std :: string> & commands);
 	
 	//execute commands 
-	void execute_commmand(std :: vector<std :: string> &commands,int id);
-	 void parse_kick_command (std::vector<std::string> & commands,int id);
+	void	execute_command(std :: vector<std :: string> &commands,int id);
+
+	void	join (){};
+	void    kick(){};
+    /* invite a client to a channel */
+    void    invite(){};
+    /* Change or view the channel topic */
+    void    topic(){};
+    /* Change the channel’s mode */
+    void    mode(/* int mode */){};
+
+	//  void parse_kick_command (std::vector<std::string> & commands,int id);
 private :
 
 	// server's password

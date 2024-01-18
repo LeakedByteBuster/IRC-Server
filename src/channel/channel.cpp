@@ -13,10 +13,10 @@ channel::channel(int id,std::string name,std::string key ,bool isoperator)
     this->inviteMode = 0;
     this->limitMode = 0;
     this->topicMode = 0;
-    this->limit = 2 ;
+    this->limit = 20 ;
     this->operatorMode = isoperator;
    
-    // std::cout << " << id << "\n";
+    std::cout << " channel " << name  << "  created by client : " << id << "\n";
 
 }
 //getters and setters
@@ -168,28 +168,9 @@ std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(
     }
     else 
     {
-        // sendError(id ,ERR_NEEDMOREPARAMS);
+        sendError(id ,ERR_NEEDMOREPARAMS,"");
         return std::map<std::vector<std::string>,std::vector<std::string> >();
     }
-    // Client::sendmsg(ERR_NEEDMOREPARAMS);
-    //print map
-    //    std::map<std::vector<std::string>, std::vector<std::string> >::iterator it;
-    // for (it = channels_keys.begin(); it != channels_keys.end(); ++it) {
-    //     const std::vector<std::string>& key = it->first;
-    //     const std::vector<std::string>& value = it->second;
-
-    //     std::cout << "Key: ";
-    //     for (std::vector<std::string>::const_iterator keyIt = key.begin(); keyIt != key.end(); ++keyIt) {
-    //         std::cout << *keyIt << " ";
-    //     }
-
-    //     std::cout << "| Value: ";
-    //     for (std::vector<std::string>::const_iterator valueIt = value.begin(); valueIt != value.end(); ++valueIt) {
-    //         std::cout << *valueIt << " ";
-    //     }
-
-    //     std::cout << std::endl;
-    // }
 
 }
 
