@@ -1,5 +1,5 @@
 #include "Command.hpp"
-#include "Errors.hpp"
+#include "Server.hpp"
 #include "registrationCommands.hpp"
 
 
@@ -28,7 +28,7 @@ void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, in
 
         std :: string first_argument = commands[0];
         std::map<int,Client>::iterator it = sev->clients.find(id);
-        
+
         if(it == sev->clients.end()) {
             std :: cout << "No such client" << std::endl;
         }
@@ -71,7 +71,7 @@ void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, in
             break;
         
         default:
-            Server::sendMsg(it->second,": COMMAND NOT FOUND !!!");
+            Server::sendMsg(it->second, LogError::getError(it->second.nickname, LogError::ERR_UNKNOWNCOMMAND));
             break;
         }
     }   

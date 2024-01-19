@@ -19,4 +19,3 @@ void get_file(Server *srv,std :: vector<std :: string> command,Client cl);
 int search_a_file(Client clt,std :: string sender);
 void creat_file(Client clt,std :: string sender,std :: string filename);
 void prv_msg(Server srv,std::vector<std :: string>command,int id);
-#include "Server.hpp"
