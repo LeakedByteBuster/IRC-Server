@@ -47,11 +47,11 @@ bool is_duplicated(std::vector<std::string>& channel_names)
 int  parse_channel_name_token (std::string token)
 {
     std::vector<std::string> channel_names;
-
+   
     if (token[0] == '#' && isalnum (token[1]))
     {
     
-        for (size_t i = 1 ;i < token.length();i++)
+        for (size_t i = 1 ;i < token.length()-1;i++)
         {
             if (!isalnum (token[i]))
              return 0;
@@ -66,7 +66,7 @@ int check_is_valid_key(std::string & line)
 {
     // if (line.length () < 4)
     //     return (0);
-    for (size_t i =1 ; i < line.length () ;i++)
+    for (size_t i =1 ; i < line.length ()-1 ;i++)
     {
         if (!isalnum (line [i]) || (line[i] == ',' &&!isalnum(line[i+1])))
             return (0);
@@ -87,6 +87,7 @@ std::vector<std::string> parse_channel_key (std::string &key)
         if (!check_is_valid_key (line))
         {
             valid_keys.clear();
+            
             break;
         }
         else
@@ -102,21 +103,21 @@ std::vector<std::string> parse_channel(const std::string& str)
     std::string token;
     int count_ch= 0;
     if (str.back() == ',')
-           return std::vector<std::string>();
+        return std::vector<std::string>();
     while (std::getline (ss,token,','))
     {
-            if (!parse_channel_name_token(token))
-            {
-                channel_names.clear();
-                break;
-            }
+        if (!parse_channel_name_token(token))
+        {
+            channel_names.clear();
+            break;
+        }
         else
         {
             channel_names .push_back(token);
             count_ch++;
         }
     }
-    if (is_duplicated (channel_names))
+    if (is_duplicated(channel_names))
     {
         channel_names.clear();
         return std::vector<std::string>();
@@ -131,6 +132,7 @@ std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(
     std::vector<std::string>validChannels;
     if (commands.size()==1)
     {
+        
         
         sendError(id ,ERR_NEEDMOREPARAMS,commands[0]);
         return std::map<std::vector<std::string>,std::vector<std::string> >();
@@ -147,14 +149,15 @@ std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(
         else 
         {
             // sendError(id ,ERR_BADCHANMASK);
-            std::cout << ERR_BADCHANMASK << std::endl;
+             Server::sendMsg(id , LogError::getError(LogError::ERR_BADCHANMASK));
              return std::map<std::vector<std::string>,std::vector<std::string> >();
         }
     }
     else if (commands.size() == 3)
     {
-        validChannels =  parse_channel (commands[1]);
+        validChannels =  parse_channel(commands[1]);
         std::vector<std::string> valid_keys =parse_channel_key (commands[2]);
+
         if (!valid_keys.empty() &&  validChannels.size() >= valid_keys.size())
         {
             channels_keys.insert(std::make_pair(validChannels, valid_keys));
@@ -163,7 +166,7 @@ std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(
         }
         else
         {
-            sendError(id ,ERR_BADCHANNELKEY,"1");
+            Server::sendMsg(id , LogError::getError(LogError::ERR_BADCHANMASK));
             return std::map<std::vector<std::string>,std::vector<std::string> >();
         }
     }

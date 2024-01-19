@@ -306,7 +306,6 @@ void            Server::handleIncomingConnections()
 
                 } else if (isError(fds[i].revents, fds[i].fd, listenFd)) {
 
-                    puts("2");
                     #if defined(LOG)
                         std::cout << geTime() << " | client disconnected " << std::endl;
                     #endif // LOG
@@ -336,6 +335,7 @@ void    Server::sendMsg(const Client &target, std::string msg)
     if (msg.size() > 0) { 
         msg.append("\r\n");
 
+    std::cout << "target.fd" << target.fd << std::endl;
         ssize_t bytes;
         if ((bytes = send(target.fd, msg.data(), msg.size(), 0)) == -1) {
             std::cerr << "Error sendMsg(): " << strerror(errno) << std::endl;

@@ -45,6 +45,8 @@ public :
     /* operator priviligies */
     bool                isOperator;
     /* client info */
+    //to fill 
+    std::vector <std::string> inChannel;
     std::string         nickname;
     std::string         realname;
     std::string         username;

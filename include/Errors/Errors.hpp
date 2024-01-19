@@ -18,6 +18,19 @@
 #define ERR_NOTEXTTOSEND ":No text to send"
 #define ERR_NOSUCHNICK " :No such nick/channel"
 
+// //errors...
+// #define ERR_NOSUCHCHANNEL 	":No such channel"
+// #define ERR_TOOMANYCHANNELS ":You have joined too many channels"
+// #define ERR_BADCHANNELKEY 	":Cannot join channel (+k)"
+// #define ERR_BANNEDFROMCHAN 	":Cannot join channel (+b)"
+// #define ERR_CHANNELISFULL   ":Cannot join channel (+l)"
+// #define ERR_INVITEONLYCHAN 	":Cannot join channel (+i)"
+// #define ERR_BADCHANMASK 	":Bad Channel Mask"
+// #define RPL_TOPIC 			"TOPIC"
+// #define RPL_TOPICWHOTIME 	"TOPICTIME "
+// #define RPL_NAMREPLY		": NAMERPLY"
+// #define RPL_ENDOFNAMES	    ":End of /NAMES list "
+
 
 /****************************   PASS    ***********************************/
 /* PASS_NOT_SUPLLIED, INCORRECT_PASS
@@ -68,7 +81,18 @@ public :
         ERR_NONICKNAMEGIVEN,
         ERR_NEEDMOREPARAM,
         ERR_ALREADYREGISTRED,
-        REGISTERED_SUCCESS
+        ERR_NOSUCHCHANNEL,
+        ERR_TOOMANYCHANNELS,
+        ERR_BADCHANNELKEY,	
+        ERR_BANNEDFROMCHAN,
+        ERR_CHANNELISFULL,
+        ERR_INVITEONLYCHAN,
+        ERR_BADCHANMASK ,	
+        RPL_TOPIC,
+        RPL_TOPICWHOTIME,		
+        RPL_NAMREPLY,		
+        RPL_ENDOFNAMES,
+        REGISTERED_SUCCESS,
     };
 
     static std::string  getError(const std::string &clt, short type);

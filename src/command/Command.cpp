@@ -2,6 +2,7 @@
 #include <set>
 #include <fstream>
 #include "registrationCommands.hpp"
+#include <algorithm>
 // #include "client.hpp"
 // std::vector<int> channel::get_id_clients_in_channel;
 
@@ -102,7 +103,7 @@ int check_limit (std::string name,std::map<std::string,channel> &channelsInServe
     return (1);
 }
 
-void parse_command(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, int id)
+void Server::parse_command(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, int id)
 {
     std::map<std::vector<std::string>,std::vector<std::string> > channel_keys;
     if (!commands.empty())
@@ -131,12 +132,13 @@ void parse_command(std::vector<std::string> & commands, std::map<std::string,cha
                                    }
                                     // std::cout << "client :"  << id <<"joined channel succesfly \n";
                                 }
-                            else 
-                                sendError(id,ERR_BADCHANNELKEY,"111112");
+                            else {
+                                Client  tmp = clients[id];
+                                Server::sendMsg(tmp, ERR_BADCHANNELKEY);
+                            }
                         }
                         else //new channel
                         {
-                            // std::cout <<"not found \n";
                             std::string lol = keyIt != it->second.end() ? *keyIt : ""; 
                             channel a(id,*nameIt,*keyIt ,1);
                             channelsInServer[*nameIt] = a;
@@ -148,44 +150,11 @@ void parse_command(std::vector<std::string> & commands, std::map<std::string,cha
                 }
             else
             {
-                sendError(id,ERR_BADCHANNELKEY,"");
+                Client  tmp = clients[id];
+                Server::sendMsg(tmp, ERR_BADCHANNELKEY);
             }
-            // else 
-            //     channel a(id,,)
-
-            // }
         }
     }
-    // else if (firstCommand == "KICK")
-    // {
-    //     if (commands.size () == 1 )
-    //     {
-    //         sendError(id ,ERR_NEEDMOREPARAMS,commands[0]);
-    //         return; 
-    //     }
-    //     else if (commands.size () == 2)
-    //     {
-    //         if (check_channel_name_token (commands[1]))
-    //             check_users(commands[2]);
-
-    //     }
-    //     else if (commands.size () == 3)
-    //     {
-    //         if (check_channel_name_token (commands[1]) && check_is_valid)
-    //         {
-    //             check_users(commands[2]);
-    //             add_comment (command[3]);
-    //         }
-
-    //     }
-
-    // }
-    // else if (firstCommand == "MODE")
-    //     check_channel_name (commands);
-    // else if (firstCommand == "INVITE")
-    //     check_channel_name (commands);
-    else 
-        sendError(id,"command not found \n","");
 }
 }
 
@@ -243,7 +212,7 @@ void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, in
             break;
         
         case 6:
-            parse_command(commands,sev->channelsInServer,id);
+            sev->parse_command(commands,sev->channelsInServer,id);
             break;
         
         default:

@@ -74,7 +74,13 @@ public :
     // void    sendMsg(const Channels &target, const std::string &msg);
 
     //  list of clients connected to the server || Nickname, Client class
+void parse_command(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, int id);
     std::map<int, Client>       clients;
+
+    // get client 
+    Client & get_Client();
+    
+
 
 private :
 
@@ -93,7 +99,6 @@ private :
 
 bool    parseRegistrationCommands(std::map<int, Client> &clients, 
             std::vector<std::string> &str, Client &client, const std::string &pass);
-void parse_command(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, int id);
 //                 //  prints date, time, host, ip and port in STDOUT
 // void            serverWelcomeMessage(const struct sockaddr_in &srvSock, int sfd);
 //                 //  prints on client side

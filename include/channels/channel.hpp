@@ -1,34 +1,20 @@
 #pragma once 
 
-#include <iostream> 
 #include <iostream>
 #include <vector>
 #include <map>
 #include <sstream>
-// join errors 
-#include "vector"
 #include<set>
-#include"../client/Client.hpp"
+#include"Client.hpp"
 #include"Errors.hpp"
-// #define ERR_NEEDMOREPARAMS "461  : Not enough parameters\n"
-#define ERR_NOSUCHCHANNEL "403 :No such channel\n"
-#define ERR_TOOMANYCHANNELS ":You have joined too many channels\n"
-#define ERR_BADCHANNELKEY "475 :Cannot join channel (+k)\n"
-// #define ERR_BANNEDFROMCHAN ":Cannot join channel (+b)\n"
-#define ERR_CHANNELISFULL "471:Cannot join channel (+l)\n"
-#define ERR_INVITEONLYCHAN ":Cannot join channel (+i)\n"
-#define ERR_BADCHANMASK "476:Bad Channel Mask\n"
-#define RPL_TOPIC "332:TOPIC\n"
-#define RPL_TOPICWHOTIME " 333 : TOPICTIME \n"
-#define RPL_NAMREPLY ": NAMERPLY\n"
-#define RPL_ENDOFNAMES ":End of /NAMES list \n"
 
-// class server;
+// #define ERR_NEEDMOREPARAMS "461  : Not enough parameters\n"
+
 class Client;
 class channel
 {
 private:
-	std::vector <int> id_clients_in_channel;
+	std::vector <int,Client> id_clients_in_channel;
 	std::string name;
 	std::string key;
 	std::string topic;
@@ -55,7 +41,6 @@ public:
 	void setKey (std::string key) ;
 	void setName (std::string name) ;
 	void setTopic (std::string topic) ;
-	
 };
 	std::vector<std::string>  check_key(std::string &line) ;
 	std::vector<std::string> parse_channel_key (std::string &key);

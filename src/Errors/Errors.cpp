@@ -32,7 +32,7 @@ std::string LogError::registrationSuccess(const std::string &nick)
 
     return (str);
 }
-
+// Server::sendMsg(clt, getError(nick, ERR_...))
 std::string    LogError::getError(const std::string &nick, short type)
 {
     std::string error;
@@ -78,6 +78,11 @@ std::string    LogError::getError(const std::string &nick, short type)
         error.append(":You may not reregister " + nick);
         break ;
 
+    case LogError::ERR_BADCHANMASK :
+        error = IRC_NAME + static_cast<std::string>("475 ");
+        error.append(nick + static_cast<std::string>(" "));
+        error.append(":Cannot join channel (+k) - bad key" + nick);
+        break ;
     default:
         std::cerr << "Warning passErrors: Unknown type : " << type << std::endl;
     }
