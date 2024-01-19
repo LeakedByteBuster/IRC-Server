@@ -54,6 +54,7 @@ public:
 	void setKey (std::string key) ;
 	void setName (std::string name) ;
 	void setTopic (std::string topic) ;
+	std::string getName();
 	
 };
 	std::vector<std::string>  check_key(std::string &line) ;

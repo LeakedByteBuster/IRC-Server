@@ -67,6 +67,9 @@ public :
 
     //  list of clients connected to the server || Nickname, Client class
     std::map<int, Client>       clients;
+
+    //  list of channels in the server
+    std::map<int, channel>       channles;
 private :
 
 	// server's password

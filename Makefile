@@ -6,7 +6,7 @@ BOT_NAME = botIRC
 
 CXX = c++
 
-CXXFLAGS = -Wall -Werror -Wextra
+CXXFLAGS = -Wall -Werror -Wextra -g -fsanitize=address
 
 STD = -std=c++98
 

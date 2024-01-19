@@ -306,20 +306,19 @@ void            Server::handleIncomingConnections()
                             buff = ptr;
                             std::pair<std::string, bool>    str;
                             str = ReadIncomingMsg(buff, map, fds, i);
-                            if (str.second == 1) { // '\n' is in the message
-                                std::vector<std::string> strings = splitByLines(str.first);
-                                if ((clients[fds[i].fd].isRegistred == 0)
-                                        && strings.size() > 0) {
-                                    userRegistration(fds[i].fd, strings);
-                                } else if (clients[fds[i].fd].isRegistred == 1 
-                                    && strings.size() > 0) {
-                                    std :: cout << strings[0] << std::endl;
-                                    // std :: vector<std :: string> commands;
-                                    // HandleIncomingMsg(commands, str.first);
-                                    // execute_commmand(this, commands, fds[i].fd);
+                            // if (str.second == 1) { // '\n' is in the message
+                            //     std::vector<std::string> strings = splitByLines(str.first);
+                            //     if ((clients[fds[i].fd].isRegistred == 0)
+                            //             && strings.size() > 0) {
+                            //         userRegistration(fds[i].fd, strings);
+                            //     } else if (clients[fds[i].fd].isRegistred == 1 
+                            //         && strings.size() > 0) {
+                                    std :: vector<std :: string> commands;
+                                    HandleIncomingMsg(commands, str.first);
+                                    execute_commmand(this, commands, fds[i].fd);
                                 }
-                            }
-                    }
+                    //         }
+                    // }
                     fdsLeft--;
 
                 } else if (isError(fds[i].revents, fds[i].fd, listenFd)) {

@@ -2,264 +2,348 @@
 #include "Errors.hpp"
 #include "registrationCommands.hpp"
 
-
-//split command into vector of string to check it
-std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &commands,std :: string msg)
+// split command into vector of string to check it
+std ::vector<std ::string> HandleIncomingMsg(std ::vector<std ::string> &commands, std ::string msg)
 {
-    std::stringstream   ss(msg);
-    std :: string        token;
-    std::string        tmp;
-    
-    std :: getline(ss,token,'\n');
-    std::stringstream   parser(token);
-        while (getline(parser,tmp,' ')) {
-            commands.push_back(tmp);
-        }
-    return(commands);
+    std::stringstream ss(msg);
+    std ::string token;
+    std::string tmp;
+
+    std ::getline(ss, token, '\n');
+    std::stringstream parser(token);
+    while (getline(parser, tmp, ' '))
+    {
+        commands.push_back(tmp);
+    }
+    return (commands);
 }
 
-
 // check command if it's valide and exucte it
-void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, int id)
+void execute_commmand(Server *sev, std ::vector<std ::string> &commands, int id)
 {
     int res = 0;
 
-    if(!commands.empty()) {
+    if (!commands.empty())
+    {
 
-        std :: string first_argument = commands[0];
-        std::map<int,Client>::iterator it = sev->clients.find(id);
-        
-        if(it == sev->clients.end()) {
-            std :: cout << "No such client" << std::endl;
+        std ::string first_argument = commands[0];
+        std::map<int, Client>::iterator it = sev->clients.find(id);
+
+        if (it == sev->clients.end())
+        {
+            std ::cout << "No such client" << std::endl;
         }
-        
-        res =     (first_argument.compare("SENDFILE") == 0) * 1 \
-                + (first_argument.compare("GETFILE") == 0)  * 2 \
-                + (first_argument.compare("NICK") == 0)     * 3 \
-                + (first_argument.compare("PASS") == 0)     * 4 \
-                + (first_argument.compare("USER") == 0)     * 4 \
-                + (first_argument.compare("PRVMSG") == 0)   * 5 ;
+
+        res = (first_argument.compare("SENDFILE") == 0) * 1 
+            + (first_argument.compare("GETFILE") == 0) * 2 
+            + (first_argument.compare("NICK") == 0) * 3 
+            + (first_argument.compare("PASS") == 0) * 4 
+            + (first_argument.compare("USER") == 0) * 4 
+            + (first_argument.compare("PRVMSG") == 0) * 5;
         switch (res)
         {
         case 1:
-            send_file(sev,commands,it->second);
+            send_file(sev, commands, it->second);
             break;
-        
+
         case 2:
-            get_file(sev,commands,it->second);
+            get_file(sev, commands, it->second);
             break;
-        
+
         case 3:
-            try {
+            try
+            {
                 std::string buff;
-                for (unsigned long i = 0; i < commands.size(); i++) {
+                for (unsigned long i = 0; i < commands.size(); i++)
+                {
                     if (i != 0)
                         buff = buff.append(" ");
                     buff = buff.append(commands[i]);
                 }
                 parseNick(sev->clients, it->second, buff);
-            } catch (std::exception &e) { }
+            }
+            catch (std::exception &e)
+            {
+            }
             break;
-        
+
         case 4:
             Server::sendMsg(it->second, LogError::getError(it->second.nickname, LogError::ERR_ALREADYREGISTRED));
             break;
-        
-        case 5:
-            prv_msg(sev,commands,it->second);
-            break;
-        
-        default:
-            Server::sendMsg(it->second,": COMMAND NOT FOUND !!!");
-            break;
-        }
-    }   
-}
 
-//search for a client by his nickname 
-int search_a_client(Server *sev,std :: string NickName)
-{
-    std::map<int,Client>::iterator it = sev->clients.begin();
-    for(; it != sev->clients.end();it++)
-    {
-        if(it->second.nickname.compare(NickName) == 0)
-        {
-            return(it->second.fd);
+        case 5:
+            prv_msg(sev, commands, it->second);
+            break;
+
+        default:
+            Server::sendMsg(it->second, ": COMMAND NOT FOUND !!!");
+            break;
         }
     }
-    return(0);
+}
+
+// search for a client by his nickname
+int search_a_client(Server *sev, std ::string NickName)
+{
+    std::map<int, Client>::iterator it = sev->clients.begin();
+    for (; it != sev->clients.end(); it++)
+    {
+        if (it->second.nickname.compare(NickName) == 0)
+        {
+            return (it->second.fd);
+        }
+    }
+    return (0);
 }
 
 // SYNTAXE SENDFILE FILENAME  RECIEVER
-void send_file(Server *sev,std :: vector<std :: string> & commands,Client cl)
+void send_file(Server *sev, std ::vector<std ::string> &commands, Client cl)
 {
-    std :: FILE  *FileName;
-    int fd = search_a_client(sev,commands[2]);
+    std ::FILE *FileName;
+    int fd = search_a_client(sev, commands[2]);
 
-    if(commands.size() < 3)
+    if (commands.size() < 3)
     {
-        Server::sendMsg(cl, LogError::getError(cl.nickname,LogError::ERR_NEEDMOREPARAM));
+        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NEEDMOREPARAM));
         return;
     }
-    //open file both binary and text
-    FileName = fopen(commands[1].c_str(),"rb"); 
-    if(!FileName)
+    // open file both binary and text
+    FileName = fopen(commands[1].c_str(), "rb");
+    if (!FileName)
     {
-        Server::sendMsg(cl,LogError::getError(cl.nickname,LogError::ERR_NOSUCHFILE));
+        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILE));
         return;
     }
-    //if not found reciever 
-    if(!fd)
+    // if not found reciever
+    if (!fd)
     {
-        Server::sendMsg(cl,LogError::getError(cl.nickname,LogError::ERR_NOSUCHNICK));
+        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHNICK));
         return;
     }
     // creat object file and push it in client vector of files
-    TFile fl(FileName,commands[1].c_str(),cl.nickname,commands[2].c_str());
-    std::map<int,Client>::iterator rec = sev->clients.find(fd);
+    TFile fl(FileName, commands[1].c_str(), cl.nickname, commands[2].c_str());
+    std::map<int, Client>::iterator rec = sev->clients.find(fd);
     rec->second.Files.push_back(fl);
-    cl.sendMsg(cl,getDownMsg());
+    cl.sendMsg(cl, getDownMsg());
 }
 
-
-
-// SYNTAXE : GETFILE FILENAME SENDER 
-void get_file(Server *srv,std :: vector<std :: string> command,Client cl)
+// SYNTAXE : GETFILE FILENAME SENDER
+void get_file(Server *srv, std ::vector<std ::string> command, Client cl)
 {
-    if(command.size() != 3)
+    if (command.size() != 3)
     {
-        Server::sendMsg(cl,LogError::getError(cl.nickname,LogError::ERR_NEEDMOREPARAM));
+        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NEEDMOREPARAM));
         return;
     }
-    else if(command[1].empty())
+    else if (command[1].empty())
     {
-        Server::sendMsg(cl,LogError::getError(cl.nickname,LogError::ERR_NOSUCHFILENAME));
+        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILENAME));
         return;
     }
     // if c'ant find the sender of file
-    else if(!search_a_client(srv,command[2]))
+    else if (!search_a_client(srv, command[2]))
     {
-        Server::sendMsg(cl,LogError::getError(cl.nickname,LogError::ERR_NOSUCHNICK));
+        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHNICK));
         return;
     }
     // if there is no files in client vector files
-    else if(cl.Files.empty())
+    else if (cl.Files.empty())
     {
-        Server::sendMsg(cl,LogError::getError(cl.nickname,LogError::ERR_NOSUCHFILENAME));
+        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILENAME));
         return;
     }
     // if there is no file from sender
-    else if(!search_a_file(cl,command[2].c_str()))
+    else if (!search_a_file(cl, command[2].c_str()))
     {
-        Server::sendMsg(cl,LogError::getError(cl.nickname,LogError::ERR_NOFILEFROMSENDER));
+        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOFILEFROMSENDER));
         return;
     }
     else
     {
-        // creat file in reciever /dir 
-        creat_file(cl,command[2],command[1]);
+        // creat file in reciever /dir
+        creat_file(cl, command[2], command[1]);
     }
-    
 }
 
-int  search_a_file(Client clt,std :: string sender)
+int search_a_file(Client clt, std ::string sender)
 {
-    std :: vector<TFile>::iterator it = clt.Files.begin();
+    std ::vector<TFile>::iterator it = clt.Files.begin();
 
-    for(; it != clt.Files.end();it++)
+    for (; it != clt.Files.end(); it++)
     {
-        if(it->getSender().compare(sender) == 0)
+        if (it->getSender().compare(sender) == 0)
         {
-            return(1);
+            return (1);
         }
+    }
+    return (0);
+}
+
+void creat_file(Client clt, std ::string sender, std ::string filename)
+{
+    int file_size;
+    char *line = NULL;
+    FILE *fd;
+    std ::vector<TFile>::iterator it = clt.Files.begin();
+    std::fstream myfile;
+
+    for (; it != clt.Files.end(); it++)
+    {
+        if (it->getSender().compare(sender) == 0)
+        {
+            fd = it->getstream();
+        }
+    }
+    // determine size of file
+    int prev = ftell(fd);
+    std::fseek(fd, 0, SEEK_END);
+    file_size = ftell(fd);
+    std::fseek(fd, prev, SEEK_SET);
+    try
+    {
+        line = new char[file_size];
+    }
+    catch (std::bad_alloc &e)
+    {
+        std ::cerr << e.what() << std ::endl;
+    }
+    // open the new file in client /dir
+    myfile.open("transferd_" + filename, std::ios::out | std::ios::binary);
+    if (myfile.is_open() == 0)
+    {
+        clt.sendMsg(clt, "C 'ant open file ");
+        myfile.close();
+        clt.Files.clear();
+        clt.Files.clear();
+    }
+    // read from sender file
+    int readbytes = fread(line, 1, file_size, fd);
+    if (readbytes == -1)
+    {
+        clt.sendMsg(clt, "C'ant read from file");
+        myfile.close();
+        clt.Files.clear();
+    }
+    myfile.write(line, file_size);
+    myfile.close();
+    clt.Files.clear();
+}
+
+int search_msg(std::vector<std::string> command)
+{
+    int i = 0;
+    std::vector<std::string>::iterator it = command.begin();
+    for(; it != command.end();it++)
+    {
+        // std::cout << *it << std::endl;
+        if(it->find(":") != std::string::npos)
+        {
+            return(i);
+        }
+        i++;
     }
     return(0);
 }
 
-void creat_file(Client clt,std :: string sender,std :: string filename)
+void prv_msg(Server *srv, std::vector<std ::string> command, Client clt)
 {
-    int file_size;
-    char *line = NULL;
-    FILE * fd;
-    std :: vector<TFile>::iterator it = clt.Files.begin();
-    std::fstream myfile;
-
-    for(; it != clt.Files.end();it++)
+    size_t position = search_msg(command);
+    std :: cout <<"position :"<<position<< std ::endl;
+    if (command.size() < 3)
     {
-        if(it->getSender().compare(sender) == 0)
-        {
-            fd = it->getstream();
-        }   
+        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NEEDMOREPARAM));
+        return;
     }
-    //determine size of file
-        int prev = ftell(fd);
-        std::fseek(fd,0,SEEK_END);
-        file_size = ftell(fd);
-        std::fseek(fd,prev,SEEK_SET);
-        try{
-            line = new char[file_size];
-        }
-        catch(std::bad_alloc &e)
-        {
-            std :: cerr << e.what() << std :: endl;
-        }
-    // open the new file in client /dir
-    myfile.open("transferd_" + filename,std::ios::out | std::ios::binary);
-    if(myfile.is_open() == 0)
+    else if (position == 0)
     {
-        clt.sendMsg(clt,"C 'ant open file ");
-        myfile.close();
-        clt.Files.clear();
-        clt.Files.clear();
+        std :: cout << position << std :: endl;
+        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOTEXTTOSEND));
+        return;
     }
-    // read from sender file 
-    int readbytes = fread(line,1,file_size,fd);
-    if(readbytes == -1)
-    {
-        clt.sendMsg(clt,"C'ant read from file");
-        myfile.close();
-        clt.Files.clear();
-    }
-    myfile.write(line,file_size);
-    myfile.close();
-    clt.Files.clear();
-    
+    check_targets(srv,command,clt,position);
 }
 
-void prv_msg(Server *,std::vector<std :: string>command,Client )
+std :: string compile_msg(std::vector<std::string> commands,int position)
 {
-    // if(command.size() < 3)
-    // {
-    //    Server::sendMsg(clt,LogError::getError(clt.nickname,LogError::ERR_NEEDMOREPARAM));
-    // }
-    std :: cout <<"last parm :"<<command[command.size()] << std :: endl;
+    size_t i = position;
+    std :: string msg;
+
+    for(; i < commands.size();i++)
+    {
+        if(i != commands.size() - 1)
+            msg = msg.append(commands[i] + " ");
+        else
+            msg = msg.append(commands[i]);
+    }
+    return(msg);
 }
 
 
-const char * getDownMsg()
+void check_targets(Server *srv, std::vector<std::string> command, Client clt,size_t position)
+{
+    std :: string msg = compile_msg(command,position);
+    for(size_t i = 1; i < position;i++)
+    {
+        if(command[i].find('#') == 0)
+        {
+            int id = search_in_channels(srv,command[i],clt);
+            if(id)
+            {
+                std::map<int,channel>::iterator it = srv->channles.find(id);
+                (void) it;
+
+                // send Massege to channel
+            }
+        }
+        else
+        {
+            int id = search_a_client(srv,command[i]);
+            if(id)
+            {
+                std::map<int,Client>::iterator it = srv->clients.find(id);
+                sendPrvmsg(clt,msg,it->second);
+                // send Massege to client;
+            }
+            else
+            {
+                Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOSUCHNICK));
+            }
+        }
+    }
+}
+
+const char *getDownMsg()
 {
 
-    const char * Down = 
-   "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
-   " █████ ██╗██╗  █████╗█████╗█████╗███╗  ██╗████████╗\n"
-   " ██╔═══██║██║  ██═══╝██═══╝██═══╝████  ██║╚══██╔══╝\n"
-   " ████╗ ██║██║  ███╗  █████╗███╗  ██╔█╗ ██║   ██║   \n"
-   " ██╔═╝ ██║██║  ██═╝  ╚══██║██═╝  ██║╚█╗██║   ██║   \n"
-   " ██║   ██║████ █████╗█████║█████╗██║ ████║   ██║   \n"
-   " ╚═╝   ╚═╝╚════╚════╝╚════╝╚════╝╚═╝ ╚═══╝   ╚═╝   \n"                  
-    "⣿⣿⣿⣿⠿⠛⠋⠁⠀⣿⣀⣬⣿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
-    "⣿⣿⣿⡀⠀⠀⠀⠀⠀⠈⣛⣁⣀⣠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
-    "⣿⣿⣿⣷⠀⠀⠀⠀⠀⠀⣿⠉⠉⠉⠀⠀⠀⢹⡏⠛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
-    "⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀⢻⡆⠀⠀⠀⠀⠀⠘⠿⠛⠛⢻⣿⣿⣿⣿⣿⣿⣿⣿\n"
-    "⣿⣿⣿⣿⣿⣇⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⢰⡶⠶⠦⠤⢼⣿⣿⣿⣿⣿⣿⣿⣿\n"
-    "⣿⣿⣿⣿⣿⣿⣆⠀⠀⠀⠈⡇⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⢠⡿⢻⣿⣿⣿⣿\n"
-    "⣿⣿⣿⣿⣿⣿⣿⡄⠀⠀⠀⣿⠀⠀⠀⠀⣾⠇⠀⠀⠀⠀⠀⠸⣧⣤⣽⣿⣿⣿\n"
-    "⣿⣿⣿⣿⣿⣿⣿⣿⡄⠀⠀⣿⡀⠀⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿\n"
-    "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣿⣿⡇⠀⠀⢰⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⣿⣿\n"
-    "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿\n"
-    "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣾⣿⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⣿⣿⣿\n"
-    "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿\n"
-    "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣤⣤⣀⣀⣀⣀⠀⠀⠀⠀⣿⣿⣿⣿\n"
-    "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n";
-    return(Down);
+    const char *Down =
+        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
+        " █████ ██╗██╗  █████╗█████╗█████╗███╗  ██╗████████╗\n"
+        " ██╔═══██║██║  ██═══╝██═══╝██═══╝████  ██║╚══██╔══╝\n"
+        " ████╗ ██║██║  ███╗  █████╗███╗  ██╔█╗ ██║   ██║   \n"
+        " ██╔═╝ ██║██║  ██═╝  ╚══██║██═╝  ██║╚█╗██║   ██║   \n"
+        " ██║   ██║████ █████╗█████║█████╗██║ ████║   ██║   \n"
+        " ╚═╝   ╚═╝╚════╚════╝╚════╝╚════╝╚═╝ ╚═══╝   ╚═╝   \n"
+        "⣿⣿⣿⣿⠿⠛⠋⠁⠀⣿⣀⣬⣿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
+        "⣿⣿⣿⡀⠀⠀⠀⠀⠀⠈⣛⣁⣀⣠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
+        "⣿⣿⣿⣷⠀⠀⠀⠀⠀⠀⣿⠉⠉⠉⠀⠀⠀⢹⡏⠛⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
+        "⣿⣿⣿⣿⣧⠀⠀⠀⠀⠀⢻⡆⠀⠀⠀⠀⠀⠘⠿⠛⠛⢻⣿⣿⣿⣿⣿⣿⣿⣿\n"
+        "⣿⣿⣿⣿⣿⣇⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⢰⡶⠶⠦⠤⢼⣿⣿⣿⣿⣿⣿⣿⣿\n"
+        "⣿⣿⣿⣿⣿⣿⣆⠀⠀⠀⠈⡇⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⢠⡿⢻⣿⣿⣿⣿\n"
+        "⣿⣿⣿⣿⣿⣿⣿⡄⠀⠀⠀⣿⠀⠀⠀⠀⣾⠇⠀⠀⠀⠀⠀⠸⣧⣤⣽⣿⣿⣿\n"
+        "⣿⣿⣿⣿⣿⣿⣿⣿⡄⠀⠀⣿⡀⠀⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿\n"
+        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣿⣿⡇⠀⠀⢰⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⣿⣿\n"
+        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿\n"
+        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣾⣿⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⣿⣿⣿\n"
+        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿\n"
+        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣤⣤⣀⣀⣀⣀⠀⠀⠀⠀⣿⣿⣿⣿\n"
+        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n";
+    return (Down);
+}
+
+void sendPrvmsg(Client sender,std::string str,Client recv)
+{
+    std::string msg = sender.nickname + " PRVMSG " + recv.nickname;
+    msg.append(" " + str);
+    Server::sendMsg(recv,msg);
+    LogError::rplAwayMsg(sender,msg); 
 }

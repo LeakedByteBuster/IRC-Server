@@ -15,7 +15,7 @@
 // //PRVMSG
 
 #define ERR_NORECIPIENT ":No recipient given"
-#define ERR_NOTEXTTOSEND ":No text to send"
+// #define ERR_NOTEXTTOSEND ":No text to send"
 
 
 /****************************   PASS    ***********************************/
@@ -71,11 +71,14 @@ public :
         ERR_NOSUCHFILE,
         ERR_NOSUCHNICK,
         ERR_NOSUCHFILENAME,
-        ERR_NOFILEFROMSENDER
+        ERR_NOFILEFROMSENDER,
+        ERR_NOTEXTTOSEND,
+        ERR_CANNOTSENDTOCHAN
     };
 
     static std::string  getError(const std::string &clt, short type);
     static std::string  registrationSuccess(const std::string &nick);
+    static std::string  rplAwayMsg(Client &clt,std :: string str);
 
 };
 
