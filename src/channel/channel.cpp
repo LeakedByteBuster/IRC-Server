@@ -28,6 +28,7 @@ channel::channel(int id,std::string name,std::string key ,bool isoperator)
 	bool channel::getkeyMode (void) const{return this->keyMode;}
 	bool channel::getOperatorMode (void) const{return this->operatorMode;}
 	bool channel::getLimitMode (void) const {return this->inviteMode;}
+
 channel::~channel()
 {
 }

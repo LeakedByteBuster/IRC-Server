@@ -2,8 +2,8 @@
 #define SERVER_HPP
 
 /*  Containers  */
-#include <vector> // std::vector
-#include <string>
+// #include <vector> // std::vector
+// #include <string>
 #include <map>
 #include <utility>
 
@@ -16,7 +16,7 @@
 #include <netdb.h> // getaddinfo()
 
 /* I/O */
-#include <iostream> // std::cout...
+// #include <iostream> // std::cout...
 #include <unistd.h> // write()
 #include <fcntl.h> // fcntl()
 
@@ -27,6 +27,8 @@
 #include "Client.hpp"
 #include "Command.hpp"
 #include "channel.hpp"
+#include "utils.hpp"
+
 #define SOCK_DOMAIN AF_INET
 #define BACKLOG SOMAXCONN
 #define POLL_TIMEOUT    0 // timeout used for poll(2) || NON_BLOCKING mode
@@ -59,25 +61,22 @@ public :
 	    //  returns 0 if connection is done successfully, otherwise 0 is returned
     bool    addNewClient(std::vector<struct pollfd> &fds, nfds_t *nfds, int &fdsLeft);
 
-    void    userRegistration(int fd, std::string &str);
-
-	    //	checks if msg revceived has a '\n'
-    void    ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
-				const std::vector<struct pollfd>  &fds, unsigned long &i,std::vector<std :: string> & commands);
-	
+    void    userRegistration(int fd, std::vector<std::string> string);
 	//execute commands 
 	void	execute_command(std :: vector<std :: string> &commands,int id);
 
-	void	join (){};
-	void    kick(){};
-    /* invite a client to a channel */
-    void    invite(){};
-    /* Change or view the channel topic */
-    void    topic(){};
-    /* Change the channel’s mode */
-    void    mode(/* int mode */){};
-
 	//  void parse_kick_command (std::vector<std::string> & commands,int id);
+
+            //	checks if msg revceived has a '\n'
+    std::pair<std::string, bool>   ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
+                                const std::vector<struct pollfd>  &fds, unsigned long &i);
+
+    static void    sendMsg(const Client &target, std::string msg);
+    // void    sendMsg(const Channels &target, const std::string &msg);
+
+    //  list of clients connected to the server || Nickname, Client class
+    std::map<int, Client>       clients;
+
 private :
 
 	// server's password
@@ -86,26 +85,31 @@ private :
     const in_port_t             listenPort;
 	// listenning fd (not const because it is set after socket is created)
     int                         listenFd;
-    //  list of clients connected to the server || Nickname, Client class
-    std::map<int, Client>       clients;
+
+    // make class command a friend to server class to get client id from class command
+    friend class command;
 };
 	// void execute_commmand(std::map<std::string,channel> & channelsInServer,std :: vector<std :: string> &commands,int id);
 	// map that had name of channels as key and class channel as value
-	
 
-		//  prints date, time, host, ip and port in STDOUT
-void            serverWelcomeMessage(const struct sockaddr_in &srvSock, int sfd);
-		//  prints on client side
-void            clientWelcomeMessage(unsigned short cfd);
-		//  print IP and host of connected client on server side
-void            printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr);
-		//  returns current local time
-std::string     geTime();  
-		//  Checks if fd.revents == POLLIN
-bool            isReadable(const struct pollfd &fd);
-		//  checks if fd.revents == POLLERR | POLLHUP
-bool            isError(int revents, int fd, int listenFd);
-		//  checks if (revents == POLLIN) && (fd == server fd)
-bool     	    isNewConnection(const struct pollfd &fd, int srvfd);
+bool    parseRegistrationCommands(std::map<int, Client> &clients, 
+            std::vector<std::string> &str, Client &client, const std::string &pass);
+//                 //  prints date, time, host, ip and port in STDOUT
+// void            serverWelcomeMessage(const struct sockaddr_in &srvSock, int sfd);
+//                 //  prints on client side
+// void            clientWelcomeMessage(unsigned short cfd);
+//                 //  print IP and host of connected client on server side
+// void            printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr);
+//                 //  returns current local time
+// std::string     geTime();
+//                 //  Checks if fd.revents == POLLIN
+// bool            isReadable(const struct pollfd &fd);
+//                 //  checks if fd.revents == POLLERR | POLLHUP
+// bool            isError(int revents, int fd, int listenFd);
+//                 //  checks if (revents == POLLIN) && (fd == server fd)
+// bool            isNewConnection(const struct pollfd &fd, int srvfd);
+//                 //  type=0 : <client> || type=1 : nick!~user@hostname
+// std::string     getId(Client &clt, int type);
+std::vector<std::string>     splitByLines(std::string buff);
 
 #endif // SERVER_HPP

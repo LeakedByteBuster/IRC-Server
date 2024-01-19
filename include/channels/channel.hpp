@@ -9,7 +9,8 @@
 #include "vector"
 #include<set>
 #include"../client/Client.hpp"
-#define ERR_NEEDMOREPARAMS "461  : Not enough parameters\n"
+#include"Errors.hpp"
+// #define ERR_NEEDMOREPARAMS "461  : Not enough parameters\n"
 #define ERR_NOSUCHCHANNEL "403 :No such channel\n"
 #define ERR_TOOMANYCHANNELS ":You have joined too many channels\n"
 #define ERR_BADCHANNELKEY "475 :Cannot join channel (+k)\n"

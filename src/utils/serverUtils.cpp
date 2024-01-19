@@ -1,7 +1,12 @@
 #include <time.h> // time()
-#include "Server.hpp"
-
-static const char *    getBigMsg();
+#include <poll.h> // poll()
+#include <unistd.h> // write()
+#include <netdb.h> // getaddinfo()
+#include <arpa/inet.h> // inet_aton(), htons()
+#include <iostream> // std::cout...
+#include "registrationCommands.hpp"
+#include "Client.hpp"
+#include "utils.hpp"
 
 /* -------------------------------------------------------------------------- */
 /*                          Sockets helper functions                          */
@@ -20,24 +25,36 @@ bool    isReadable(const struct pollfd &fd)
                 && ((fd.revents & POLLHUP) != POLLHUP));
 }
 
-bool    isError(int revents, int fd, int listenFd) {
+bool    isError(int revents, int fd, int listenFd)
+{
     return (((revents & POLLHUP) == POLLHUP 
                 || (revents & POLLERR) == POLLERR) && fd != listenFd);
+}
+
+//  Parse PASS, NICK, USER commands
+bool    parseRegistrationCommands(std::map<int, Client> &clients, 
+            std::vector<std::string> &str, Client &client, const std::string &pass)
+{   
+    for (unsigned long i = 0; i < str.size(); i++) {
+        switch (i + 1)
+        {
+        case 1:
+            parsePass(client, str[i], pass);
+            break;
+        case 2:
+            parseNick(clients, client, str[i]);
+            break;
+        case 3:
+            parseUser(client, str[i]);
+            break;
+        }
+    }
+    return (0);
 }
 
 /* -------------------------------------------------------------------------- */
 /*                             Printing functions                             */
 /* -------------------------------------------------------------------------- */
-
-//  Returns local current time
-std::string  geTime()
-{
-    time_t  t;
-    time(&t);
-    std::string currentTime = asctime(localtime(&t));
-    currentTime.pop_back(); // removes '\n' character from the string
-    return (currentTime);
-}
 
 void    serverWelcomeMessage(const struct sockaddr_in &srvSock, int)
 {
@@ -78,17 +95,37 @@ void    printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr)
                 << std::endl;
 }
 
-static const char *    getBigMsg()
+//  type=0 : <client> || type=1 : nick!~user@hostname
+std::string getId(Client &clt, int type)
 {
-        const char    *bigMsg =
+    std::string str;
 
-  "\n$$$$$$\\ $$$$$$$\\   $$$$$$\\  \n"
-        "\\_$$  _|$$  __$$\\ $$  __$$\\  \n"
-        "  $$ |  $$ |  $$ |$$ /   \n"
-        "  $$ |  $$$$$$$  |$$ | \n"
-        "  $$ |  $$  __$$< $$ |  \n"
-        "  $$ |  $$ |  $$ |$$ | \n"
-        "$$$$$$\\ $$ |  $$ |\\$$$$$$  |     \n"
-        "\\______|\\__|  \\__| \\______/   \n";
-    return (bigMsg);
+    switch (type)
+    {
+    case 0 :    /* <client> */
+        str = clt.nickname.append(" ");
+        break;
+    case 1 :    /* [<nick> '!' <user> ] ['@' <host> ] */
+        str = clt.nickname.append("!~");
+        str.append(clt.username.append("@"));
+        str.append(inet_ntoa(clt.hints.sin_addr));
+        break;
+    }
+    std::cout << "string ==> " << str << std::endl;
+    return (str);
+}
+
+int  parseInput(const char *port, std::string pass)
+{
+    char    *endptr = NULL;
+    long res = strtol(port, &endptr, 10);
+    if ((endptr && *endptr != '\0') || (res > USHRT_MAX)
+        || (res < 0)) {
+        throw std::invalid_argument("Error : invalid port number");
+    }
+
+    if (pass.length() == 0) {
+        throw std::invalid_argument("Error : empty password");
+    }
+    return (0);
 }

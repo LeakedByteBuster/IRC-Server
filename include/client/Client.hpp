@@ -3,6 +3,9 @@
 
 #include <iostream>
 #include <arpa/inet.h>
+#include "TFile.hpp"
+#include <vector>
+
 
 /*
     - Each client is distinguished from other clients by a unique nickname
@@ -34,7 +37,7 @@ public :
     void    mode(/* int mode */){}
 };
 
-class   Client : public Operator{
+class   Client : public Operator {
 
 public :
     /* doe */
@@ -43,11 +46,14 @@ public :
     bool                isOperator;
     /* client info */
     std::string         nickname;
+    std::string         realname;
     std::string         username;
     std::string         hostname;
     // /* Connection infos */
     struct sockaddr_in  hints;
     int                 fd;
+
+    std :: vector<TFile> Files;
 
 public :
     Client();
@@ -55,8 +61,8 @@ public :
     Client& operator=(Client &rhs);
     virtual ~Client();
 
-    virtual void    sendMsg(int/* private message */) {};
-    virtual void    sendMsg(char/* message to a channel */) {};
+    void    sendMsg(const Client &target, std::string msg);
+    // void    sendMsg(const Channels &target, const std::string &msg);
 };
 
 #endif // CLIENT_HPP
