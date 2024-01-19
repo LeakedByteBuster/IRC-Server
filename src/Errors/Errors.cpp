@@ -1,5 +1,8 @@
+
+// #include "Server.hpp"
+#include <string>
 #include "Errors.hpp"
-#include "Server.hpp"
+
 
 static  std::string getPassError (const std::string &nick) 
 {

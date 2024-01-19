@@ -63,7 +63,6 @@ public :
 
     void    userRegistration(int fd, std::vector<std::string> string);
 	//execute commands 
-	void	execute_command(std :: vector<std :: string> &commands,int id);
 
 	//  void parse_kick_command (std::vector<std::string> & commands,int id);
 
@@ -94,6 +93,7 @@ private :
 
 bool    parseRegistrationCommands(std::map<int, Client> &clients, 
             std::vector<std::string> &str, Client &client, const std::string &pass);
+void parse_command(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, int id);
 //                 //  prints date, time, host, ip and port in STDOUT
 // void            serverWelcomeMessage(const struct sockaddr_in &srvSock, int sfd);
 //                 //  prints on client side

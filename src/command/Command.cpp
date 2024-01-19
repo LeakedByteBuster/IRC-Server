@@ -1,11 +1,9 @@
-#include "Command.hpp"
-#include "channel.hpp"
-#include<set>
-#include<fstream>
+#include "Server.hpp"
+#include <set>
+#include <fstream>
+#include "registrationCommands.hpp"
 // #include "client.hpp"
 // std::vector<int> channel::get_id_clients_in_channel;
-#include "Errors.hpp"
-#include "registrationCommands.hpp"
 
 
 //split command into vector of string to check it
@@ -189,18 +187,6 @@ void parse_command(std::vector<std::string> & commands, std::map<std::string,cha
     else 
         sendError(id,"command not found \n","");
 }
-}
-
-
-void Server::execute_command(std :: vector<std :: string> &commands,int id)
-{
-    parse_command(commands,channelsInServer,id);
-    // std::cout << commands <<"\n"
-//     for(size_t i = 0;i < commands.size();i++)
-//     {
-//         std :: cout <<">>"<< commands[i]<<"<<"<< std ::endl;
-//     }
-//     std :: cout << "---------------" << std :: endl;
 }
 
 // check command if it's valide and exucte it

@@ -246,13 +246,8 @@ std::pair<std::string, bool>    Server::ReadIncomingMsg(std::string buff, std::m
         std::cout << "buff in ReadIncomingMsg() : " << buff;
         std::cout.flush();
     #endif // LOG
-<<<<<<< HEAD
-    // userRegistration(fds[i].fd, buff);
-    HandleIncomingMsg(commands,buff);
-=======
 
     return (make_pair(buff, 1));
->>>>>>> 98a6b7d0e54b4ceec061f624bcea40f568d49330
 }
 //  Accepts incoming connections
 void            Server::handleIncomingConnections()

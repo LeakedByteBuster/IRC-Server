@@ -1,16 +1,17 @@
 #pragma once 
-
-#include "Server.hpp"
-
-
-#include <fstream>
+class Server;
+class Client;
+#include <string.h>
+#include<vector>
+#include<map>
+// #include <fstream>
 #include <unistd.h>
-#include "TFile.hpp"
-#include "Errors.hpp"
+// #include "TFile.hpp"
+// #include "Errors.hpp"
 // handle the buffer that's comming from server and parse it into vector<string>
 std :: vector<std :: string> HandleIncomingMsg(std :: vector<std :: string> & commands,std :: string msg);
 // compare first string in vector too see if is a valid command
-void execute_commmand(Server srv ,std :: vector<std :: string> & commands,int id);
+// void execute_commmand(Server srv ,std :: vector<std :: string> & commands,int id);
 void execute_commmand(Server *sev,std :: vector<std :: string> & commands,int id);
 void send_file(Server *sev,std :: vector<std :: string> & commands,Client cl);
 void get_file(Server *srv,std :: vector<std :: string> command,Client cl);
