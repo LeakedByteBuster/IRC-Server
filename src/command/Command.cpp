@@ -1,5 +1,6 @@
 #include "Command.hpp"
 #include "Server.hpp"
+#include "Bot.hpp"
 #include "registrationCommands.hpp"
 
 
@@ -32,13 +33,19 @@ void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, in
         if(it == sev->clients.end()) {
             std :: cout << "No such client" << std::endl;
         }
-        
+
         res =     (first_argument.compare("SENDFILE") == 0) * 1 \
                 + (first_argument.compare("GETFILE") == 0)  * 2 \
                 + (first_argument.compare("NICK") == 0)     * 3 \
+                + (first_argument.compare("nick") == 0)     * 3 \
                 + (first_argument.compare("PASS") == 0)     * 4 \
+                + (first_argument.compare("pass") == 0)     * 4 \
                 + (first_argument.compare("USER") == 0)     * 4 \
-                + (first_argument.compare("PRVMSG") == 0)   * 5 ;
+                + (first_argument.compare("user") == 0)     * 4 \
+                + (first_argument.compare("PRVMSG") == 0)   * 5 \
+                + (first_argument.compare("PONG") == 0)     * 9 \
+                + (first_argument.compare("/TIME") == 0)    * 10 \
+                + (first_argument.compare("/time") == 0)    * 10 ;
 
         switch (res)
         {
@@ -68,6 +75,16 @@ void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, in
         
         case 5:
             // prv_msg(sev,commands,id);
+            break;
+
+        case 9:
+            // ignore PONG
+            break;
+
+        case 10:
+            // bot
+            std::cout << commands[0] << std::endl;
+            Server::sendMsg(it->second, Bot::botExecuter(commands[0]));
             break;
         
         default:

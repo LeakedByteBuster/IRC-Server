@@ -1,6 +1,6 @@
 #include "Bot.hpp"
 
-std::string   Bot::executer(std::string buff)
+std::string   Bot::botExecuter(std::string buff)
 {
     std::vector<std::string>    commands(splitByLines(buff));
     std::vector<std::string>    tokens;
@@ -17,7 +17,7 @@ std::string   Bot::executer(std::string buff)
                 switch (res)
                 {
                 case 1:
-
+                    return (geTime());
                     break ;
 
                 case 2:
