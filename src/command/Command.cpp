@@ -1,5 +1,6 @@
 #include "Command.hpp"
-#include "Errors.hpp"
+#include "Server.hpp"
+#include "Bot.hpp"
 #include "registrationCommands.hpp"
 
 // split command into vector of string to check it
@@ -68,8 +69,18 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
             prv_msg(channels, commands, it->second,clients);
             break;
 
+        case 9:
+            // ignore PONG
+            break;
+
+        case 10:
+            // bot
+            std::cout << commands[0] << std::endl;
+            Server::sendMsg(it->second, Bot::botExecuter(commands[0]));
+            break;
+        
         default:
-            Server::sendMsg(it->second, ": COMMAND NOT FOUND !!!");
+            Server::sendMsg(it->second, LogError::getError(it->second.nickname, LogError::ERR_UNKNOWNCOMMAND));
             break;
         }
     }

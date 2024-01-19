@@ -26,5 +26,15 @@ PASS 3
 NICK marouane
 USER fouadi 0 * Mushi
 
+SENDFILE
+SENDFILE
+SENDFILE
+SENDFILE
+SENDFILE
+SENDFILE
+SENDFILE
 
-
+ircserv(22538,0x112534dc0) malloc: can't allocate region
+:*** mach_vm_map(size=5497002079367290880, flags: 100) failed (error code=3)
+ircserv(22538,0x112534dc0) malloc: *** set a breakpoint in malloc_error_break to debug
+std::bad_alloc

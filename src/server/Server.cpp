@@ -198,28 +198,6 @@ bool Server::addNewClient(std::vector<struct pollfd> &fds, nfds_t *nfds, int &fd
     return (EXIT_SUCCESS);
 }
 
-//  Parse PASS, NICK, USER commands
-bool parseRegistrationCommands(std::map<int, Client> &clients,
-                               std::vector<std::string> &str, Client &client, const std::string &pass)
-{
-    for (unsigned long i = 0; i < str.size(); i++)
-    {
-        switch (i + 1)
-        {
-        case 1:
-            parsePass(client, str[i], pass);
-            break;
-        case 2:
-            parseNick(clients, client, str[i]);
-            break;
-        case 3:
-            parseUser(client, str[i]);
-            break;
-        }
-    }
-    return (0);
-}
-
 // used for capturing all 3 lines or more at once (for registration)
 std::map<int, std::vector<std::string> > gbuff;
 void Server::userRegistration(int fd, std::vector<std::string> string)
@@ -290,24 +268,20 @@ std::pair<std::string, bool> Server::ReadIncomingMsg(std::string buff, std::map<
 //  Accepts incoming connections
 void Server::handleIncomingConnections()
 {
-#define BYTES_TO_READ 4096
-
-    std::map<int, std::string> map; // used as a buff when "\n" is not found
-    std::vector<struct pollfd> fds; // holds all connection accepted
-    std::string buff;               // for recv()
-    ssize_t bytes;                  // for recv()
-    nfds_t nfds = 0;                // size of fds vector
+    std::map<int, std::string>  map; // used as a buff when "\n" is not found
+    std::vector<struct pollfd>  fds; // holds all connection accepted
+    std::string                 buff; // for recv()
+    ssize_t                     bytes; // for recv()
+    nfds_t                      nfds = 0; // size of fds vector
+    int                         fdsLeft = 0;
 
     buff.resize(BYTES_TO_READ);
 
     //  add the server socket fd to the pollfd vector
     Server::addNewPollfd(listenFd, fds, nfds);
 
-    int fdsLeft = 0;
-    while (1)
-    {
-        if ((fdsLeft = isPollReady(fds, nfds)))
-        {
+    while (1) {
+        if ((fdsLeft = isPollReady(fds, nfds))) {
 
             //  Checks if there is a new connection to accept
             if (isNewConnection(fds[0], listenFd))
@@ -329,26 +303,19 @@ void Server::handleIncomingConnections()
                     {
                         std::cout << "Error recv(): an error occured" << std::endl;
                         std::cout.flush();
-                    }
-                    else if (bytes > 0)
-                    {
-                        buff = ptr;
-                        std::pair<std::string, bool> str;
-                        str = ReadIncomingMsg(buff, map, fds, i);
-                        if (str.second == 1)
-                        { // '\n' is in the message
-                            std::vector<std::string> strings = splitByLines(str.first);
-                            if ((clients[fds[i].fd].isRegistred == 0) && strings.size() > 0)
-                            {
-                                userRegistration(fds[i].fd, strings);
+                    } else if (bytes > 0) {
+                            buff = ptr;
+                            std::pair<std::string, bool>    str;
+                            str = ReadIncomingMsg(buff, map, fds, i);
+                            if (str.second == 1) { // '\n' is in the message
+                                std::vector<std::string> strings = splitByLines(str.first);
+                                if ((clients[fds[i].fd].isRegistred == 0)
+                                        && strings.size() > 0) {
+                                    userRegistration(fds[i].fd, strings);
+                                } else if (clients[fds[i].fd].isRegistred == 1 
+                                    && strings.size() > 0) {
+                                    std :: vector<std :: string> commands;
 
-                            }
-                            else if (clients[fds[i].fd].isRegistred == 1 && strings.size() > 0)
-                            {
-                                std ::vector<std ::string> commands;
-                                for(size_t i = 0;i < strings.size();i++)
-                                {
-                                    std :: cout << strings[i] << std::endl;
                                     HandleIncomingMsg(commands, str.first);
                                     execute_commmand(clients, commands, fds[i].fd, channles);
                                 }
@@ -356,45 +323,25 @@ void Server::handleIncomingConnections()
                         }
                     }
                     fdsLeft--;
-                }
-                else if (isError(fds[i].revents, fds[i].fd, listenFd))
-                {
 
-#if defined(LOG)
-                    std::cout << geTime() << " | client disconnected " << std::endl;
-#endif // LOG
-
-                    gbuff.erase(fds[i].fd);
-                    //  Close client file descriptor
-                    close(fds[i].fd);
-                    // remove client from list clients that may have a buff not complete
-                    map.erase(fds[i].fd);
-                    // delete client from vector given to poll()
-
-                    clients.erase(fds[i].fd);
-
-                    fds.erase(fds.begin() + i);
-                    // delete client from list of clients in server
-                    // decrement number of file descriptors in pollfd
-                    nfds--;
-                    // decrement number of file descriptors handeled
-                    fdsLeft--;
+                } else if (isError(fds[i].revents, fds[i].fd, listenFd)) {
+                    deleteClient(map, fds, clients, gbuff, nfds, i, fdsLeft);
                 }
             }
         }
     }
-#undef BYTES_TO_READ // BYTES_TO_READ
 }
 
 void Server::sendMsg(const Client &target, std::string msg)
 {
-    if (msg.size() > 0)
-    {
-        msg.append("\r\n");
-
+    if (msg.size() > 0) { 
+        
+        char    buff[BYTES_TO_READ];
         ssize_t bytes;
-        if ((bytes = send(target.fd, msg.data(), msg.size(), 0)) == -1)
-        {
+
+        msg.append("\r\n");
+        std::strcpy(buff, msg.data());
+        if ((bytes = send(target.fd, (const void *)buff, msg.size(), 0)) == -1) {
             std::cerr << "Error sendMsg(): " << strerror(errno) << std::endl;
         }
         else if (static_cast<unsigned long>(bytes) != msg.size())

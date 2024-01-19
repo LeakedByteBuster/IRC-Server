@@ -83,7 +83,13 @@ std::string    LogError::getError(const std::string &nick, short type)
     case LogError::ERR_ALREADYREGISTRED :
         error = IRC_NAME + static_cast<std::string>("462 ");
         error.append(nick + static_cast<std::string>(" "));
-        error.append(":You may not reregister " + nick);
+        error.append(":You may not reregister ");
+        break ;
+
+    case LogError::ERR_UNKNOWNCOMMAND :
+        error = IRC_NAME + static_cast<std::string>("421 ");
+        error.append(nick + static_cast<std::string>(" "));
+        error.append(":Unknown command");
         break ;
     
      case LogError::ERR_NOSUCHFILE :
