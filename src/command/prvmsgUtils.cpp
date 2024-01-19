@@ -2,30 +2,33 @@
 
 
 
-int search_in_channels(Server *srv,std::string name,Client clt)
+int search_in_channels(std::map<int,channel> channels ,std::string name,Client clt)
 {
-    std::map<int,channel>::iterator it= srv->channles.begin();
-
-    for(;it != srv->channles.end();it++)
+    if(!channels.empty())
     {
-        if(!it->second.getName().compare(name))
+        std::map<int,channel>::iterator it= channels.begin();
+
+        for(;it != channels.end();it++)
         {
-            int id = search_client_inChannel(clt,it->second);
-            if(id)
+            if(!it->second.getName().compare(name))
             {
-                return id;
-            }
-            else
-            {
-                Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_CANNOTSENDTOCHAN));
-                return 0;
+                int id = search_client_inChannel(clt,it->second);
+                if(id)
+                {
+                    return id;
+                }
+                else
+                {
+                    Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_CANNOTSENDTOCHAN));
+                    return 0;
+                }
             }
         }
-    }
-    if(it == srv->channles.end())
-    {
-        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOSUCHNICK));
-            return 0;
+        if(it == channels.end())
+        {
+            Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOSUCHNICK));
+                return 0;
+        }
     }
     return(0);
 }

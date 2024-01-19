@@ -29,6 +29,7 @@ std::string LogError::registrationSuccess(const std::string &nick)
 
     return (str);
 }
+
 std::string  LogError :: rplAwayMsg(Client &clt,std :: string str)
 {
     std :: string msg;

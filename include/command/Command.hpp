@@ -17,23 +17,23 @@ class Server;
 std :: vector<std :: string> HandleIncomingMsg(std :: vector<std :: string> & commands,std :: string msg);
 
 // compare first string in vector too see if is a valid command
-void                        execute_commmand(Server *sev,std :: vector<std :: string> & commands,int id);
+void                        execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> &commands, int id,std::map<int,channel> &channels);
 
-void                        send_file(Server *sev,std :: vector<std :: string> & commands,Client cl);
+void                        send_file(std::map<int,Client>clients,std :: vector<std :: string> & commands,Client cl);
 
-void                        get_file(Server *srv,std :: vector<std :: string> command,Client cl);
+void                        get_file(std::map<int,Client> clients,std :: vector<std :: string> command,Client cl);
 
 int                         search_a_file(Client clt,std :: string sender);
 
 void                        creat_file(Client clt,std :: string sender,std :: string filename);
 
-void                        prv_msg(Server *srv,std::vector<std :: string>command,Client clt);
+void                        prv_msg(std::map<int,channel> &channels,std::vector<std :: string>command,Client clt,std::map<int,Client> Clients);
 
 const char *                getDownMsg(void);
 
-void                        check_targets(Server *srv,std::vector<std::string>commmand,Client clt,size_t position);
+void                        check_targets(std::map<int,channel> channels,std::vector<std::string>commmand,Client clt,size_t position,std::map<int,Client> clients);
 
-int                        search_in_channels(Server * srv,std::string name,Client clt);
+int                        search_in_channels(std::map<int,channel> channels,std::string name,Client clt);
 
 int                        search_client_inChannel(Client clt,channel channel);
 

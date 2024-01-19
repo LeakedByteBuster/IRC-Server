@@ -19,7 +19,7 @@ std ::vector<std ::string> HandleIncomingMsg(std ::vector<std ::string> &command
 }
 
 // check command if it's valide and exucte it
-void execute_commmand(Server *sev, std ::vector<std ::string> &commands, int id)
+void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> &commands, int id,std::map<int,channel> &channels)
 {
     int res = 0;
 
@@ -27,27 +27,20 @@ void execute_commmand(Server *sev, std ::vector<std ::string> &commands, int id)
     {
 
         std ::string first_argument = commands[0];
-        std::map<int, Client>::iterator it = sev->clients.find(id);
+        std::map<int, Client>::iterator it = clients.find(id);
 
-        if (it == sev->clients.end())
+        if(it == clients.end())
         {
-            std ::cout << "No such client" << std::endl;
+            return;
         }
-
-        res = (first_argument.compare("SENDFILE") == 0) * 1 
-            + (first_argument.compare("GETFILE") == 0) * 2 
-            + (first_argument.compare("NICK") == 0) * 3 
-            + (first_argument.compare("PASS") == 0) * 4 
-            + (first_argument.compare("USER") == 0) * 4 
-            + (first_argument.compare("PRVMSG") == 0) * 5;
         switch (res)
         {
         case 1:
-            send_file(sev, commands, it->second);
+            send_file(clients, commands, it->second);
             break;
 
         case 2:
-            get_file(sev, commands, it->second);
+            get_file(clients, commands, it->second);
             break;
 
         case 3:
@@ -60,7 +53,7 @@ void execute_commmand(Server *sev, std ::vector<std ::string> &commands, int id)
                         buff = buff.append(" ");
                     buff = buff.append(commands[i]);
                 }
-                parseNick(sev->clients, it->second, buff);
+                parseNick(clients, it->second, buff);
             }
             catch (std::exception &e)
             {
@@ -72,7 +65,7 @@ void execute_commmand(Server *sev, std ::vector<std ::string> &commands, int id)
             break;
 
         case 5:
-            prv_msg(sev, commands, it->second);
+            prv_msg(channels, commands, it->second,clients);
             break;
 
         default:
@@ -83,24 +76,27 @@ void execute_commmand(Server *sev, std ::vector<std ::string> &commands, int id)
 }
 
 // search for a client by his nickname
-int search_a_client(Server *sev, std ::string NickName)
+int search_a_client(std::map<int,Client> clients, std ::string NickName)
 {
-    std::map<int, Client>::iterator it = sev->clients.begin();
-    for (; it != sev->clients.end(); it++)
+    if(clients.empty())
     {
-        if (it->second.nickname.compare(NickName) == 0)
-        {
-            return (it->second.fd);
-        }
+        return(0);
     }
+        std::map<int, Client>::iterator it = clients.begin();
+        for (; it != clients.end(); it++)
+        {
+            if (it->second.nickname.compare(NickName) == 0)
+            {
+                return (it->second.fd);
+            }
+        }
     return (0);
 }
 
 // SYNTAXE SENDFILE FILENAME  RECIEVER
-void send_file(Server *sev, std ::vector<std ::string> &commands, Client cl)
+void send_file(std::map<int,Client> clients, std ::vector<std ::string> &commands, Client cl)
 {
     std ::FILE *FileName;
-    int fd = search_a_client(sev, commands[2]);
 
     if (commands.size() < 3)
     {
@@ -115,6 +111,7 @@ void send_file(Server *sev, std ::vector<std ::string> &commands, Client cl)
         return;
     }
     // if not found reciever
+    int fd = search_a_client(clients, commands[2]);
     if (!fd)
     {
         Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHNICK));
@@ -122,13 +119,13 @@ void send_file(Server *sev, std ::vector<std ::string> &commands, Client cl)
     }
     // creat object file and push it in client vector of files
     TFile fl(FileName, commands[1].c_str(), cl.nickname, commands[2].c_str());
-    std::map<int, Client>::iterator rec = sev->clients.find(fd);
+    std::map<int, Client>::iterator rec = clients.find(fd);
     rec->second.Files.push_back(fl);
     cl.sendMsg(cl, getDownMsg());
 }
 
 // SYNTAXE : GETFILE FILENAME SENDER
-void get_file(Server *srv, std ::vector<std ::string> command, Client cl)
+void get_file(std::map<int,Client> clients, std ::vector<std ::string> command, Client cl)
 {
     if (command.size() != 3)
     {
@@ -141,7 +138,7 @@ void get_file(Server *srv, std ::vector<std ::string> command, Client cl)
         return;
     }
     // if c'ant find the sender of file
-    else if (!search_a_client(srv, command[2]))
+    else if (!search_a_client(clients, command[2]))
     {
         Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHNICK));
         return;
@@ -199,13 +196,10 @@ void creat_file(Client clt, std ::string sender, std ::string filename)
     std::fseek(fd, 0, SEEK_END);
     file_size = ftell(fd);
     std::fseek(fd, prev, SEEK_SET);
-    try
+        line = new(std::nothrow)char[file_size];
+    if(!line)
     {
-        line = new char[file_size];
-    }
-    catch (std::bad_alloc &e)
-    {
-        std ::cerr << e.what() << std ::endl;
+        clt.sendMsg(clt, "I think the file is too big can you be kind with us :)");
     }
     // open the new file in client /dir
     myfile.open("transferd_" + filename, std::ios::out | std::ios::binary);
@@ -235,7 +229,6 @@ int search_msg(std::vector<std::string> command)
     std::vector<std::string>::iterator it = command.begin();
     for(; it != command.end();it++)
     {
-        // std::cout << *it << std::endl;
         if(it->find(":") != std::string::npos)
         {
             return(i);
@@ -245,10 +238,9 @@ int search_msg(std::vector<std::string> command)
     return(0);
 }
 
-void prv_msg(Server *srv, std::vector<std ::string> command, Client clt)
+void prv_msg(std::map<int,channel> &channels, std::vector<std ::string> command, Client clt,std::map<int,Client> clients)
 {
     size_t position = search_msg(command);
-    std :: cout <<"position :"<<position<< std ::endl;
     if (command.size() < 3)
     {
         Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NEEDMOREPARAM));
@@ -256,11 +248,10 @@ void prv_msg(Server *srv, std::vector<std ::string> command, Client clt)
     }
     else if (position == 0)
     {
-        std :: cout << position << std :: endl;
         Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOTEXTTOSEND));
         return;
     }
-    check_targets(srv,command,clt,position);
+    check_targets(channels,command,clt,position,clients);
 }
 
 std :: string compile_msg(std::vector<std::string> commands,int position)
@@ -279,17 +270,17 @@ std :: string compile_msg(std::vector<std::string> commands,int position)
 }
 
 
-void check_targets(Server *srv, std::vector<std::string> command, Client clt,size_t position)
+void check_targets(std::map<int,channel> channels, std::vector<std::string> command, Client clt,size_t position,std::map<int,Client> clients)
 {
     std :: string msg = compile_msg(command,position);
     for(size_t i = 1; i < position;i++)
     {
         if(command[i].find('#') == 0)
         {
-            int id = search_in_channels(srv,command[i],clt);
+            int id = search_in_channels(channels,command[i],clt);
             if(id)
             {
-                std::map<int,channel>::iterator it = srv->channles.find(id);
+                std::map<int,channel>::iterator it = channels.find(id);
                 (void) it;
 
                 // send Massege to channel
@@ -297,10 +288,10 @@ void check_targets(Server *srv, std::vector<std::string> command, Client clt,siz
         }
         else
         {
-            int id = search_a_client(srv,command[i]);
+            int id = search_a_client(clients,command[i]);
             if(id)
             {
-                std::map<int,Client>::iterator it = srv->clients.find(id);
+                std::map<int,Client>::iterator it = clients.find(id);
                 sendPrvmsg(clt,msg,it->second);
                 // send Massege to client;
             }
