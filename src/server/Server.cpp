@@ -266,7 +266,7 @@ std::pair<std::string, bool> Server::ReadIncomingMsg(std::string buff, std::map<
 }
 
 //  Accepts incoming connections
-void Server::handleIncomingConnections()
+void            Server::handleIncomingConnections()
 {
     std::map<int, std::string>  map; // used as a buff when "\n" is not found
     std::vector<struct pollfd>  fds; // holds all connection accepted
@@ -284,23 +284,19 @@ void Server::handleIncomingConnections()
         if ((fdsLeft = isPollReady(fds, nfds))) {
 
             //  Checks if there is a new connection to accept
-            if (isNewConnection(fds[0], listenFd))
-            {
+            if (isNewConnection(fds[0], listenFd)) {
                 addNewClient(fds, &nfds, fdsLeft);
             }
 
-            for (unsigned long i = 1; (i < nfds) && (fdsLeft > 0); i++)
-            {
-                if (isReadable(fds[i]))
-                {
+            for (unsigned long i = 1; (i < nfds) && (fdsLeft > 0); i++) {
+                if (isReadable(fds[i])) {
                     //  Read from client file descriptor
                     memset((void *)buff.data(), 0, sizeof(buff));
                     char ptr[BYTES_TO_READ];
                     memset(ptr, 0, sizeof(ptr));
                     bytes = recv(fds[i].fd, (void *)ptr, sizeof(ptr) - 1, 0);
                     ptr[bytes] = 0;
-                    if (bytes == -1)
-                    {
+                    if (bytes == -1) {
                         std::cout << "Error recv(): an error occured" << std::endl;
                         std::cout.flush();
                     } else if (bytes > 0) {
@@ -317,10 +313,9 @@ void Server::handleIncomingConnections()
                                     std :: vector<std :: string> commands;
 
                                     HandleIncomingMsg(commands, str.first);
-                                    execute_commmand(clients, commands, fds[i].fd, channles);
+                                    execute_commmand(clients, commands, fds[i].fd,channles);
                                 }
                             }
-                        }
                     }
                     fdsLeft--;
 
