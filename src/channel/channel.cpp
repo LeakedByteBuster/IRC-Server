@@ -15,7 +15,7 @@ channel::channel(int id,std::string name,std::string key ,bool isoperator)
     this->topicMode = 0;
     this->limit = 20 ;
     this->operatorMode = isoperator;
-   
+    
     std::cout << " channel " << name  << "  created by client : " << id << "\n";
 
 }

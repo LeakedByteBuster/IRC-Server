@@ -47,8 +47,7 @@ public :
     const int &                 getListenFd() const;
     const std::string &         getPassword() const;
 	       //get channel map 
-	std::map<std::string, channel>  & getChannelMap ()const; 
-
+	std::map<std::string, channel>  & getChannelMap ()const;
 	std::map<std::string, channel> channelsInServer;
 
 	    //  Accepts clients connections
@@ -101,7 +100,7 @@ void            clientWelcomeMessage(unsigned short cfd);
 		//  print IP and host of connected client on server side
 void            printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr);
 		//  returns current local time
-std::string     geTime();
+std::string     geTime();  
 		//  Checks if fd.revents == POLLIN
 bool            isReadable(const struct pollfd &fd);
 		//  checks if fd.revents == POLLERR | POLLHUP
