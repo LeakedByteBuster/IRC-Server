@@ -20,11 +20,12 @@ LimeChat :
     - Error sendMsg(): Socket operation on non-socket
         (happens sometimes after send nick command)
 
-
+Server :
+    - MSG_NOSIGNAL (SIGPIPE)
 
 PASS 3
-NICK marouane
-USER fouadi 0 * Mushi
+NICK Douga
+USER hoba 0 * loba
 
 SENDFILE
 SENDFILE

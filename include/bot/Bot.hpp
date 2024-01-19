@@ -8,7 +8,7 @@ class Bot {
 
 public:
 
-    static std::string botExecuter(std::string buff);
+    static std::string botExecuter(std::string buff, const Client &clt);
 
 private:
     /* data */

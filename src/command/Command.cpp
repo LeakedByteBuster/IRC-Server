@@ -19,6 +19,34 @@ std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &co
     return(commands);
 }
 
+int whichCommand(const std::string &first_argument)
+{
+    int ret =   0;
+    ret =   (first_argument.compare("SENDFILE") == 0) * 1 \
+            + (first_argument.compare("GETFILE") == 0)  * 2 \
+
+            + (first_argument.compare("NICK") == 0)     * 3 \
+            + (first_argument.compare("nick") == 0)     * 3 \
+
+            + (first_argument.compare("PASS") == 0)     * 4 \
+            + (first_argument.compare("pass") == 0)     * 4 \
+
+            + (first_argument.compare("USER") == 0)     * 4 \
+            + (first_argument.compare("user") == 0)     * 4 \
+
+            + (first_argument.compare("PRVMSG") == 0)   * 5 \
+
+            + (first_argument.compare("PONG") == 0)     * 9 \
+
+            + (first_argument.compare("/DATE") == 0)    * 10 \
+            + (first_argument.compare("/date") == 0)    * 10 \
+
+            + (first_argument.compare("/JOKES") == 0)    * 11 \
+            + (first_argument.compare("/jokes") == 0)    * 11 \
+
+            + (first_argument.compare("/whoami") == 0)    * 12;
+    return (ret);
+}
 
 // check command if it's valide and exucte it
 void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, int id)
@@ -34,18 +62,7 @@ void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, in
             std :: cout << "No such client" << std::endl;
         }
 
-        res =     (first_argument.compare("SENDFILE") == 0) * 1 \
-                + (first_argument.compare("GETFILE") == 0)  * 2 \
-                + (first_argument.compare("NICK") == 0)     * 3 \
-                + (first_argument.compare("nick") == 0)     * 3 \
-                + (first_argument.compare("PASS") == 0)     * 4 \
-                + (first_argument.compare("pass") == 0)     * 4 \
-                + (first_argument.compare("USER") == 0)     * 4 \
-                + (first_argument.compare("user") == 0)     * 4 \
-                + (first_argument.compare("PRVMSG") == 0)   * 5 \
-                + (first_argument.compare("PONG") == 0)     * 9 \
-                + (first_argument.compare("/TIME") == 0)    * 10 \
-                + (first_argument.compare("/time") == 0)    * 10 ;
+        res =  whichCommand(first_argument);
 
         switch (res)
         {
@@ -72,21 +89,26 @@ void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, in
         case 4:
             Server::sendMsg(it->second, LogError::getError(it->second.nickname, LogError::ERR_ALREADYREGISTRED));
             break;
-        
+
         case 5:
             // prv_msg(sev,commands,id);
             break;
 
-        case 9:
-            // ignore PONG
+        case 9: // ignore PONG
             break;
 
-        case 10:
-            // bot
-            std::cout << commands[0] << std::endl;
-            Server::sendMsg(it->second, Bot::botExecuter(commands[0]));
+        case 10 : // bot (time)
+            Server::sendMsg(it->second, Bot::botExecuter(commands[0], it->second));
+            break;
+
+        case 11 : // bot (jokes)
+            Server::sendMsg(it->second, Bot::botExecuter(commands[0], it->second));
             break;
         
+        case 12 : // bot (/whomai)
+            Server::sendMsg(it->second, Bot::botExecuter(commands[0], it->second));
+            break;
+
         default:
             Server::sendMsg(it->second, LogError::getError(it->second.nickname, LogError::ERR_UNKNOWNCOMMAND));
             break;

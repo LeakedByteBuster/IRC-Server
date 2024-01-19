@@ -9,7 +9,7 @@
 #include "utils.hpp"
 
 /* -------------------------------------------------------------------------- */
-/*                          Sockets helper functions                          */
+/*                          Server helper functions                           */
 /* -------------------------------------------------------------------------- */
 
 bool    isNewConnection(const struct pollfd &fd, int srvfd)
@@ -50,49 +50,6 @@ bool    parseRegistrationCommands(std::map<int, Client> &clients,
         }
     }
     return (0);
-}
-
-/* -------------------------------------------------------------------------- */
-/*                             Printing functions                             */
-/* -------------------------------------------------------------------------- */
-
-void    serverWelcomeMessage(const struct sockaddr_in &srvSock, int)
-{
-    // struct protoent *p = getprotobyname(inet_ntoa(srvSock.sin_addr));
-    struct hostent *d = gethostbyname(inet_ntoa(srvSock.sin_addr));
-
-    if (d != NULL){
-        std::cout   << "host : " << d->h_name << std::endl;
-        for (int i = 0; d->h_addr_list[i] != NULL; ++i) {
-            char *ip = inet_ntoa(*((struct in_addr *)d->h_addr_list[i]));
-            std::cout << "IP   : " << ip << std::endl;
-        }
-        std::cout << "Port : " << ntohs(srvSock.sin_port) << std::endl;
-        return ;
-    }
-    std::cerr << "Warning gethostbyname() : " << strerror(errno) << std::endl;
-}
-
-void    clientWelcomeMessage(unsigned short cfd)
-{
-
-    std::string s(
-        getBigMsg() + 
-        static_cast<std::string>("\n\n") + 
-        geTime() +
-        static_cast<std::string>("\n")
-    );
-    write(cfd, s.data(), s.size());
-}
-
-void    printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr)
-{
-    std::cout   << geTime() << " |"
-                << " new connection ==> IP : " 
-                << inet_ntoa(cltAddr.sin_addr)
-                << " | port : "
-                << ntohs(cltAddr.sin_port)
-                << std::endl;
 }
 
 //  type=0 : <client> || type=1 : nick!~user@hostname
@@ -138,6 +95,7 @@ void    deleteClient(std::map<int, std::string> &map, std::vector<struct pollfd>
         std::cout << geTime() << " | client disconnected " << std::endl;
     #endif // LOG
 
+    // tmp buff used for registration
     gbuff.erase(fds[i].fd);
     //  Close client file descriptor
     close(fds[i].fd);
@@ -151,4 +109,47 @@ void    deleteClient(std::map<int, std::string> &map, std::vector<struct pollfd>
     nfds--;
     // decrement number of file descriptors handeled
     fdsLeft--;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                             Printing functions                             */
+/* -------------------------------------------------------------------------- */
+
+void    serverWelcomeMessage(const struct sockaddr_in &srvSock, int)
+{
+    // struct protoent *p = getprotobyname(inet_ntoa(srvSock.sin_addr));
+    struct hostent *d = gethostbyname(inet_ntoa(srvSock.sin_addr));
+
+    if (d != NULL){
+        std::cout   << "host : " << d->h_name << std::endl;
+        for (int i = 0; d->h_addr_list[i] != NULL; ++i) {
+            char *ip = inet_ntoa(*((struct in_addr *)d->h_addr_list[i]));
+            std::cout << "IP   : " << ip << std::endl;
+        }
+        std::cout << "Port : " << ntohs(srvSock.sin_port) << std::endl;
+        return ;
+    }
+    std::cerr << "Warning gethostbyname() : " << strerror(errno) << std::endl;
+}
+
+void    clientWelcomeMessage(unsigned short cfd)
+{
+
+    std::string s(
+        getBigMsg() + 
+        static_cast<std::string>("\n\n") + 
+        geTime() +
+        static_cast<std::string>("\n")
+    );
+    write(cfd, s.data(), s.size());
+}
+
+void    printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr)
+{
+    std::cout   << geTime() << " |"
+                << " new connection ==> IP : " 
+                << inet_ntoa(cltAddr.sin_addr)
+                << " | port : "
+                << ntohs(cltAddr.sin_port)
+                << std::endl;
 }

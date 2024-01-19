@@ -145,7 +145,7 @@ void    parseUser(Client &clt, std::string str)
         str = tokens[1].substr(0, 9);
     if (rname.size() > 9)
         rname = rname.substr(0, 15);
-    clt.username = str;
+    clt.username = tokens[1];
     clt.realname = rname;
     // client sent all the information correctly, sending welcome message
     Server::sendMsg(clt, LogError::registrationSuccess(clt.nickname));
