@@ -4,22 +4,6 @@
 #include "utils.hpp"
 #include "registrationCommands.hpp"
 
-
-//split command into vector of string to check it
-std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &commands,std :: string msg)
-{
-    std::stringstream   ss(msg);
-    std :: string        token;
-    std::string        tmp;
-    
-    std :: getline(ss,token,'\n');
-    std::stringstream   parser(token);
-        while (getline(parser,tmp,' ')) {
-            commands.push_back(tmp);
-        }
-    return(commands);
-}
-
 // check command if it's valide and exucte it
 void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, int id)
 {

@@ -89,6 +89,33 @@ int  parseInput(const char *port, std::string pass)
     return (0);
 }
 
+std::pair<std::string, bool>    parseInput(std::string buff, std::map<int, std::string> &map,
+                            const std::vector<struct pollfd>  &fds, unsigned long &i)
+{
+    //  if buff doesn't have '\n' at the end
+    if (buff.rfind('\n') == std::string::npos) {
+        std::pair<std::map<int, std::string>::iterator,bool> itRet;
+        itRet = map.insert(std::pair<int, std::string>(fds[i].fd, buff));
+        if (itRet.second == false) {
+            map[fds[i].fd].append(buff); // join buff
+        }
+        return (make_pair(static_cast<std::string>(""), 0));
+    } 
+    // if client sent a '\n' but he has already a buff stored in map
+    if ( !map.empty() && (buff.find('\n') != std::string::npos)
+                && !map[fds[i].fd].empty() ) {
+        buff = map[fds[i].fd].append(buff);
+        map.erase(fds[i].fd);
+    }
+
+    #if defined(LOG)
+        std::cout << "buff in parseInput() : " << buff;
+        std::cout.flush();
+    #endif // LOG
+
+    return (make_pair(buff, 1));
+}
+
 void    deleteClient(std::map<int, std::string> &map, std::vector<struct pollfd> &fds, 
             std::map<int, Client> &clients, std::map<int, std::vector<std::string> > &gbuff,
             nfds_t &nfds, unsigned long i, int &fdsLeft)
@@ -123,6 +150,37 @@ bool    readIncomingMsg(char ptr[], const int id)
         std::cerr << "Error recv(): an error occured" << std::endl;
     }
     return (bytes > 0 ? 1 : 0);
+}
+
+int whichCommand(const std::string &first_argument)
+{
+    int ret =   0;
+    ret =   (first_argument.compare("SENDFILE") == 0) * SENDFILE \
+            + (first_argument.compare("GETFILE") == 0)  * GETFILE \
+
+            + (first_argument.compare("NICK") == 0)     * NICK \
+            + (first_argument.compare("nick") == 0)     * NICK \
+
+            + (first_argument.compare("PASS") == 0)     * PASS_USER \
+            + (first_argument.compare("pass") == 0)     * PASS_USER \
+
+            + (first_argument.compare("USER") == 0)     * PASS_USER \
+            + (first_argument.compare("user") == 0)     * PASS_USER \
+
+            + (first_argument.compare("PRVMSG") == 0)   * PRVMSG \
+
+            + (first_argument.compare("PONG") == 0)     * PONG \
+
+            + (first_argument.compare("/DATE") == 0)    * IRCBOT \
+            + (first_argument.compare("/date") == 0)    * IRCBOT \
+
+            + (first_argument.compare("/JOKE") == 0)    * IRCBOT \
+            + (first_argument.compare("/joke") == 0)    * IRCBOT \
+
+            + (first_argument.compare("/whoami") == 0) * IRCBOT \
+            + (first_argument.compare("/WHOAMI") == 0)   * IRCBOT;
+
+    return (ret);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -166,35 +224,4 @@ void    printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr)
                 << " | port : "
                 << ntohs(cltAddr.sin_port)
                 << std::endl;
-}
-
-int whichCommand(const std::string &first_argument)
-{
-    int ret =   0;
-    ret =   (first_argument.compare("SENDFILE") == 0) * SENDFILE \
-            + (first_argument.compare("GETFILE") == 0)  * GETFILE \
-
-            + (first_argument.compare("NICK") == 0)     * NICK \
-            + (first_argument.compare("nick") == 0)     * NICK \
-
-            + (first_argument.compare("PASS") == 0)     * PASS_USER \
-            + (first_argument.compare("pass") == 0)     * PASS_USER \
-
-            + (first_argument.compare("USER") == 0)     * PASS_USER \
-            + (first_argument.compare("user") == 0)     * PASS_USER \
-
-            + (first_argument.compare("PRVMSG") == 0)   * PRVMSG \
-
-            + (first_argument.compare("PONG") == 0)     * PONG \
-
-            + (first_argument.compare("/DATE") == 0)    * IRCBOT \
-            + (first_argument.compare("/date") == 0)    * IRCBOT \
-
-            + (first_argument.compare("/JOKE") == 0)    * IRCBOT \
-            + (first_argument.compare("/joke") == 0)    * IRCBOT \
-
-            + (first_argument.compare("/whoami") == 0) * IRCBOT \
-            + (first_argument.compare("/WHOAMI") == 0)   * IRCBOT;
-
-    return (ret);
 }

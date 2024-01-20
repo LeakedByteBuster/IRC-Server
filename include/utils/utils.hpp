@@ -41,5 +41,7 @@ void                        deleteClient(std::map<int, std::string> &map, std::v
             nfds_t &nfds, unsigned long i, int &fdsLeft);
 bool						parseRegistrationCommands(std::map<int, Client> &clients, 
 	    			std::vector<std::string> &str, Client &client, const std::string &pass);
+std::pair<std::string, bool>    parseInput(std::string buff, std::map<int, std::string> &map,
+                            const std::vector<struct pollfd>  &fds, unsigned long &i);
 
 #endif // UTILS_CPP

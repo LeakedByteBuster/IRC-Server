@@ -54,10 +54,6 @@ public :
 
     void    userRegistration(int fd, std::vector<std::string> string);
 
-	    //	checks if msg revceived has a '\n'
-    std::pair<std::string, bool>   parseInput(std::string buff, std::map<int, std::string> &map,
-				const std::vector<struct pollfd>  &fds, unsigned long &i);
-
     static void    sendMsg(const Client &target, std::string msg);
     // void    sendMsg(const Channels &target, const std::string &msg);
 
