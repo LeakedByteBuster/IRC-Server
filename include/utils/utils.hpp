@@ -9,7 +9,6 @@
 
 #define BYTES_TO_READ   4096
 
-
 struct pollfd;
 struct sockaddr_in;
 class Client;
@@ -39,5 +38,7 @@ void                        deleteClient(std::map<int, std::string> &map, std::v
             std::map<int, Client> &clients, std::map<int, std::vector<std::string> > &gbuff,
             nfds_t &nfds, unsigned long i, int &fdsLeft);
 int                         whichCommand(const std::string &first_argument);
+bool                        readIncomingMsg(char ptr[], const int id);
+
 
 #endif // UTILS_CPP

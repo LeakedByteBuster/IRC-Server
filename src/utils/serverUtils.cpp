@@ -113,6 +113,18 @@ void    deleteClient(std::map<int, std::string> &map, std::vector<struct pollfd>
     fdsLeft--;
 }
 
+bool    readIncomingMsg(char ptr[], const int id)
+{
+    ssize_t                     bytes;
+
+    memset(ptr, 0, BYTES_TO_READ);
+    bytes = recv(id, (void *)ptr, BYTES_TO_READ - 1, 0);
+    if (bytes == -1) {
+        std::cerr << "Error recv(): an error occured" << std::endl;
+    }
+    return (bytes > 0 ? 1 : 0);
+}
+
 /* -------------------------------------------------------------------------- */
 /*                             Printing functions                             */
 /* -------------------------------------------------------------------------- */
