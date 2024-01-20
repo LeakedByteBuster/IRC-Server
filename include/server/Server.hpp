@@ -22,6 +22,7 @@
 /* static headers */
 #include "Client.hpp"
 #include "Command.hpp"
+#include "channel.hpp"
 #include "utils.hpp"
 
 #define SOCK_DOMAIN AF_INET
@@ -60,6 +61,8 @@ public :
     //  list of clients connected to the server || Nickname, Client class
     std::map<int, Client>       clients;
 
+    //  list of channels in the server
+    std::map<int, channel>       channles;
 private :
 
 	// server's password

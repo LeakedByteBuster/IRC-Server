@@ -6,8 +6,7 @@
 
 #define ERR_NEEDMOREPARAMS ":Not enough parameters"
 #define ERR_NORECIPIENT ":No recipient given"
-#define ERR_NOTEXTTOSEND ":No text to send"
-#define ERR_NOSUCHNICK " :No such nick/channel"
+// #define ERR_NOTEXTTOSEND ":No text to send"
 
 #define IRC_NAME    ":ircCamel.localhost "
 
@@ -23,11 +22,18 @@ public :
         ERR_NEEDMOREPARAM,
         ERR_ALREADYREGISTRED,
         ERR_UNKNOWNCOMMAND,
-        REGISTERED_SUCCESS
+        REGISTERED_SUCCESS,
+        ERR_NOSUCHFILE,
+        ERR_NOSUCHNICK,
+        ERR_NOSUCHFILENAME,
+        ERR_NOFILEFROMSENDER,
+        ERR_NOTEXTTOSEND,
+        ERR_CANNOTSENDTOCHAN
     };
 
     static std::string  getError(const std::string &clt, short type);
     static std::string  registrationSuccess(const std::string &nick);
+    static std::string  rplAwayMsg(Client &clt,std :: string str);
 
 };
 
