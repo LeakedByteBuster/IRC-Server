@@ -19,7 +19,6 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
         {
             return;
         }
-        std::cout <<"size in server :"<< it->second.Files.size()<<std::endl;
         res =  whichCommand(first_argument);
 
         switch (res)
@@ -115,7 +114,6 @@ void send_file(std::map<int,Client> &clients, std ::vector<std ::string> &comman
     TFile fl(FileName, commands[1].c_str(), cl.nickname, commands[2].c_str());
     std::map<int, Client>::iterator rec = clients.find(fd);
     rec->second.Files.push_back(fl);
-    std :: cout <<"FILE SIZE "<<rec->second.Files.size() << std :: endl;
     cl.sendMsg(cl, getDownMsg());
 }
 
@@ -129,7 +127,6 @@ void get_file(std::map<int,Client> &clients, std ::vector<std ::string> &command
     }
     else if (command[1].empty())
     {
-        std::cout <<"client file size "<<cl.Files.size() << std::endl;
         Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILENAME));
         return;
     }
