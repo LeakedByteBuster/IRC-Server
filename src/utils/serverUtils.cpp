@@ -55,22 +55,14 @@ bool    parseRegistrationCommands(std::map<int, Client> &clients,
 }
 
 //  type=0 : <client> || type=1 : nick!~user@hostname
-std::string getId(Client &clt, int type)
+std::string getId(const Client &clt)
 {
+   /* [: <nick> '!' <user> ] ['@' <host> ] */
     std::string str;
 
-    switch (type)
-    {
-    case 0 :    /* <client> */
-        str = clt.nickname.append(" ");
-        break;
-    case 1 :    /* [<nick> '!' <user> ] ['@' <host> ] */
-        str = clt.nickname.append("!~");
-        str.append(clt.username.append("@"));
-        str.append(inet_ntoa(clt.hints.sin_addr));
-        break;
-    }
-    std::cout << "string ==> " << str << std::endl;
+        str = static_cast<std::string>(":") + clt.nickname + "!";
+        str.append(clt.username + "@" + inet_ntoa(clt.hints.sin_addr));
+
     return (str);
 }
 
@@ -167,7 +159,7 @@ int whichCommand(const std::string &first_argument)
             + (first_argument.compare("USER") == 0)     * PASS_USER \
             + (first_argument.compare("user") == 0)     * PASS_USER \
 
-            + (first_argument.compare("PRVMSG") == 0)   * PRVMSG \
+            + (first_argument.compare("PRIVMSG") == 0)   * PRVMSG \
 
             + (first_argument.compare("PONG") == 0)     * PONG \
 

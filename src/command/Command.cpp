@@ -331,8 +331,8 @@ const char *getDownMsg()
 
 void sendPrvmsg(Client sender,std::string str,Client recv)
 {
-    std::string msg = sender.nickname + " PRVMSG " + recv.nickname;
-    msg.append(" " + str);
-    Server::sendMsg(recv,msg);
-    LogError::rplAwayMsg(sender,msg); 
+    std::string msg = getId(sender);
+    msg.append(" PRIVMSG " + recv.nickname + " " + str);
+    Server::sendMsg(recv, msg);
+    Server::sendMsg(sender, LogError::rplAwayMsg(sender, msg));
 }
