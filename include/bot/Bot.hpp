@@ -7,11 +7,13 @@
 class Bot {
 
 public:
-
+    Bot();
     static std::string botExecuter(std::string buff, const Client &clt);
+    const std::string & getJoke();
 
 private:
-    /* data */
+    std::vector<std::string>    jokes;
+    int                         numJokes;
 };
 
 #endif // BOT_CPP

@@ -178,8 +178,8 @@ int whichCommand(const std::string &first_argument)
             + (first_argument.compare("/DATE") == 0)    * IRCBOT \
             + (first_argument.compare("/date") == 0)    * IRCBOT \
 
-            + (first_argument.compare("/JOKES") == 0)    * IRCBOT \
-            + (first_argument.compare("/jokes") == 0)    * IRCBOT \
+            + (first_argument.compare("/JOKE") == 0)    * IRCBOT \
+            + (first_argument.compare("/joke") == 0)    * IRCBOT \
 
             + (first_argument.compare("/whoami") == 0) * IRCBOT \
             + (first_argument.compare("/WHOAMI") == 0)   * IRCBOT;
