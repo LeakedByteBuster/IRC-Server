@@ -163,35 +163,38 @@ int Server::isPollReady(std::vector<struct pollfd> &fds, nfds_t &nfds)
 //  returns 0 if connection is done successfully, otherwise 0 is returned
 bool Server::addNewClient(std::vector<struct pollfd> &fds, nfds_t *nfds, int &fdsLeft)
 {
-    Client clt;
+    Client clt(0);
+    int clientFd = 0;
     socklen_t sockLen = 0; // used for accept()
 
     //  Accepting incoming connection
     memset(&clt.hints, 0, sizeof(clt.hints));
     sockLen = sizeof(clt.hints);
-    if ((clt.fd = accept(listenFd, (sockaddr *)&clt.hints, &sockLen)) == -1)
+    if ((clientFd = accept(listenFd, (sockaddr *)&clt.hints, &sockLen)) == -1)
     {
         fdsLeft--;
         std::cerr << "Error accept() : " << strerror(errno) << std::endl;
         return (EXIT_FAILURE);
     }
     //  Setting the client fd to NON_BLOCKING mode
-    if (fcntl(clt.fd, F_SETFL, O_NONBLOCK) == -1)
+    if (fcntl(clientFd, F_SETFL, O_NONBLOCK) == -1)
     {
         std::cerr << "Error fcntl() : undefined error" << std::endl;
         fdsLeft--;
         return (EXIT_FAILURE);
     }
     //  Add client fd to the poll of file descriptors
-    Server::addNewPollfd(clt.fd, fds, *nfds);
+    Server::addNewPollfd(clientFd, fds, *nfds);
 
-#if defined(LOG)
-    printNewClientInfoOnServerSide(clt.hints);
-    clientWelcomeMessage(clt.fd);
-#endif // LOG
+    #if defined(LOG)
+        printNewClientInfoOnServerSide(clt.hints);
+        clientWelcomeMessage(clientFd);
+    #endif // LOG
 
     //  Push the new client to map<> in the server
-    clients.insert(std::pair<int, Client>(clt.fd, clt));
+    Client  toPush(clientFd);
+    toPush = clt;
+    clients.insert(std::pair<int, Client>(clientFd, toPush));
     // Decrement number of fds returned by poll()
     fdsLeft--;
 
@@ -205,9 +208,7 @@ void Server::userRegistration(int fd, std::vector<std::string> string)
     std::pair<std::map<int, std::vector<std::string> >::iterator, bool> it;
     it = gbuff.insert(std::pair<int, std::vector<std::string> >(fd, string));
 
-    if ((it.second == false) || (string.size() >= 3))
-    {
-
+    if ((it.second == false) || (string.size() >= 3)) {
         for (size_t i = 0; i < string.size(); i++)
         {
             if (!string[i].empty())
@@ -218,7 +219,6 @@ void Server::userRegistration(int fd, std::vector<std::string> string)
                 parseRegistrationCommands(clients, gbuff[fd], clients[fd], password);
                 clients[fd].isRegistred = 1;
                 gbuff.erase(fd);
-
             } catch (std::exception &e) {
                 clients[fd].nickname.clear();
                 clients[fd].realname.clear();

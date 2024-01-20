@@ -22,25 +22,20 @@ public :
 class   Client : public Operator {
 
 public :
-    /* doe */
-    bool                isRegistred;
-    /* operator priviligies */
-    bool                isOperator;
-    /* client info */
-    std::string         nickname;
-    std::string         realname;
-    std::string         username;
-    std::string         hostname;
-    // /* Connection infos */
-    struct sockaddr_in  hints;
-    int                 fd;
-
     std :: vector<TFile> Files;
+    struct sockaddr_in  hints;
+    std::string         username;
+    std::string         realname;
+    std::string         nickname;
+    const int           fd;
+    bool                isOperator; // has operator privilige
+    bool                isRegistred; // Successfully registered
 
 public :
     Client();
-    Client(std::string port, std::string password);
-    Client& operator=(Client &rhs);
+    Client(const int fd);
+    Client(const Client &rhs);
+    Client& operator=(const Client &rhs);
     virtual ~Client();
 
     void    sendMsg(const Client &target, std::string msg);
