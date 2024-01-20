@@ -41,48 +41,41 @@ std::string    LogError::getError(const std::string &nick, short type)
 
     case LogError::ERR_NONICKNAMEGIVEN:
         error = IRC_NAME + static_cast<std::string>("431 * ");
-        error.append(nick + static_cast<std::string>(" "));
         error.append(":No nickname given");
         break ;
 
     case LogError::ERR_ERRONEUSNICKNAME :
-        error = IRC_NAME + static_cast<std::string>("432 ");
-        error.append(nick + static_cast<std::string>(" "));
-        error.append(":Erroneous nickname");
+        error = IRC_NAME + static_cast<std::string>("432 * ");
+        error.append("Erroneous nickname");
         break;
 
     case LogError::ERR_ERRONEUSUSERNAME :
-        error = IRC_NAME + static_cast<std::string>("432 ");
-        error.append(nick + static_cast<std::string>(" "));
+        error = IRC_NAME + static_cast<std::string>("432 * ");
         error.append(":Erroneous username");
         break;
 
     case LogError::ERR_NICKNAMEINUSE :
         error = IRC_NAME + static_cast<std::string>("433 * ");
-        error.append(nick + static_cast<std::string>(" "));
         error.append(":Nickname is already in use");
         break ;
 
     case LogError::ERR_NEEDMOREPARAM :
         error = IRC_NAME + static_cast<std::string>("461 * ");
-        error.append(nick + static_cast<std::string>(" "));
         error.append(":Not enough parameters");
         break ;
 
     case LogError::ERR_ALREADYREGISTRED :
-        error = IRC_NAME + static_cast<std::string>("462 ");
-        error.append(nick + static_cast<std::string>(" "));
-        error.append(":You may not reregister ");
+        error = IRC_NAME + static_cast<std::string>("462 * ");
+        error.append(":You may not reregister");
         break ;
 
     case LogError::ERR_UNKNOWNCOMMAND :
-        error = IRC_NAME + static_cast<std::string>("421 ");
-        error.append(nick + static_cast<std::string>(" "));
-        error.append(":Unknown command");
+        error = IRC_NAME + static_cast<std::string>("421 * ");
+        error.append("Unknown command");
         break ;
 
     default:
-        std::cerr << "Warning passErrors: Unknown type : " << type << std::endl;
+        std::cerr << "Warning getError(): Unknown type : " << type << std::endl;
     }
 
     return (error);
