@@ -44,7 +44,9 @@ int whichCommand(const std::string &first_argument)
             + (first_argument.compare("/JOKES") == 0)    * 11 \
             + (first_argument.compare("/jokes") == 0)    * 11 \
 
-            + (first_argument.compare("/whoami") == 0)    * 12;
+            + (first_argument.compare("/whoami") == 0) * 12 \
+            + (first_argument.compare("/WHOAMI") == 0)   * 12;
+
     return (ret);
 }
 
@@ -73,7 +75,7 @@ void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, in
         case 2:
             get_file(sev,commands,it->second);
             break;
-        
+
         case 3:
             try {
                 std::string buff;

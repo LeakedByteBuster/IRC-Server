@@ -24,12 +24,20 @@ std::string     getInfos(const Client &clt)
     std::string ret;
     bool    t = clt.isOperator;
 
-    ret = "Nickname: " + clt.nickname;
-    ret.append("\nUsername: " + clt.username);
-    t == 1 ?    ret.append("\nOperator Status: true") \
-                : ret.append("\nOperator Status: false");
-    ret.append("\nrealname: " + clt.realname);
-    ret.append("\nID: " + itoa(clt.fd));
+    ret = IRC_NAME + static_cast<std::string>("003 ");
+    ret.append(clt.username + ": Nickname: " + clt.nickname + "\r\n");
+
+    ret.append(IRC_NAME + static_cast<std::string>("003 ") + clt.username + ": Username: " + clt.username + "\r\n");
+
+    ret.append(IRC_NAME + static_cast<std::string>("003 ") + clt.username);
+    ret.append(": realname: " + clt.realname + "\r\n");
+
+    ret.append(IRC_NAME + static_cast<std::string>("003 ") + clt.username);
+    t == 1 ?    ret.append(": Operator Status: true\r\n") \
+                : ret.append(": Operator Status: false\r\n");
+
+    ret.append(IRC_NAME + static_cast<std::string>("003 ") + clt.username);
+    ret.append(": ID: " + itoa(clt.fd));
 
     return (ret);
 }
@@ -45,22 +53,34 @@ std::string   Bot::botExecuter(std::string buff, const Client &clt)
         for (unsigned long i = 0; i < commands.size(); i++) {
             tokens = splitBySpace(commands[i]);
             if (!tokens.empty()) {
-                res =     (tokens[0].compare("/date") == 0)     * 1
-                        + (tokens[0].compare("/DATE") == 0)     * 1
-                        + (tokens[0].compare("/jokes") == 0)    * 2
-                        + (tokens[0].compare("/JOKES") == 0)    * 2
-                        + (tokens[0].compare("/whoami") == 0)   * 3;
+                res =     (tokens[0].compare("/date") == 0)     * 1 \
+                        + (tokens[0].compare("/DATE") == 0)     * 1 \
+                        + (tokens[0].compare("/jokes") == 0)    * 2 \
+                        + (tokens[0].compare("/JOKES") == 0)    * 2 \
+                        + (tokens[0].compare("/whoami") == 0)   * 3 \
+                        + (tokens[0].compare("/WHOAMI") == 0)   * 3;
+
                 switch (res)
                 {
                 case 1:
-                    ret = geTime();
+
+                    ret = static_cast<std::string>("003: ");
+
+                    // ret = clt.nickname;
+                    // ret.append(": ");
+                    ret.append(geTime());
                     break ;
 
                 case 2:
                     break ;
 
                 case 3:
-                    ret = getInfos(clt);
+                    // ret = clt.nickname;
+                    // ret.append(": ");
+                    ret.append(getInfos(clt));
+        // error.append(nick + static_cast<std::string>(" "));
+        // error.append(":Not enough parameters");
+        break ;
                     break ;
 
                 default:
