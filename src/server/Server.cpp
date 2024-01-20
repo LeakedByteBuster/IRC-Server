@@ -287,11 +287,13 @@ void            Server::handleIncomingConnections()
                                         userRegistration(id, commandStrings);
 
                                     } else if (clients[id].isRegistred == 1 ) {
+                                        
+                                        for (unsigned long n = 0; n < commandStrings.size(); n++) {
+                                            std::vector<std::string> commands = splitBySpace(commandStrings[n]);
+                                            // HandleIncomingMsg(commands, commandStrings[n]);
+                                            execute_commmand(this, commands, id);
 
-                                        std :: vector<std :: string> commands;
-
-                                        HandleIncomingMsg(commands, str.first);
-                                        execute_commmand(this, commands, id);
+                                        }
                                     }
                                 }
                             }
