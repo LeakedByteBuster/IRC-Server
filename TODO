@@ -9,7 +9,7 @@ Registration :
 
 Bot :
     - Jokes, time, WELCOME
-    - Class bot and its methods in server side
+    - using PRVMSG to send messages from bot instead of "003:"
 
 SEGFAULT :
     ...
