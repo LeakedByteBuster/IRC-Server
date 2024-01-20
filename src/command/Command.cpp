@@ -1,52 +1,8 @@
 #include "Command.hpp"
 #include "Server.hpp"
 #include "Bot.hpp"
+#include "utils.hpp"
 #include "registrationCommands.hpp"
-
-// split command into vector of string to check it
-std ::vector<std ::string> HandleIncomingMsg(std ::vector<std ::string> &commands, std ::string msg)
-{
-    std::stringstream ss(msg);
-    std ::string token;
-    std::string tmp;
-
-    std ::getline(ss, token, '\n');
-    std::stringstream parser(token);
-    while (getline(parser, tmp, ' '))
-    {
-        commands.push_back(tmp);
-    }
-    return (commands);
-}
-
-int whichCommand(const std::string &first_argument)
-{
-    int ret =   0;
-    ret =   (first_argument.compare("SENDFILE") == 0) * 1 \
-            + (first_argument.compare("GETFILE") == 0)  * 2 \
-
-            + (first_argument.compare("NICK") == 0)     * 3 \
-            + (first_argument.compare("nick") == 0)     * 3 \
-
-            + (first_argument.compare("PASS") == 0)     * 4 \
-            + (first_argument.compare("pass") == 0)     * 4 \
-
-            + (first_argument.compare("USER") == 0)     * 4 \
-            + (first_argument.compare("user") == 0)     * 4 \
-
-            + (first_argument.compare("PRVMSG") == 0)   * 5 \
-
-            + (first_argument.compare("PONG") == 0)     * 9 \
-
-            + (first_argument.compare("/DATE") == 0)    * 10 \
-            + (first_argument.compare("/date") == 0)    * 10 \
-
-            + (first_argument.compare("/JOKES") == 0)    * 11 \
-            + (first_argument.compare("/jokes") == 0)    * 11 \
-
-            + (first_argument.compare("/whoami") == 0)    * 12;
-    return (ret);
-}
 
 // check command if it's valide and exucte it
 void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> &commands, int id,std::map<int,channel> &channels)
@@ -63,20 +19,21 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
         {
             return;
         }
-        res = whichCommand(first_argument);
+
+        res =  whichCommand(first_argument);
+
         switch (res)
         {
-        case 1:
-            send_file(clients, commands, it->second);
+        case SENDFILE:
+            send_file(clients,commands,it->second);
             break;
 
-        case 2:
-            get_file(clients, commands, it->second);
+        case GETFILE:
+            get_file(clients,commands,it->second);
             break;
 
-        case 3:
-            try
-            {
+        case NICK:
+            try {
                 std::string buff;
                 for (unsigned long i = 0; i < commands.size(); i++)
                 {
@@ -86,29 +43,24 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
                 }
                 parseNick(clients, it->second, buff);
             }
-            catch (std::exception &e)
-            {
-            }
+            catch (std::exception &e) { }
             break;
-
-        case 4:
+        
+        case PASS_USER:
             Server::sendMsg(it->second, LogError::getError(it->second.nickname, LogError::ERR_ALREADYREGISTRED));
             break;
 
-        case 5:
+        case PRVMSG:
             prv_msg(channels, commands, it->second,clients);
+            break ;
+
+        case PONG: // ignore PONG
             break;
 
-        case 9:
-            // ignore PONG
+        case IRCBOT : // bot (time)
+            Server::sendMsg(it->second, Bot::botExecuter(commands[0], it->second));
             break;
 
-        case 10:
-            // bot
-            std::cout << commands[0] << std::endl;
-            Server::sendMsg(it->second, Bot::botExecuter(commands[0]));
-            break;
-        
         default:
             Server::sendMsg(it->second, LogError::getError(it->second.nickname, LogError::ERR_UNKNOWNCOMMAND));
             break;

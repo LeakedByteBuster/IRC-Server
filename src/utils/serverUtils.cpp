@@ -7,9 +7,11 @@
 #include "registrationCommands.hpp"
 #include "Client.hpp"
 #include "utils.hpp"
+#include "Command.hpp"
+
 
 /* -------------------------------------------------------------------------- */
-/*                          Sockets helper functions                          */
+/*                          Server helper functions                           */
 /* -------------------------------------------------------------------------- */
 
 bool    isNewConnection(const struct pollfd &fd, int srvfd)
@@ -50,6 +52,135 @@ bool    parseRegistrationCommands(std::map<int, Client> &clients,
         }
     }
     return (0);
+}
+
+//  type=0 : <client> || type=1 : nick!~user@hostname
+std::string getId(Client &clt, int type)
+{
+    std::string str;
+
+    switch (type)
+    {
+    case 0 :    /* <client> */
+        str = clt.nickname.append(" ");
+        break;
+    case 1 :    /* [<nick> '!' <user> ] ['@' <host> ] */
+        str = clt.nickname.append("!~");
+        str.append(clt.username.append("@"));
+        str.append(inet_ntoa(clt.hints.sin_addr));
+        break;
+    }
+    std::cout << "string ==> " << str << std::endl;
+    return (str);
+}
+
+int  parseInput(const char *port, std::string pass)
+{
+    char    *endptr = NULL;
+    long res = strtol(port, &endptr, 10);
+    if ((endptr && *endptr != '\0') || (res > USHRT_MAX)
+        || (res < 0)) {
+        throw std::invalid_argument("Error : invalid port number");
+    }
+
+    if (pass.length() == 0) {
+        throw std::invalid_argument("Error : empty password");
+    }
+    return (0);
+}
+
+std::pair<std::string, bool>    parseInput(std::string buff, std::map<int, std::string> &map,
+                            const std::vector<struct pollfd>  &fds, unsigned long &i)
+{
+    //  if buff doesn't have '\n' at the end
+    if (buff.rfind('\n') == std::string::npos) {
+        std::pair<std::map<int, std::string>::iterator,bool> itRet;
+        itRet = map.insert(std::pair<int, std::string>(fds[i].fd, buff));
+        if (itRet.second == false) {
+            map[fds[i].fd].append(buff); // join buff
+        }
+        return (make_pair(static_cast<std::string>(""), 0));
+    } 
+    // if client sent a '\n' but he has already a buff stored in map
+    if ( !map.empty() && (buff.find('\n') != std::string::npos)
+                && !map[fds[i].fd].empty() ) {
+        buff = map[fds[i].fd].append(buff);
+        map.erase(fds[i].fd);
+    }
+
+    #if defined(LOG)
+        std::cout << "buff in parseInput() : " << buff;
+        std::cout.flush();
+    #endif // LOG
+
+    return (make_pair(buff, 1));
+}
+
+void    deleteClient(std::map<int, std::string> &map, std::vector<struct pollfd> &fds, 
+            std::map<int, Client> &clients, std::map<int, std::vector<std::string> > &gbuff,
+            nfds_t &nfds, unsigned long i, int &fdsLeft)
+{
+    #if defined(LOG)
+        std::cout << geTime() << " | client disconnected " << std::endl;
+    #endif // LOG
+
+    // tmp buff used for registration
+    gbuff.erase(fds[i].fd);
+    //  Close client file descriptor
+    close(fds[i].fd);
+    // remove client from list clients that may have a buff not complete
+    map.erase(fds[i].fd);
+    // delete client from list of clients in server
+    clients.erase(fds[i].fd);
+    // delete client from vector given to poll()
+    fds.erase(fds.begin() + i);
+    // decrement number of file descriptors in pollfd
+    nfds--;
+    // decrement number of file descriptors handeled
+    fdsLeft--;
+}
+
+bool    readIncomingMsg(char ptr[], const int id)
+{
+    ssize_t                     bytes;
+
+    memset(ptr, 0, BYTES_TO_READ);
+    bytes = recv(id, (void *)ptr, BYTES_TO_READ - 1, 0);
+    if (bytes == -1) {
+        std::cerr << "Error recv(): an error occured" << std::endl;
+    }
+    return (bytes > 0 ? 1 : 0);
+}
+
+int whichCommand(const std::string &first_argument)
+{
+    int ret =   0;
+    ret =   (first_argument.compare("SENDFILE") == 0) * SENDFILE \
+            + (first_argument.compare("GETFILE") == 0)  * GETFILE \
+
+            + (first_argument.compare("NICK") == 0)     * NICK \
+            + (first_argument.compare("nick") == 0)     * NICK \
+
+            + (first_argument.compare("PASS") == 0)     * PASS_USER \
+            + (first_argument.compare("pass") == 0)     * PASS_USER \
+
+            + (first_argument.compare("USER") == 0)     * PASS_USER \
+            + (first_argument.compare("user") == 0)     * PASS_USER \
+
+            + (first_argument.compare("PRVMSG") == 0)   * PRVMSG \
+
+            + (first_argument.compare("PONG") == 0)     * PONG \
+
+            + (first_argument.compare("/DATE") == 0)    * IRCBOT \
+            + (first_argument.compare("/date") == 0)    * IRCBOT \
+
+            + (first_argument.compare("/JOKE") == 0)    * IRCBOT \
+            + (first_argument.compare("/joke") == 0)    * IRCBOT \
+
+            + (first_argument.compare("/whoami") == 0) * IRCBOT \
+            + (first_argument.compare("/WHOAMI") == 0)   * IRCBOT;
+
+    return (ret);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -93,62 +224,4 @@ void    printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr)
                 << " | port : "
                 << ntohs(cltAddr.sin_port)
                 << std::endl;
-}
-
-//  type=0 : <client> || type=1 : nick!~user@hostname
-std::string getId(Client &clt, int type)
-{
-    std::string str;
-
-    switch (type)
-    {
-    case 0 :    /* <client> */
-        str = clt.nickname.append(" ");
-        break;
-    case 1 :    /* [<nick> '!' <user> ] ['@' <host> ] */
-        str = clt.nickname.append("!~");
-        str.append(clt.username.append("@"));
-        str.append(inet_ntoa(clt.hints.sin_addr));
-        break;
-    }
-    std::cout << "string ==> " << str << std::endl;
-    return (str);
-}
-
-int  parseInput(const char *port, std::string pass)
-{
-    char    *endptr = NULL;
-    long res = strtol(port, &endptr, 10);
-    if ((endptr && *endptr != '\0') || (res > USHRT_MAX)
-        || (res < 0)) {
-        throw std::invalid_argument("Error : invalid port number");
-    }
-
-    if (pass.length() == 0) {
-        throw std::invalid_argument("Error : empty password");
-    }
-    return (0);
-}
-
-void    deleteClient(std::map<int, std::string> &map, std::vector<struct pollfd> &fds, 
-            std::map<int, Client> &clients, std::map<int, std::vector<std::string> > &gbuff,
-            nfds_t &nfds, unsigned long i, int &fdsLeft)
-{
-    #if defined(LOG)
-        std::cout << geTime() << " | client disconnected " << std::endl;
-    #endif // LOG
-
-    gbuff.erase(fds[i].fd);
-    //  Close client file descriptor
-    close(fds[i].fd);
-    // remove client from list clients that may have a buff not complete
-    map.erase(fds[i].fd);
-    // delete client from vector given to poll()
-    // delete client from list of clients in server
-    clients.erase(fds[i].fd);
-    // decrement number of file descriptors in pollfd
-    fds.erase(fds.begin() + i);
-    nfds--;
-    // decrement number of file descriptors handeled
-    fdsLeft--;
 }

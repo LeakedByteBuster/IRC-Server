@@ -2,11 +2,9 @@ NAME = ircserv
 
 TESTS_NAME = testIRC
 
-BOT_NAME = botIRC
-
 CXX = c++
 
-CXXFLAGS = -Wall -Werror -Wextra -g -fsanitize=address
+CXXFLAGS = -Wall -Werror -Wextra
 
 STD = -std=c++98
 
@@ -34,9 +32,8 @@ ifeq ($(build), tests)
 	NAME=$(TESTS_NAME)
 else ifeq ($(build), log)
 	CXXFLAGS+=-DLOG
-else ifeq ($(build), bot)
-	SRC=$(shell find IRCbot -type f -name "*.cpp")
-	NAME=$(BOT_NAME)
+else ifeq ($(build), debug)
+	CXXFLAGS+=-DDEBUG
 else ifeq ($(build), sani)
 	CXXFLAGS+=-fsanitize=address
 endif
@@ -51,8 +48,6 @@ $(OBJ_DIR)/%.o : %.cpp
 #	@ printf $(HYEL)"[+]"$(HWHT)" COMPILING"$(HYEL)" ⤐  "$(HWHT)"%s\n"$(NC) $(notdir $<)
 	$(CXX) $(STD) $(CXXFLAGS) $(INCLUDE) -MMD -o $@ -c $<
 	@ printf $(NC)
-
-
 
 clean :
 	@ $(RM) $(OBJ_DIR)
@@ -69,5 +64,3 @@ fcleanbot :
 re : fclean all
 
 -include $(DEPS)
-
-

@@ -1,6 +1,4 @@
-#include "Command.hpp"
-
-
+#include "Server.hpp"
 
 int search_in_channels(std::map<int,channel> channels ,std::string name,Client clt)
 {

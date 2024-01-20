@@ -1,4 +1,6 @@
-#pragma once
+#if !defined(TFILE_HPP)
+#define TFILE_HPP
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -29,3 +31,5 @@ class TFile
     std::FILE*  getstream(){return fd;};
     ~TFile(){};
 };
+
+#endif // TFILE_HPP

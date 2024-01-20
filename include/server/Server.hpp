@@ -2,8 +2,6 @@
 #define SERVER_HPP
 
 /*  Containers  */
-// #include <vector> // std::vector
-// #include <string>
 #include <utility>
 
 /* Sockets */
@@ -15,7 +13,6 @@
 #include <netdb.h> // getaddinfo()
 
 /* I/O */
-// #include <iostream> // std::cout...
 #include <unistd.h> // write()
 #include <fcntl.h> // fcntl()
 
@@ -47,20 +44,16 @@ public :
     const int &                 getListenFd() const;
     const std::string &         getPassword() const;
 
-            //  Accepts clients connections
+	    //  Accepts clients connections
     void    handleIncomingConnections();
-            //  Add socket fd to the vector and increment nfds by 1
+	    //  Add socket fd to the vector and increment nfds by 1
     void    addNewPollfd(int fd, std::vector<struct pollfd> &fds, nfds_t &nfds);
-            //  checks if checks if there is a revents in one of the fds
+	    //  checks if checks if there is a revents in one of the fds
     int     isPollReady(std::vector<struct pollfd> &fds, nfds_t &nfds);
-            //  returns 0 if connection is done successfully, otherwise 0 is returned
+	    //  returns 0 if connection is done successfully, otherwise 0 is returned
     bool    addNewClient(std::vector<struct pollfd> &fds, nfds_t *nfds, int &fdsLeft);
 
     void    userRegistration(int fd, std::vector<std::string> string);
-
-            //	checks if msg revceived has a '\n'
-    std::pair<std::string, bool>   ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
-                                const std::vector<struct pollfd>  &fds, unsigned long &i);
 
     static void    sendMsg(const Client &target, std::string msg);
     // void    sendMsg(const Channels &target, const std::string &msg);
@@ -82,27 +75,5 @@ private :
     // make class command a friend to server class to get client id from class command
     friend class command;
 };
-
-bool    parseRegistrationCommands(std::map<int, Client> &clients, 
-            std::vector<std::string> &str, Client &client, const std::string &pass);
-//                 //  prints date, time, host, ip and port in STDOUT
-// void            serverWelcomeMessage(const struct sockaddr_in &srvSock, int sfd);
-//                 //  prints on client side
-// void            clientWelcomeMessage(unsigned short cfd);
-//                 //  print IP and host of connected client on server side
-// void            printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr);
-//                 //  returns current local time
-// std::string     geTime();
-//                 //  Checks if fd.revents == POLLIN
-// bool            isReadable(const struct pollfd &fd);
-//                 //  checks if fd.revents == POLLERR | POLLHUP
-// bool            isError(int revents, int fd, int listenFd);
-//                 //  checks if (revents == POLLIN) && (fd == server fd)
-// bool            isNewConnection(const struct pollfd &fd, int srvfd);
-//                 //  type=0 : <client> || type=1 : nick!~user@hostname
-// std::string     getId(Client &clt, int type);
-
-
-std::vector<std::string>     splitByLines(std::string buff);
 
 #endif // SERVER_HPP

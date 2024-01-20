@@ -1,28 +1,11 @@
 #include "Errors.hpp"
 #include "Server.hpp"
 
-static  std::string getPassError (const std::string &nick) 
-{
-    std::string str;
-
-    str = IRC_NAME + static_cast<std::string>("464 ");
-    str.append(nick + static_cast<std::string>(" "));
-    str.append (
-        ":Password Incorrect\n"
-    );
-    return (str);
-}
-
 std::string LogError::registrationSuccess(const std::string &nick)
 {
-    /* REGISTERED_SUCCESS
-
-    S <-   :irc.example.com 001 <nick> :Welcome to the ExampleNet Internet Relay Chat Network <nick>
-    */
     std::string str;
 
-    str = IRC_NAME + static_cast<std::string>("001 ");
-    str.append(nick + static_cast<std::string>(" "));
+    str = IRC_NAME + static_cast<std::string>("001 * ");
     str.append(
         ":Welcome to the Camel Internet Relay Chat Network " + nick
     );
@@ -41,96 +24,40 @@ std::string  LogError :: rplAwayMsg(Client &clt,std :: string str)
     return(msg);
 }
 
-std::string    LogError::getError(const std::string &nick, short type)
+#define FOR_LIST_OF_ERRORS(BUILD_MESSAGE) \
+    BUILD_MESSAGE(LogError::INCORRECT_PASS, 464 * , : Password Incorrect)           \
+    BUILD_MESSAGE(LogError::ERR_NONICKNAMEGIVEN, 431 * , : No nickname given)       \
+    BUILD_MESSAGE(LogError::ERR_ERRONEUSNICKNAME, 432 * , : Erroneous nickname)     \
+    BUILD_MESSAGE(LogError::ERR_ERRONEUSUSERNAME, 432 * , : Erroneous username)     \
+    BUILD_MESSAGE(LogError::ERR_NICKNAMEINUSE, 433 * , : Nickname is already in use)\
+    BUILD_MESSAGE(LogError::ERR_NEEDMOREPARAM, 461 * , : Not enough parameters)     \
+    BUILD_MESSAGE(LogError::ERR_ALREADYREGISTRED, 462 * , : You may not reregister) \
+    BUILD_MESSAGE(LogError::ERR_UNKNOWNCOMMAND, 421 * , : Unknown command)          \
+    BUILD_MESSAGE(LogError::ERR_NOSUCHFILE, 1336 * , : No such a file in /DIR)      \
+    BUILD_MESSAGE(LogError::ERR_NOSUCHNICK, 133 * , : No such nick/channel)         \
+    BUILD_MESSAGE(LogError::ERR_NOSUCHFILENAME, 1336 * , : /file name not found)    \
+    BUILD_MESSAGE(LogError::ERR_NOFILEFROMSENDER, 1335 * , : No file from sender)   \
+    BUILD_MESSAGE(LogError::ERR_NOTEXTTOSEND, 412 * , : No text to send)            \
+    BUILD_MESSAGE(LogError::ERR_CANNOTSENDTOCHAN, 404 * , : Cannot send to channel)
+
+std::string LogError::getError(const std::string &, short type)
 {
     std::string error;
 
     switch (type)
     {
-    case LogError::INCORRECT_PASS :
-        return (getPassError(nick));
+        #define BUILD_MESSAGE(errorType, errorNum, errorMsg) \
+            case LogError::errorType: \
+                error = IRC_NAME + static_cast<std::string>(#errorNum); \
+                error.append(#errorMsg); \
+                break;
 
-    case LogError::ERR_NONICKNAMEGIVEN:
-        error = IRC_NAME + static_cast<std::string>(" 431 * ");
-        error.append(nick + static_cast<std::string>(" "));
-        error.append(":No nickname given");
-        break ;
+            FOR_LIST_OF_ERRORS(BUILD_MESSAGE)
+        #undef BUILD_MESSAGE
 
-    case LogError::ERR_ERRONEUSNICKNAME :
-        error = IRC_NAME + static_cast<std::string>("432 ");
-        error.append(nick + static_cast<std::string>(" "));
-        error.append(":Erroneous nickname");
-        break;
-
-    case LogError::ERR_ERRONEUSUSERNAME :
-        error = IRC_NAME + static_cast<std::string>("432 ");
-        error.append(nick + static_cast<std::string>(" "));
-        error.append(":Erroneous username");
-        break;
-
-    case LogError::ERR_NICKNAMEINUSE :
-        error = IRC_NAME + static_cast<std::string>("433 * ");
-        error.append(nick + static_cast<std::string>(" "));
-        error.append(":Nickname is already in use");
-        break ;
-
-    case LogError::ERR_NEEDMOREPARAM :
-        error = IRC_NAME + static_cast<std::string>(" 461 * ");
-        error.append(nick + static_cast<std::string>(" "));
-        error.append(":Not enough parameters");
-        break ;
-
-    case LogError::ERR_ALREADYREGISTRED :
-        error = IRC_NAME + static_cast<std::string>(" 462 ");
-        error.append(nick + static_cast<std::string>(" "));
-        error.append(":You may not reregister ");
-        break ;
-
-    case LogError::ERR_UNKNOWNCOMMAND :
-        error = IRC_NAME + static_cast<std::string>(" 421 ");
-        error.append(nick + static_cast<std::string>(" "));
-        error.append(":Unknown command");
-        break ;
-    
-     case LogError::ERR_NOSUCHFILE :
-        error = IRC_NAME + static_cast<std::string>("1336 ");
-        error.append(nick + static_cast<std::string>(" "));
-        error.append(":No such a file in /DIR");
-        break ;
-
-    case LogError::ERR_NOSUCHNICK :
-        error = IRC_NAME + static_cast<std::string>(" 133 ");
-        error.append(nick + static_cast<std::string>(" "));
-        error.append(":No such nick/channel");
-        break ;
-
-    case LogError::ERR_NOSUCHFILENAME :
-        error = IRC_NAME + static_cast<std::string>(" 1336 ");
-        error.append(nick + static_cast<std::string>(" "));
-        error.append(": /file name not found");
-        break ;
-    
-    case LogError::ERR_NOFILEFROMSENDER :
-        error = IRC_NAME + static_cast<std::string>("1335");
-        error.append(nick + static_cast<std::string>(" "));
-        error.append(": No file from sender");
-        break ;
-
-    case LogError::ERR_NOTEXTTOSEND :
-        error = IRC_NAME + static_cast<std::string>("412");
-        error.append(nick + static_cast<std::string>(" "));
-        error.append(":No text to send");
-        break ;
-
-    case LogError::ERR_CANNOTSENDTOCHAN :
-        error = IRC_NAME + static_cast<std::string>(" 404 ");
-        error.append(nick + static_cast<std::string>(" "));
-        error.append(":Cannot send to channel");
-        break ;
-    
     default:
-        std::cerr << "Warning passErrors: Unknown type : " << type << std::endl;
+        std::cerr << "Warning getError(): Unknown type: " << type << std::endl;
     }
 
-    return (error);
+    return error;
 }

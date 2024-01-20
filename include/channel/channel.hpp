@@ -1,6 +1,5 @@
 #pragma once 
 
-#include <iostream> 
 #include <iostream>
 #include <vector>
 #include <map>
@@ -8,7 +7,7 @@
 // join errors 
 #include "vector"
 #include<set>
-#include"../client/Client.hpp"
+// #include"Client.hpp"
 // #define ERR_NEEDMOREPARAMS "461  : Not enough parameters\n"
 #define ERR_NOSUCHCHANNEL "403 :No such channel\n"
 #define ERR_TOOMANYCHANNELS ":You have joined too many channels\n"
