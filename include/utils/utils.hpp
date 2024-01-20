@@ -34,11 +34,12 @@ std::vector<std::string>    splitByLines(std::string buff);
 std::vector<std::string>    splitBySpace(std::string str);
 int                         parseInput(const char *port, std::string pass);
 const char *                getBigMsg();
+int                         whichCommand(const std::string &first_argument);
+bool                        readIncomingMsg(char ptr[], const int id);
 void                        deleteClient(std::map<int, std::string> &map, std::vector<struct pollfd> &fds, 
             std::map<int, Client> &clients, std::map<int, std::vector<std::string> > &gbuff,
             nfds_t &nfds, unsigned long i, int &fdsLeft);
-int                         whichCommand(const std::string &first_argument);
-bool                        readIncomingMsg(char ptr[], const int id);
-
+bool						parseRegistrationCommands(std::map<int, Client> &clients, 
+	    			std::vector<std::string> &str, Client &client, const std::string &pass);
 
 #endif // UTILS_CPP
