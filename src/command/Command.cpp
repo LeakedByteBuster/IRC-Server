@@ -1,6 +1,7 @@
 #include "Command.hpp"
 #include "Server.hpp"
 #include "Bot.hpp"
+#include "utils.hpp"
 #include "registrationCommands.hpp"
 
 
@@ -17,37 +18,6 @@ std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &co
             commands.push_back(tmp);
         }
     return(commands);
-}
-
-int whichCommand(const std::string &first_argument)
-{
-    int ret =   0;
-    ret =   (first_argument.compare("SENDFILE") == 0) * 1 \
-            + (first_argument.compare("GETFILE") == 0)  * 2 \
-
-            + (first_argument.compare("NICK") == 0)     * 3 \
-            + (first_argument.compare("nick") == 0)     * 3 \
-
-            + (first_argument.compare("PASS") == 0)     * 4 \
-            + (first_argument.compare("pass") == 0)     * 4 \
-
-            + (first_argument.compare("USER") == 0)     * 4 \
-            + (first_argument.compare("user") == 0)     * 4 \
-
-            + (first_argument.compare("PRVMSG") == 0)   * 5 \
-
-            + (first_argument.compare("PONG") == 0)     * 9 \
-
-            + (first_argument.compare("/DATE") == 0)    * 10 \
-            + (first_argument.compare("/date") == 0)    * 10 \
-
-            + (first_argument.compare("/JOKES") == 0)    * 11 \
-            + (first_argument.compare("/jokes") == 0)    * 11 \
-
-            + (first_argument.compare("/whoami") == 0) * 12 \
-            + (first_argument.compare("/WHOAMI") == 0)   * 12;
-
-    return (ret);
 }
 
 // check command if it's valide and exucte it
@@ -68,15 +38,15 @@ void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, in
 
         switch (res)
         {
-        case 1:
+        case SENDFILE:
             send_file(sev,commands,it->second);
             break;
-        
-        case 2:
+
+        case GETFILE:
             get_file(sev,commands,it->second);
             break;
 
-        case 3:
+        case NICK:
             try {
                 std::string buff;
                 for (unsigned long i = 0; i < commands.size(); i++) {
@@ -88,26 +58,18 @@ void    execute_commmand(Server *sev, std :: vector<std :: string> &commands, in
             } catch (std::exception &e) { }
             break;
         
-        case 4:
+        case PASS_USER:
             Server::sendMsg(it->second, LogError::getError(it->second.nickname, LogError::ERR_ALREADYREGISTRED));
             break;
 
-        case 5:
+        case PRVMSG:
             // prv_msg(sev,commands,id);
             break;
 
-        case 9: // ignore PONG
+        case PONG: // ignore PONG
             break;
 
-        case 10 : // bot (time)
-            Server::sendMsg(it->second, Bot::botExecuter(commands[0], it->second));
-            break;
-
-        case 11 : // bot (jokes)
-            Server::sendMsg(it->second, Bot::botExecuter(commands[0], it->second));
-            break;
-        
-        case 12 : // bot (/whomai)
+        case IRCBOT : // bot (time)
             Server::sendMsg(it->second, Bot::botExecuter(commands[0], it->second));
             break;
 

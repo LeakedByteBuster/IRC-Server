@@ -10,6 +10,18 @@
 #include "Errors.hpp"
 
 class Server;
+
+enum    Commands {
+    UNKNOWN,
+    SENDFILE,
+    GETFILE,
+    NICK,
+    PASS_USER,
+    PRVMSG,
+    PONG,
+    IRCBOT
+};
+
 // handle the buffer that's comming from server and parse it into vector<string>
 std :: vector<std :: string> HandleIncomingMsg(std :: vector<std :: string> & commands,std :: string msg);
 // compare first string in vector too see if is a valid command

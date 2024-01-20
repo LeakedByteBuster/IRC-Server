@@ -7,6 +7,8 @@
 #include "registrationCommands.hpp"
 #include "Client.hpp"
 #include "utils.hpp"
+#include "Command.hpp"
+
 
 /* -------------------------------------------------------------------------- */
 /*                          Server helper functions                           */
@@ -152,4 +154,35 @@ void    printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr)
                 << " | port : "
                 << ntohs(cltAddr.sin_port)
                 << std::endl;
+}
+
+int whichCommand(const std::string &first_argument)
+{
+    int ret =   0;
+    ret =   (first_argument.compare("SENDFILE") == 0) * SENDFILE \
+            + (first_argument.compare("GETFILE") == 0)  * GETFILE \
+
+            + (first_argument.compare("NICK") == 0)     * NICK \
+            + (first_argument.compare("nick") == 0)     * NICK \
+
+            + (first_argument.compare("PASS") == 0)     * PASS_USER \
+            + (first_argument.compare("pass") == 0)     * PASS_USER \
+
+            + (first_argument.compare("USER") == 0)     * PASS_USER \
+            + (first_argument.compare("user") == 0)     * PASS_USER \
+
+            + (first_argument.compare("PRVMSG") == 0)   * PRVMSG \
+
+            + (first_argument.compare("PONG") == 0)     * PONG \
+
+            + (first_argument.compare("/DATE") == 0)    * IRCBOT \
+            + (first_argument.compare("/date") == 0)    * IRCBOT \
+
+            + (first_argument.compare("/JOKES") == 0)    * IRCBOT \
+            + (first_argument.compare("/jokes") == 0)    * IRCBOT \
+
+            + (first_argument.compare("/whoami") == 0) * IRCBOT \
+            + (first_argument.compare("/WHOAMI") == 0)   * IRCBOT;
+
+    return (ret);
 }
