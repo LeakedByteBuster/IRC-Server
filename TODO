@@ -19,13 +19,14 @@ SEGFAULT :
 LimeChat :
     - Error sendMsg(): Socket operation on non-socket
         (happens sometimes after send nick command)
+    - Handle QUIT command sent by LimeChat when client disconnect
 
 Server :
     - MSG_NOSIGNAL (SIGPIPE)
 
 PASS 3
 NICK Douga
-USER hoba 0 * loba
+USER hoba 0 * loba hoba douga
 
 SENDFILE
 SENDFILE
