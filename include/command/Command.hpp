@@ -26,8 +26,8 @@ enum    Commands {
 
 // compare first string in vector too see if is a valid command
 void                        execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> &commands, int id,std::map<int,channel> &channels);
-void                        send_file(std::map<int,Client>clients,std :: vector<std :: string> & commands,Client cl);
-void                        get_file(std::map<int,Client> clients,std :: vector<std :: string> command,Client cl);
+void                        send_file(std::map<int,Client> &clients,std :: vector<std :: string> & commands,Client &cl);
+void                        get_file(std::map<int,Client> &clients,std :: vector<std :: string> &command,Client &cl);
 int                         search_a_file(Client clt,std :: string sender);
 void                        creat_file(Client clt,std :: string sender,std :: string filename);
 void                        prv_msg(std::map<int,channel> &channels,std::vector<std :: string>command,Client clt,std::map<int,Client> Clients);

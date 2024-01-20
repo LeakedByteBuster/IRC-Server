@@ -19,7 +19,7 @@ class TFile
 
     public :
 
-    // ructor
+    // Constructor
     TFile(std::FILE *Fd,std :: string  Filename,std :: string  Sender,std :: string Receiver) :sender(Sender),receiver(Receiver),filename(Filename),fd(Fd)
     {
     };

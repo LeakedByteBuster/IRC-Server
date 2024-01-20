@@ -19,7 +19,7 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
         {
             return;
         }
-
+        std::cout <<"size in server :"<< it->second.Files.size()<<std::endl;
         res =  whichCommand(first_argument);
 
         switch (res)
@@ -87,7 +87,7 @@ int search_a_client(std::map<int,Client> clients, std ::string NickName)
 }
 
 // SYNTAXE SENDFILE FILENAME  RECIEVER
-void send_file(std::map<int,Client> clients, std ::vector<std ::string> &commands, Client cl)
+void send_file(std::map<int,Client> &clients, std ::vector<std ::string> &commands, Client &cl)
 {
     std ::FILE *FileName;
 
@@ -111,25 +111,28 @@ void send_file(std::map<int,Client> clients, std ::vector<std ::string> &command
         return;
     }
     // creat object file and push it in client vector of files
+    // fl(FILE *,FILNAME,SENDER,RECEIVER);
     TFile fl(FileName, commands[1].c_str(), cl.nickname, commands[2].c_str());
     std::map<int, Client>::iterator rec = clients.find(fd);
     rec->second.Files.push_back(fl);
+    std :: cout <<"FILE SIZE "<<rec->second.Files.size() << std :: endl;
     cl.sendMsg(cl, getDownMsg());
 }
 
 // SYNTAXE : GETFILE FILENAME SENDER
-void get_file(std::map<int,Client> clients, std ::vector<std ::string> command, Client cl)
+void get_file(std::map<int,Client> &clients, std ::vector<std ::string> &command, Client &cl)
 {
     if (command.size() != 3)
     {
         Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NEEDMOREPARAM));
         return;
     }
-    // else if (command[1].empty())
-    // {
-    //     Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILENAME));
-    //     return;
-    // }
+    else if (command[1].empty())
+    {
+        std::cout <<"client file size "<<cl.Files.size() << std::endl;
+        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILENAME));
+        return;
+    }
     // if c'ant find the sender of file
     else if (!search_a_client(clients, command[2]))
     {
@@ -139,6 +142,7 @@ void get_file(std::map<int,Client> clients, std ::vector<std ::string> command, 
     //if there is no files in client vector files
     else if (cl.Files.empty())
     {
+        // std::cout << "reciever :"<<cl.fd<<std::endl;
         Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILENAME));
         return;
     }
