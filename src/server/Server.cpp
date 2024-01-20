@@ -259,11 +259,12 @@ void            Server::handleIncomingConnections()
                                 if (commandStrings.size() > 0) {
                                     if (clients[id].isRegistred == 0) {
                                         userRegistration(id, commandStrings);
-                                    } else if (clients[id].isRegistred == 1 ) {
-                                        for (size_t n = 0; n < commandStrings.size(); n++) {
-                                            std::vector<std::string> commands = splitBySpace(commandStrings[n]);
-                                            execute_commmand(clients, commands, pollFds[i].fd,channles);
-                                        }
+                                        fdsLeft--;
+                                        continue;
+                                    }
+                                    for (size_t n = 0; n < commandStrings.size(); n++) {
+                                        std::vector<std::string> commands = splitBySpace(commandStrings[n]);
+                                        execute_commmand(clients, commands, pollFds[i].fd,channles);
                                     }
                                 }
                             }
