@@ -51,7 +51,7 @@ std::string    LogError::getError(const std::string &nick, short type)
         return (getPassError(nick));
 
     case LogError::ERR_NONICKNAMEGIVEN:
-        error = IRC_NAME + static_cast<std::string>("431 * ");
+        error = IRC_NAME + static_cast<std::string>(" 431 * ");
         error.append(nick + static_cast<std::string>(" "));
         error.append(":No nickname given");
         break ;
@@ -75,37 +75,37 @@ std::string    LogError::getError(const std::string &nick, short type)
         break ;
 
     case LogError::ERR_NEEDMOREPARAM :
-        error = IRC_NAME + static_cast<std::string>("461 * ");
+        error = IRC_NAME + static_cast<std::string>(" 461 * ");
         error.append(nick + static_cast<std::string>(" "));
         error.append(":Not enough parameters");
         break ;
 
     case LogError::ERR_ALREADYREGISTRED :
-        error = IRC_NAME + static_cast<std::string>("462 ");
+        error = IRC_NAME + static_cast<std::string>(" 462 ");
         error.append(nick + static_cast<std::string>(" "));
         error.append(":You may not reregister ");
         break ;
 
     case LogError::ERR_UNKNOWNCOMMAND :
-        error = IRC_NAME + static_cast<std::string>("421 ");
+        error = IRC_NAME + static_cast<std::string>(" 421 ");
         error.append(nick + static_cast<std::string>(" "));
         error.append(":Unknown command");
         break ;
     
      case LogError::ERR_NOSUCHFILE :
-        error = IRC_NAME + static_cast<std::string>("1336");
+        error = IRC_NAME + static_cast<std::string>("1336 ");
         error.append(nick + static_cast<std::string>(" "));
         error.append(":No such a file in /DIR");
         break ;
 
     case LogError::ERR_NOSUCHNICK :
-        error = IRC_NAME + static_cast<std::string>("133");
+        error = IRC_NAME + static_cast<std::string>(" 133 ");
         error.append(nick + static_cast<std::string>(" "));
         error.append(":No such nick/channel");
         break ;
 
     case LogError::ERR_NOSUCHFILENAME :
-        error = IRC_NAME + static_cast<std::string>("1336");
+        error = IRC_NAME + static_cast<std::string>(" 1336 ");
         error.append(nick + static_cast<std::string>(" "));
         error.append(": /file name not found");
         break ;
@@ -123,7 +123,7 @@ std::string    LogError::getError(const std::string &nick, short type)
         break ;
 
     case LogError::ERR_CANNOTSENDTOCHAN :
-        error = IRC_NAME + static_cast<std::string>("404");
+        error = IRC_NAME + static_cast<std::string>(" 404 ");
         error.append(nick + static_cast<std::string>(" "));
         error.append(":Cannot send to channel");
         break ;

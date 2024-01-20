@@ -19,6 +19,35 @@ std ::vector<std ::string> HandleIncomingMsg(std ::vector<std ::string> &command
     return (commands);
 }
 
+int whichCommand(const std::string &first_argument)
+{
+    int ret =   0;
+    ret =   (first_argument.compare("SENDFILE") == 0) * 1 \
+            + (first_argument.compare("GETFILE") == 0)  * 2 \
+
+            + (first_argument.compare("NICK") == 0)     * 3 \
+            + (first_argument.compare("nick") == 0)     * 3 \
+
+            + (first_argument.compare("PASS") == 0)     * 4 \
+            + (first_argument.compare("pass") == 0)     * 4 \
+
+            + (first_argument.compare("USER") == 0)     * 4 \
+            + (first_argument.compare("user") == 0)     * 4 \
+
+            + (first_argument.compare("PRVMSG") == 0)   * 5 \
+
+            + (first_argument.compare("PONG") == 0)     * 9 \
+
+            + (first_argument.compare("/DATE") == 0)    * 10 \
+            + (first_argument.compare("/date") == 0)    * 10 \
+
+            + (first_argument.compare("/JOKES") == 0)    * 11 \
+            + (first_argument.compare("/jokes") == 0)    * 11 \
+
+            + (first_argument.compare("/whoami") == 0)    * 12;
+    return (ret);
+}
+
 // check command if it's valide and exucte it
 void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> &commands, int id,std::map<int,channel> &channels)
 {
@@ -34,6 +63,7 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
         {
             return;
         }
+        res = whichCommand(first_argument);
         switch (res)
         {
         case 1:
@@ -143,18 +173,18 @@ void get_file(std::map<int,Client> clients, std ::vector<std ::string> command, 
         Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NEEDMOREPARAM));
         return;
     }
-    else if (command[1].empty())
-    {
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILENAME));
-        return;
-    }
+    // else if (command[1].empty())
+    // {
+    //     Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILENAME));
+    //     return;
+    // }
     // if c'ant find the sender of file
     else if (!search_a_client(clients, command[2]))
     {
         Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHNICK));
         return;
     }
-    // if there is no files in client vector files
+    //if there is no files in client vector files
     else if (cl.Files.empty())
     {
         Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILENAME));
@@ -295,6 +325,10 @@ void check_targets(std::map<int,channel> channels, std::vector<std::string> comm
                 (void) it;
 
                 // send Massege to channel
+            }
+            else
+            {
+                Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOSUCHNICK));
             }
         }
         else

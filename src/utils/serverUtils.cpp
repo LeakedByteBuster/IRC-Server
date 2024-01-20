@@ -144,10 +144,10 @@ void    deleteClient(std::map<int, std::string> &map, std::vector<struct pollfd>
     // remove client from list clients that may have a buff not complete
     map.erase(fds[i].fd);
     // delete client from vector given to poll()
-    fds.erase(fds.begin() + i);
     // delete client from list of clients in server
     clients.erase(fds[i].fd);
     // decrement number of file descriptors in pollfd
+    fds.erase(fds.begin() + i);
     nfds--;
     // decrement number of file descriptors handeled
     fdsLeft--;
