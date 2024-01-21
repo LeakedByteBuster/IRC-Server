@@ -2,9 +2,6 @@
 #define SERVER_HPP
 
 /*  Containers  */
-// #include <vector> // std::vector
-// #include <string>
-#include <map>
 #include <utility>
 
 /* Sockets */
@@ -16,7 +13,6 @@
 #include <netdb.h> // getaddinfo()
 
 /* I/O */
-// #include <iostream> // std::cout...
 #include <unistd.h> // write()
 #include <fcntl.h> // fcntl()
 
@@ -50,7 +46,7 @@ public :
     const std::string &         getPassword() const;
 	       //get channel map 
 	std::map<std::string, channel>  & getChannelMap ()const;
-	std::map<std::string, channel> channelsInServer;
+	static std::map<std::string, channel> channelsInServer;
 
 	    //  Accepts clients connections
     void    handleIncomingConnections();
@@ -66,22 +62,20 @@ public :
 
 	//  void parse_kick_command (std::vector<std::string> & commands,int id);
 
-            //	checks if msg revceived has a '\n'
-    std::pair<std::string, bool>   ReadIncomingMsg(std::string buff, std::map<int, std::string> &map,
-                                const std::vector<struct pollfd>  &fds, unsigned long &i);
-
     static void    sendMsg(const Client &target, std::string msg);
     // void    sendMsg(const Channels &target, const std::string &msg);
 
     //  list of clients connected to the server || Nickname, Client class
-void parse_command(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, int id);
     std::map<int, Client>       clients;
 
     // get client 
     Client & get_Client();
     
+    
 
 
+    //  list of channels in the server
+    std::map<int, channel>       channles;
 private :
 
 	// server's password
@@ -99,6 +93,8 @@ private :
 
 bool    parseRegistrationCommands(std::map<int, Client> &clients, 
             std::vector<std::string> &str, Client &client, const std::string &pass);
+    
+void parse_command(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, int id);
 //                 //  prints date, time, host, ip and port in STDOUT
 // void            serverWelcomeMessage(const struct sockaddr_in &srvSock, int sfd);
 //                 //  prints on client side

@@ -2,14 +2,17 @@
 #define UTILS_HPP
 
 #include <vector> // std::vector
+#include <map>
 #include <string>
 #include <sstream>
 #include <iostream>
 
+#define BYTES_TO_READ   4096
 
 struct pollfd;
 struct sockaddr_in;
 class Client;
+typedef unsigned int nfds_t;
 
                             //  prints date, time, host, ip and port in STDOUT
 void                        serverWelcomeMessage(const struct sockaddr_in &srvSock, int sfd);
@@ -31,4 +34,14 @@ std::vector<std::string>    splitByLines(std::string buff);
 std::vector<std::string>    splitBySpace(std::string str);
 int                         parseInput(const char *port, std::string pass);
 const char *                getBigMsg();
+int                         whichCommand(const std::string &first_argument);
+bool                        readIncomingMsg(char ptr[], const int id);
+void                        deleteClient(std::map<int, std::string> &map, std::vector<struct pollfd> &fds, 
+            std::map<int, Client> &clients, std::map<int, std::vector<std::string> > &gbuff,
+            nfds_t &nfds, unsigned long i, int &fdsLeft);
+bool						parseRegistrationCommands(std::map<int, Client> &clients, 
+	    			std::vector<std::string> &str, Client &client, const std::string &pass);
+std::pair<std::string, bool>    parseInput(std::string buff, std::map<int, std::string> &map,
+                            const std::vector<struct pollfd>  &fds, unsigned long &i);
+
 #endif // UTILS_CPP

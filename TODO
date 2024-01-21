@@ -9,7 +9,7 @@ Registration :
 
 Bot :
     - Jokes, time, WELCOME
-    - Class bot and its methods in server side
+    - using PRVMSG to send messages from bot instead of "003:"
 
 SEGFAULT :
     ...
@@ -19,12 +19,14 @@ SEGFAULT :
 LimeChat :
     - Error sendMsg(): Socket operation on non-socket
         (happens sometimes after send nick command)
+    - Handle QUIT command sent by LimeChat when client disconnect
 
-
+Server :
+    - MSG_NOSIGNAL (SIGPIPE)
 
 PASS 0000
-NICK marouan
-USER fouadi 0 * Mushi
+NICK Doum
+USER hoba 0 * loba hoba douga
 
 SENDFILE
 SENDFILE

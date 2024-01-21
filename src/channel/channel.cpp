@@ -4,9 +4,9 @@ channel::channel()
 {
 
 }
-channel::channel(int id,std::string name,std::string key ,bool isoperator)
+channel::channel(Client clt ,std::string name,std::string key ,bool isoperator)
 {
-	this->id_clients_in_channel.push_back(id);
+	this->id_clients_in_channel.push_back(clt.fd);
     this->name = name;
     this->key = key;
     this->keyMode = 0 ;
@@ -16,10 +16,11 @@ channel::channel(int id,std::string name,std::string key ,bool isoperator)
     this->limit = 20 ;
     this->operatorMode = isoperator;
     
-    std::cout << " channel " << name  << "  created by client : " << id << "\n";
+    Server::sendMsg (clt ,":"+clt.nickname+"!~"+clt.username+"@"+ " JOIN :" + name );
 
 }
 //getters and setters
+    std::string channel::getName(){return this->name;}
     std::vector <int>& channel::get_id_clients_in_channel (void){return this->id_clients_in_channel;}
 	int channel::getLimit(void) const  {return this->limit;}
     const std::string & channel::getKey (void) const {return this->key;}
@@ -28,7 +29,6 @@ channel::channel(int id,std::string name,std::string key ,bool isoperator)
 	bool channel::getkeyMode (void) const{return this->keyMode;}
 	bool channel::getOperatorMode (void) const{return this->operatorMode;}
 	bool channel::getLimitMode (void) const {return this->inviteMode;}
-
 channel::~channel()
 {
 }
@@ -64,8 +64,6 @@ int  parse_channel_name_token (std::string token)
 
 int check_is_valid_key(std::string & line)
 {
-    // if (line.length () < 4)
-    //     return (0);
     for (size_t i =1 ; i < line.length ()-1 ;i++)
     {
         if (!isalnum (line [i]) || (line[i] == ',' &&!isalnum(line[i+1])))
@@ -126,15 +124,14 @@ std::vector<std::string> parse_channel(const std::string& str)
     return channel_names;
 }
 
-std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(std::vector<std::string> & commands,int id)
+std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(std::vector<std::string> & commands,Client clt)
 {
     std::map<std::vector<std::string>,std::vector<std::string> > channels_keys;
     std::vector<std::string>validChannels;
     if (commands.size()==1)
     {
-        
-        
-        sendError(id ,ERR_NEEDMOREPARAMS,commands[0]);
+        std::cout << "here" <<std::endl;
+        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NEEDMOREPARAMS));
         return std::map<std::vector<std::string>,std::vector<std::string> >();
     }
     else if (commands.size()== 2)
@@ -149,7 +146,7 @@ std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(
         else 
         {
             // sendError(id ,ERR_BADCHANMASK);
-             Server::sendMsg(id , LogError::getError(LogError::ERR_BADCHANMASK));
+                Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_BADCHANMASK));
              return std::map<std::vector<std::string>,std::vector<std::string> >();
         }
     }
@@ -166,13 +163,13 @@ std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(
         }
         else
         {
-            Server::sendMsg(id , LogError::getError(LogError::ERR_BADCHANMASK));
+            Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_BADCHANMASK));
             return std::map<std::vector<std::string>,std::vector<std::string> >();
         }
     }
     else 
     {
-        sendError(id ,ERR_NEEDMOREPARAMS,"");
+            Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_BADCHANMASK));
         return std::map<std::vector<std::string>,std::vector<std::string> >();
     }
 
