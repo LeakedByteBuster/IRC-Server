@@ -17,14 +17,14 @@ int search_in_channels(std::map<int,channel> channels ,std::string name,Client c
                 }
                 else
                 {
-                    Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_CANNOTSENDTOCHAN));
+                    Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_CANNOTSENDTOCHAN));
                     return 0;
                 }
             }
         }
         if(it == channels.end())
         {
-            Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOSUCHNICK));
+            Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NOSUCHNICK));
                 return 0;
         }
     }

@@ -13,19 +13,19 @@ void    parsePass(Client &clt, std::string str, const std::string &pass)
     std::vector<std::string>    tokens = splitBySpace(str);
     // Checks if pass command is already given
     if (clt.isRegistred == 1) {
-        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_ALREADYREGISTRED));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_ALREADYREGISTRED));
         throw std::invalid_argument("");
     }
     if (tokens.size() != 2) {
-        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NEEDMOREPARAM));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAM));
         throw std::invalid_argument("");
     }
     if (tokens[0].compare("PASS") != 0) {
-        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NEEDMOREPARAM));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAM));
         throw std::invalid_argument("");
     }
     if (tokens[1].compare(pass) != 0) {
-        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::INCORRECT_PASS));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::INCORRECT_PASS));
         throw std::invalid_argument("");
     }
 }
@@ -47,19 +47,19 @@ void    parseNick(std::map<int, Client> &clients, Client &clt, std::string str)
     // checks number of parameters and command
     std::vector<std::string>    tokens = splitBySpace(str);
     if (tokens.size() != 2) {
-        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NONICKNAMEGIVEN));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NONICKNAMEGIVEN));
         throw std::invalid_argument("");
     }
     //  Assigning given nick to str
     str = tokens[1];
     //  check command
     if (tokens[0].compare("NICK") != 0) {
-        Server::sendMsg(clt, LogError::getError(str, LogError::ERR_ERRONEUSNICKNAME));
+        Server::sendMsg(clt, Message::getError(str, Message::ERR_ERRONEUSNICKNAME));
         throw std::invalid_argument("");
     }
     //  checks if first character is a letter
     if (!isalpha(str[0])) {
-        Server::sendMsg(clt, LogError::getError(str, LogError::ERR_ERRONEUSNICKNAME));
+        Server::sendMsg(clt, Message::getError(str, Message::ERR_ERRONEUSNICKNAME));
         throw std::invalid_argument("");
     }
     //  checks if rest of characters is valid
@@ -68,7 +68,7 @@ void    parseNick(std::map<int, Client> &clients, Client &clt, std::string str)
         if (isalnum(str[i])) {
             continue ;
         } else if (special.find(str[i]) == std::string::npos) {
-            Server::sendMsg(clt, LogError::getError(str, LogError::ERR_ERRONEUSNICKNAME));
+            Server::sendMsg(clt, Message::getError(str, Message::ERR_ERRONEUSNICKNAME));
             throw std::invalid_argument("");
         }
     }
@@ -76,7 +76,7 @@ void    parseNick(std::map<int, Client> &clients, Client &clt, std::string str)
     it = clients.begin();
     for (; it != clients.end(); it++) {
         if (str.compare(it->second.nickname) == 0) {
-            Server::sendMsg(clt, LogError::getError(str, LogError::ERR_NICKNAMEINUSE));
+            Server::sendMsg(clt, Message::getError(str, Message::ERR_NICKNAMEINUSE));
             throw std::invalid_argument("");
         }
     }
@@ -104,12 +104,12 @@ void    parseUser(Client &clt, std::string str)
     
     // checks if parameter number is > 5
     if (tokens.size() < 5) {
-        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NEEDMOREPARAM));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAM));
         throw std::invalid_argument("");
     }
     // checks USER
     if (tokens[0].compare("USER") != 0) {
-        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NEEDMOREPARAM));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAM));
         throw std::invalid_argument("");
     }
     // checks if username has some invalid characters
@@ -118,13 +118,13 @@ void    parseUser(Client &clt, std::string str)
         if (special.find(tokens[1][i]) == std::string::npos) {
             continue ;
         } else {
-            Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_ERRONEUSUSERNAME));
+            Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_ERRONEUSUSERNAME));
             throw std::invalid_argument("");
         }
     }
     // checks '0' and '*'
     if (tokens[2].compare("0") || tokens[3].compare("*")) {
-        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_ERRONEUSUSERNAME));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_ERRONEUSUSERNAME));
         throw std::invalid_argument("");
     }
     //  looks for first character in realname
@@ -136,7 +136,7 @@ void    parseUser(Client &clt, std::string str)
     }
     //  checks if a realname is given
     if (i == rname.size()) {
-        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_ERRONEUSUSERNAME));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_ERRONEUSUSERNAME));
         throw std::invalid_argument("");
     }
     rname = rname.substr(i, rname.size());
@@ -148,5 +148,5 @@ void    parseUser(Client &clt, std::string str)
     clt.username = tokens[1];
     clt.realname = rname;
     // client sent all the information correctly, sending welcome message
-    Server::sendMsg(clt, LogError::registrationSuccess(clt.nickname));
+    Server::sendMsg(clt, Message::registrationSuccess(clt.nickname));
 }

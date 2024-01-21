@@ -105,7 +105,7 @@ void parse_command(std::vector<std::string> & commands, std::map<std::string,cha
                                 // Client  tmp = clients[clt.fd];
                                 std::cout << "can't join channel" <<std::endl ;
                                 // Server::sendMSG(setmp, ERR_BADCHANNELKEY);
-                                Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_BADCHANNELKEY));
+                                Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_BADCHANNELKEY));
                             }
                         }
                         else //new channel
@@ -123,14 +123,14 @@ void parse_command(std::vector<std::string> & commands, std::map<std::string,cha
                 // {
                     
                 //     // std::cout << "here";
-                //      Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_BADCHANNELKEY));
+                //      Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_BADCHANNELKEY));
                 // // Client  tmp = clients[clt.fd];
                 // // Server::sendMsg(tmp, ERR_BADCHANNELKEY);
                 // }
         }
 // else 
 //     {
-//          Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NEEDMOREPARAMS));
+//          Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
 //     }
 }
 
@@ -186,7 +186,7 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
             break;
         
         case PASS_USER:
-            Server::sendMsg(it->second, LogError::getError(it->second.nickname, LogError::ERR_ALREADYREGISTRED));
+            Server::sendMsg(it->second, Message::getError(it->second.nickname, Message::ERR_ALREADYREGISTRED));
             break;
 
         // case PRVMSG:
@@ -201,7 +201,7 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
             break;
         
         default:
-            Server::sendMsg(it->second, LogError::getError(it->second.nickname, LogError::ERR_UNKNOWNCOMMAND));
+            Server::sendMsg(it->second, Message::getError(it->second.nickname, Message::ERR_UNKNOWNCOMMAND));
             break;
         }
     }
@@ -232,21 +232,21 @@ void send_file(std::map<int,Client> clients, std ::vector<std ::string> &command
 
     if (commands.size() < 3)
     {
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NEEDMOREPARAM));
+        Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NEEDMOREPARAM));
         return;
     }
     // open file both binary and text
     FileName = fopen(commands[1].c_str(), "rb");
     if (!FileName)
     {
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILE));
+        Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHFILE));
         return;
     }
     // if not found reciever
     int fd = search_a_client(clients, commands[2]);
     if (!fd)
     {
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHNICK));
+        Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHNICK));
         return;
     }
     // creat object file and push it in client vector of files
@@ -261,30 +261,30 @@ void get_file(std::map<int,Client> clients, std ::vector<std ::string> command, 
 {
     if (command.size() != 3)
     {
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NEEDMOREPARAM));
+        Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NEEDMOREPARAM));
         return;
     }
     else if (command[1].empty())
     {
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILENAME));
+        Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHFILENAME));
         return;
     }
     // if c'ant find the sender of file
     else if (!search_a_client(clients, command[2]))
     {
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHNICK));
+        Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHNICK));
         return;
     }
     // if there is no files in client vector files
     else if (cl.Files.empty())
     {
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILENAME));
+        Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHFILENAME));
         return;
     }
     // if there is no file from sender
     else if (!search_a_file(cl, command[2].c_str()))
     {
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOFILEFROMSENDER));
+        Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOFILEFROMSENDER));
         return;
     }
     else
@@ -375,12 +375,12 @@ void prv_msg(std::map<int,channel> &channels, std::vector<std ::string> command,
     size_t position = search_msg(command);
     if (command.size() < 3)
     {
-        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NEEDMOREPARAM));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAM));
         return;
     }
     else if (position == 0)
     {
-        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOTEXTTOSEND));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NOTEXTTOSEND));
         return;
     }
     check_targets(channels,command,clt,position,clients);
@@ -429,7 +429,7 @@ void check_targets(std::map<int,channel> channels, std::vector<std::string> comm
             }
             else
             {
-                Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOSUCHNICK));
+                Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NOSUCHNICK));
             }
         }
     }
@@ -468,5 +468,5 @@ void sendPrvmsg(Client sender,std::string str,Client recv)
     std::string msg = sender.nickname + " PRVMSG " + recv.nickname;
     msg.append(" " + str);
     Server::sendMsg(recv,msg);
-    LogError::rplAwayMsg(sender,msg); 
+    Message::rplAwayMsg(sender,msg); 
 }

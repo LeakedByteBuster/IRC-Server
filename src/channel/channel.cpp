@@ -131,7 +131,7 @@ std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(
     if (commands.size()==1)
     {
         std::cout << "here" <<std::endl;
-        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NEEDMOREPARAMS));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
         return std::map<std::vector<std::string>,std::vector<std::string> >();
     }
     else if (commands.size()== 2)
@@ -146,7 +146,7 @@ std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(
         else 
         {
             // sendError(id ,ERR_BADCHANMASK);
-                Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_BADCHANMASK));
+                Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_BADCHANMASK));
              return std::map<std::vector<std::string>,std::vector<std::string> >();
         }
     }
@@ -163,13 +163,13 @@ std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(
         }
         else
         {
-            Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_BADCHANMASK));
+            Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_BADCHANMASK));
             return std::map<std::vector<std::string>,std::vector<std::string> >();
         }
     }
     else 
     {
-            Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_BADCHANMASK));
+            Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_BADCHANMASK));
         return std::map<std::vector<std::string>,std::vector<std::string> >();
     }
 
