@@ -24,8 +24,8 @@ LimeChat :
 Server :
     - MSG_NOSIGNAL (SIGPIPE)
 
-PASS 6667
-NICK Dou
+PASS 0000
+NICK Doum
 USER hoba 0 * loba hoba douga
 
 SENDFILE
@@ -50,3 +50,6 @@ if(it == sev->clients.end()) {
 
   //to fill 
     std::vector <std::string> inChannel;
+
+PRVMSG :ChanServ!services@services.freenode.net MODE #Help +l :77
+:Harambe!~harambe@freenode/service/Harambe PRIVMSG Mushii :VERSION

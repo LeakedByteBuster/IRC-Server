@@ -33,15 +33,12 @@ int search_in_channels(std::map<int,channel> channels ,std::string name,Client c
 
 int search_client_inChannel(Client clt,channel channel)
 {
-    std :: vector<int> vec = channel.get_id_clients_in_channel();
-    std :: vector<int>::iterator it = vec.begin();
-
-    for(; it != vec.end();it++)
+    std :: map<int,Client> vec = channel.get_id_clients_in_channel();
+    std :: map<int,Client>::iterator it = vec.find(clt.fd);
+    
+    if (it != vec.end ())
     {
-        if(*it == clt.fd)
-        {
-            return clt.fd;
-        }
+        return clt.fd;
     }
     return(0);
 }

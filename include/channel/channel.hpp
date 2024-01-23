@@ -12,7 +12,7 @@
 class channel
 {
 private:
-	std::vector <int> id_clients_in_channel;
+	std::map <int,Client> id_clients_in_channel;
 	std::string name;
 	std::string key;
 	std::string topic;
@@ -24,9 +24,9 @@ private:
 	bool limitMode;
 public:
 	channel();
-	channel(Client clt,std::string name,std::string key ,bool isoperator);
+	channel(Client &clt,std::string name,std::string key ,bool isoperator);
 	~channel();
-	std::vector <int> &get_id_clients_in_channel (void);
+	std::map <int,Client> &get_id_clients_in_channel (void);
 	const std::string & getKey (void) const;
 	std::string & getTopic (void) const  ;
 	int getLimit(void) const ;

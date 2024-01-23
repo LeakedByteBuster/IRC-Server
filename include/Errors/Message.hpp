@@ -32,7 +32,8 @@ public :
         ERR_BADCHANNELKEY,
         ERR_BADCHANMASK,
         ERR_NEEDMOREPARAMS,
-        ERR_INVITEONLYCHAN
+        ERR_INVITEONLYCHAN,
+        ERR_CHANOPRIVSNEEDED
     };
 
     static std::string  getError(const std::string &clt, short type);

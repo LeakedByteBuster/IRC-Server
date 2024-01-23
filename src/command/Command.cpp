@@ -21,13 +21,6 @@ std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &co
     return(commands);
 }
 
-void sendError(int fd, std::string error,std::string prefix)
-{
-    std::string msg = prefix + error;
-    int i = write (fd,msg.c_str(),msg.size());
-    if (i == -1)
-        std::cout << "write Error \n";
-}
 
 int check_is_valid(std::string name,std::string key, std::map<std::string,channel> &channelsInServer,Client clt)
 {
@@ -51,25 +44,55 @@ int check_modes (std::string name,std::map<std::string,channel> &channelsInServe
 int check_limit (std::string name,std::map<std::string,channel> &channelsInServer,Client clt)
 {
     channel& foundChannel = channelsInServer[name];
-    std::__1::vector<int> vector_ids = foundChannel.get_id_clients_in_channel();
-    std::__1::vector<int> ::iterator it =std::find(vector_ids .begin() ,vector_ids .end(),clt.fd);
-    for (size_t i =0; i <vector_ids.size();i++)
-        std::cout << "vec >>> " <<vector_ids[i] << "\n";
-    if (it!=vector_ids .end())
+    std::map<int,Client> map_ids = foundChannel.get_id_clients_in_channel();
+    // std::map<int,Client> ::iterator it =std::find(map_ids .begin() ,map_ids .end(),clt.fd);
+    std::map<int,Client> ::iterator it =map_ids.find(clt.fd);
+    if (it!=map_ids .end())
     {
         Server::sendMsg(clt,": already in channel ");
         return (0);
     }
-    if (static_cast<int>(vector_ids.size()+1)>foundChannel.getLimit())
+    if (static_cast<int>(map_ids.size()+1)>foundChannel.getLimit())
     {
         Server::sendMsg(clt,": cant access  channel limit ");
         return (0);
     }
     return (1);
 }
-
-void parse_command(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, Client clt)
+std::string get_clients_in_channel( std::map<std::string,channel> &channelsInServer,std::string name,Client clt)
 {
+    (void) clt ;
+    std::vector <std::string>  clients_names;
+    std::map <std::string,channel > :: iterator it = channelsInServer.find (name);
+    if(it != channelsInServer.end ())
+    {
+        std::map <int,Client > :: iterator it_c = it->second.get_id_clients_in_channel().begin();
+        for (;it_c != it->second.get_id_clients_in_channel().end(); ++it_c)
+        {
+            std::string v_name = it_c->second.nickname;
+            if (it_c->second.isOperator == 1)
+                v_name = "@"+ v_name+ " ";
+            else
+                v_name = v_name + " ";
+            clients_names.push_back(v_name);
+        }
+        std::cout << "clients in channel  name operator  = " << it_c->second.isOperator  << " fd " << it_c->second.fd<< std::endl; 
+        std::cout << "clients names =  >>> " << clients_names.size() <<std::endl;
+    }
+    std::string result;
+    if (!clients_names.empty())
+    {
+    for (std::vector<std::string>::const_iterator it = clients_names.begin(); it != clients_names.end(); ++it) {
+        // std::cout << "channnels clients --->" << *it <<" ";
+        result += *it;
+        }   
+    std::cout <<result <<std::endl ;
+    }
+    return result;
+}
+void join(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, Client clt)
+{
+    // (void)clients;
     std::map<std::vector<std::string>,std::vector<std::string> > channel_keys;
     channel_keys = parse_join_command(commands,clt.fd);
     if (!channel_keys.empty ())
@@ -85,18 +108,19 @@ void parse_command(std::vector<std::string> & commands, std::map<std::string,cha
                 {
                     if (check_is_valid(*nameIt,*keyIt,channelsInServer,clt)&& check_limit(*nameIt,channelsInServer,clt) && check_modes(*nameIt,channelsInServer,clt))
                     {
-                            std::vector<int>& channelData = channelsInServer[*nameIt].get_id_clients_in_channel();
-                            channelData.push_back (clt.fd);
-                            channelData.insert(channelData.end(), 0, clt.fd);
-                            clt.inChannel .push_back (*nameIt);
-                            for (unsigned long i = 0; i < channelsInServer[*nameIt].get_id_clients_in_channel().size(); i++) {
-                                std::cout << "id : " << *nameIt << " value ==> " <<  channelsInServer[*nameIt].get_id_clients_in_channel()[i] << std::endl;
-                            }
-                            Server::sendMsg(clt, ":"+clt.nickname+"!~"+clt.username+"@"+ " JOIN :" + *nameIt);
-                            // Server::sendMsg(clt, ":"+ static_cast<std::string>(IRC_NAME) + " 353 " + clt.nickname + " = " + *nameIt + " :" + get_clients_in_channel(clt) + "\r\n");
-			                Server::sendMsg(clt, ":" +static_cast<std::string>(IRC_NAME) + " 366 " + clt.nickname + " " + *nameIt + " :End of /NAMES list\r\n");
+                            channelsInServer[*nameIt].get_id_clients_in_channel().insert(std::make_pair (clt.fd,clt));
+                            clt.inChannel.push_back(*nameIt);
+                            get_clients_in_channel(channelsInServer,*nameIt,clt );
+                            Server::sendMsg(clt, ":"+clt.nickname+"!~"+clt.username+"@"+ static_cast<std::string>(IRC_NAME)+ " JOIN :" + *nameIt);
+                            Server::sendMsg(clt, ":"+ static_cast<std::string>(IRC_NAME) + " 353 " + clt.nickname + " = " + *nameIt + " :@" + get_clients_in_channel (channelsInServer,*nameIt,clt));
+			                Server::sendMsg(clt, ":" +static_cast<std::string>(IRC_NAME) + " 366 " + clt.nickname + " " + *nameIt + " :End of /NAMES list");
+                            // std::map<int,Client>& channelData = channelsInServer[*nameIt].get_id_clients_in_channel();
+                            // channelData.push_back (clt.fd);
+                            // for (unsigned long i = 0; i < channelsInServer[*nameIt].get_id_clients_in_channel().size(); i++) {
+                            //     // std::cout << "id : " << *nameIt << " value ==> " <<  channelsInServer[*nameIt].get_id_clients_in_channel()[i] << std::endl;
+                            // }
                             // std::cout << "client :"  << id <<"joined channel succesfly \n";
-                        }
+                    }
                 }
                 else //new channel
                 {
@@ -104,17 +128,41 @@ void parse_command(std::vector<std::string> & commands, std::map<std::string,cha
                     channel a(clt, *nameIt, *keyIt ,1);
                     channelsInServer[*nameIt] = a;
                     clt.inChannel .push_back (*nameIt);
-                    clt.isOperator = 1;
+                    if (!get_clients_in_channel (channelsInServer,*nameIt,clt).empty())
+                    {
+                        Server::sendMsg(clt, ":"+ static_cast<std::string>(IRC_NAME) + " 353 " + clt.nickname + " = " + *nameIt + " :@" + get_clients_in_channel (channelsInServer,*nameIt,clt));
+			            Server::sendMsg(clt, ":" +static_cast<std::string>(IRC_NAME) + " 366 " + clt.nickname + " " + *nameIt + " :End of /NAMES list");
+                    }
                 }
                 if (keyIt != it->second.end())
                     keyIt++;
             }
         }
-}
+    }
 }
 
-
+// int check_is_operator(std::string & commands,Client clt)
+// {
+//     if (!clt.isOperator)
+//     {
+//         Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
+//         return 0 ;
+//     }
+//     return (1);
+// }
+// void kick(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, Client clt)
+// {
+//     if (commands.size() < 3)
+//          Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
+//     else 
+//     {
+//         if (parse_channel_name_token(commands[1]) && check_is_operator(commands[2],clt))
+//     }
+// }
 // check command if it's valide and execute it
+
+
+
 void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> &commands, int id,std::map<int,channel> &channels,std::map<std::string, channel> &channelsInServer)
 {
 
@@ -137,18 +185,20 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
                 + (first_argument.compare("PASS") == 0)     * 4 \
                 + (first_argument.compare("USER") == 0)     * 4 \
                 + (first_argument.compare("PRVMSG") == 0)   * 5 \
-                + (first_argument.compare("join") == 0)   * 6 \
-                + (first_argument.compare("JOIN") == 0)   * 6 ;
+                + (first_argument.compare("join") == 0)   * 6   \
+                + (first_argument.compare("JOIN") == 0)   * 6   \
+                + (first_argument.compare("KICK") == 0)   * 7   \
+                + (first_argument.compare("kick") == 0)   * 7   ;
 
         switch (res)
         {
-        case SENDFILE:
-            send_file(clients,commands,it->second);
-            break;
+        // case SENDFILE:
+        //     send_file(clients,commands,it->second);
+        //     break;
 
-        case GETFILE:
-            get_file(clients,commands,it->second);
-            break;
+        // case GETFILE:
+        //     get_file(clients,commands,it->second);
+        //     break;
 
         case NICK:
             try {
@@ -176,9 +226,12 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
         //     break;
         
         case 6:
-            parse_command(commands,channelsInServer,it->second);
+            join(commands,channelsInServer,it->second);
             break;
         
+        // case 7:
+        //     kick(commands,channelsInServer,it->second);
+        //     break;
         default:
             Server::sendMsg(it->second, Message::getError(it->second.nickname, Message::ERR_UNKNOWNCOMMAND));
             break;
@@ -205,7 +258,7 @@ int search_a_client(std::map<int,Client> clients, std ::string NickName)
 }
 
 // SYNTAXE SENDFILE FILENAME  RECIEVER
-void send_file(std::map<int,Client> clients, std ::vector<std ::string> &commands, Client cl)
+void send_file(std::map<int,Client> &clients, std ::vector<std ::string> &commands, Client &cl)
 {
     std ::FILE *FileName;
 
@@ -229,6 +282,7 @@ void send_file(std::map<int,Client> clients, std ::vector<std ::string> &command
         return;
     }
     // creat object file and push it in client vector of files
+    // fl(FILE *,FILNAME,SENDER,RECEIVER);
     TFile fl(FileName, commands[1].c_str(), cl.nickname, commands[2].c_str());
     std::map<int, Client>::iterator rec = clients.find(fd);
     rec->second.Files.push_back(fl);
@@ -236,7 +290,7 @@ void send_file(std::map<int,Client> clients, std ::vector<std ::string> &command
 }
 
 // SYNTAXE : GETFILE FILENAME SENDER
-void get_file(std::map<int,Client> clients, std ::vector<std ::string> command, Client cl)
+void get_file(std::map<int,Client> &clients, std ::vector<std ::string> &command, Client &cl)
 {
     if (command.size() != 3)
     {
@@ -254,9 +308,10 @@ void get_file(std::map<int,Client> clients, std ::vector<std ::string> command, 
         Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHNICK));
         return;
     }
-    // if there is no files in client vector files
+    //if there is no files in client vector files
     else if (cl.Files.empty())
     {
+        // std::cout << "reciever :"<<cl.fd<<std::endl;
         Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHFILENAME));
         return;
     }
@@ -396,6 +451,10 @@ void check_targets(std::map<int,channel> channels, std::vector<std::string> comm
 
                 // send Massege to channel
             }
+            else
+            {
+                Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NOSUCHNICK));
+            }
         }
         else
         {
@@ -444,8 +503,8 @@ const char *getDownMsg()
 
 void sendPrvmsg(Client sender,std::string str,Client recv)
 {
-    std::string msg = sender.nickname + " PRVMSG " + recv.nickname;
-    msg.append(" " + str);
-    Server::sendMsg(recv,msg);
-    Message::rplAwayMsg(sender,msg); 
+    std::string msg = getId(sender);
+    msg.append(" PRIVMSG " + recv.nickname + " " + str);
+    Server::sendMsg(recv, msg);
+    Server::sendMsg(sender, Message::rplAwayMsg(sender, msg));
 }

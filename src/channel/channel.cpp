@@ -4,9 +4,8 @@ channel::channel()
 {
 
 }
-channel::channel(Client clt ,std::string name,std::string key ,bool isoperator)
+channel::channel(Client  &clt ,std::string name,std::string key ,bool isoperator)
 {
-	this->id_clients_in_channel.push_back(clt.fd);
     this->name = name;
     this->key = key;
     this->keyMode = 0 ;
@@ -16,13 +15,13 @@ channel::channel(Client clt ,std::string name,std::string key ,bool isoperator)
     this->limit = 20 ;
     isoperator  = 1 ;
     clt.isOperator = 1 ;
-    
-    Server::sendMsg (clt ,":"+clt.nickname+"!~"+clt.username+"@"+ " JOIN " + name );
+	this->id_clients_in_channel.insert(std::make_pair (clt.fd,clt));
+    Server::sendMsg(clt, ":"+clt.nickname+"!~"+clt.username+"@"+ static_cast<std::string>(IRC_NAME)+ " JOIN " + name);
 
 }
 //getters and setters
     std::string channel::getName(){return this->name;}
-    std::vector <int>& channel::get_id_clients_in_channel (void){return this->id_clients_in_channel;}
+    std::map<int,Client>& channel::get_id_clients_in_channel (void){return this->id_clients_in_channel;}
 	int channel::getLimit(void) const  {return this->limit;}
     const std::string & channel::getKey (void) const {return this->key;}
 	bool channel::getInviteMode (void) const{return this->inviteMode;}
@@ -129,9 +128,9 @@ std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(
 {
     std::map<std::vector<std::string>,std::vector<std::string> > channels_keys;
     std::vector<std::string>validChannels;
-    if (commands.size()==1)
+    if (commands.size()==1 || (commands.size()==2 && commands[1] == "#"))
     {
-        std::cout << "here" <<std::endl;
+        
         Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
         return std::map<std::vector<std::string>,std::vector<std::string> >();
     }
