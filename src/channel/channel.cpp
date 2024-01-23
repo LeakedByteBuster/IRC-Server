@@ -16,7 +16,7 @@ channel::channel(Client  &clt ,std::string name,std::string key ,bool isoperator
     isoperator  = 1 ;
     clt.isOperator = 1 ;
 	this->id_clients_in_channel.insert(std::make_pair (clt.fd,clt));
-    Server::sendMsg(clt, ":"+clt.nickname+"!~"+clt.username+"@"+ static_cast<std::string>(IRC_NAME)+ " JOIN " + name);
+   
 
 }
 //getters and setters

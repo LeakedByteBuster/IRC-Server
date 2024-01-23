@@ -90,6 +90,21 @@ std::string get_clients_in_channel( std::map<std::string,channel> &channelsInSer
     }
     return result;
 }
+
+
+
+std::string host_name()
+{
+    char host[253];
+    if (gethostname(host, sizeof(host)) == -1)
+        return "";
+    return host;
+}
+
+
+
+
+
 void join(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, Client clt)
 {
     // (void)clients;
@@ -112,8 +127,8 @@ void join(std::vector<std::string> & commands, std::map<std::string,channel> &ch
                             clt.inChannel.push_back(*nameIt);
                             get_clients_in_channel(channelsInServer,*nameIt,clt );
                             Server::sendMsg(clt, ":"+clt.nickname+"!~"+clt.username+"@"+ static_cast<std::string>(IRC_NAME)+ " JOIN :" + *nameIt);
-                            Server::sendMsg(clt, ":"+ static_cast<std::string>(IRC_NAME) + " 353 " + clt.nickname + " = " + *nameIt + " :@" + get_clients_in_channel (channelsInServer,*nameIt,clt));
-			                Server::sendMsg(clt, ":" +static_cast<std::string>(IRC_NAME) + " 366 " + clt.nickname + " " + *nameIt + " :End of /NAMES list");
+                            // Server::sendMsg(clt, ":"+  () + " 353 " + clt.nickname + " = " + *nameIt + " :" + get_clients_in_channel (channelsInServer,*nameIt,clt));
+			                Server::sendMsg(clt, ":" + host_name() + " 366 " + clt.nickname + " " + *nameIt + " :End of /NAMES list");
                             // std::map<int,Client>& channelData = channelsInServer[*nameIt].get_id_clients_in_channel();
                             // channelData.push_back (clt.fd);
                             // for (unsigned long i = 0; i < channelsInServer[*nameIt].get_id_clients_in_channel().size(); i++) {
@@ -130,8 +145,9 @@ void join(std::vector<std::string> & commands, std::map<std::string,channel> &ch
                     clt.inChannel .push_back (*nameIt);
                     if (!get_clients_in_channel (channelsInServer,*nameIt,clt).empty())
                     {
-                        Server::sendMsg(clt, ":"+ static_cast<std::string>(IRC_NAME) + " 353 " + clt.nickname + " = " + *nameIt + " :@" + get_clients_in_channel (channelsInServer,*nameIt,clt));
-			            Server::sendMsg(clt, ":" +static_cast<std::string>(IRC_NAME) + " 366 " + clt.nickname + " " + *nameIt + " :End of /NAMES list");
+                        Server::sendMsg(clt, ":" + clt.nickname + "!~" + clt.username + "@" + " JOIN " + *nameIt);
+                        Server::sendMsg(clt, ":"+ host_name() + " 353 " + clt.nickname + " = " + *nameIt + " :@" + get_clients_in_channel (channelsInServer,*nameIt,clt));
+			            Server::sendMsg(clt, ":" + host_name() + " 366 " + clt.nickname + " " + *nameIt + " :End of /NAMES list");
                     }
                 }
                 if (keyIt != it->second.end())
