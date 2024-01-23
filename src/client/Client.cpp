@@ -57,7 +57,13 @@ void    Client::sendMsg(const Client &target, std::string msg)
         std::cerr << "Error sendMsg() : error message is empty";
     }
 }
-
+// std::vector <std::string> &Client::clients_in_channel(Client clt)
+// {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+//     // if (clt.isOperator)
+//     //     clt.inChannel "@" + clt.nickname;        
+//     // return this->inChannel;
+// }
 // void    Client::sendMsg(const Channels &, const std::string &) 
 // {
     /*

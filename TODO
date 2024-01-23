@@ -24,8 +24,8 @@ LimeChat :
 Server :
     - MSG_NOSIGNAL (SIGPIPE)
 
-PASS 0000
-NICK Doum
+PASS 6667
+NICK Dou
 USER hoba 0 * loba hoba douga
 
 SENDFILE

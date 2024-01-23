@@ -1,5 +1,5 @@
 
-// #include "Server.hpp"
+#include "Server.hpp"
 #include <string>
 #include "Message.hpp"
 
@@ -19,6 +19,13 @@ std::string Message::registrationSuccess(const std::string &nick)
 // std::string    Message::getError(const std::string &nick, short type)
 // {
 
+void clientHost(Client sender,std::string str,Client recv)
+{
+    std::string msg = sender.nickname + " PRVMSG " + recv.nickname;
+    msg.append(" " + str);
+    Server::sendMsg(recv,msg);
+    Message::rplAwayMsg(sender,msg); 
+}
 
 std::string  Message :: rplAwayMsg(Client &clt,std :: string str)
 {
@@ -46,6 +53,7 @@ std::string  Message :: rplAwayMsg(Client &clt,std :: string str)
     BUILD_MESSAGE(Message::ERR_NOFILEFROMSENDER, 1335 * , : No file from sender)   \
     BUILD_MESSAGE(Message::ERR_NOTEXTTOSEND, 412 * , : No text to send)            \
     BUILD_MESSAGE(Message::ERR_CANNOTSENDTOCHAN, 404 * , : Cannot send to channel) \
+    BUILD_MESSAGE(Message::ERR_INVITEONLYCHAN, 473 *  , :Cannot join channel (+i) - invite only) \
     BUILD_MESSAGE(Message::ERR_BADCHANNELKEY, 475 *  , :Cannot join channel (+k) - bad key) \
     BUILD_MESSAGE(Message::ERR_BADCHANMASK, 476 *  , :Bad Channel Mask) \
     BUILD_MESSAGE(Message::ERR_NEEDMOREPARAMS, 461 *  ,: Not enough parameters)

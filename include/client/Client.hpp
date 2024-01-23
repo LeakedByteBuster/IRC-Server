@@ -38,6 +38,7 @@ public :
     Client(const int fd);
     Client(const Client &rhs);
     Client& operator=(const Client &rhs);
+    std::vector <std::string> &get_clients_in_channel();
     virtual ~Client();
 
     void    sendMsg(const Client &target, std::string msg);

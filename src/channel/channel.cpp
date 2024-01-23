@@ -14,9 +14,10 @@ channel::channel(Client clt ,std::string name,std::string key ,bool isoperator)
     this->limitMode = 0;
     this->topicMode = 0;
     this->limit = 20 ;
-    this->operatorMode = isoperator;
+    isoperator  = 1 ;
+    clt.isOperator = 1 ;
     
-    Server::sendMsg (clt ,":"+clt.nickname+"!~"+clt.username+"@"+ " JOIN :" + name );
+    Server::sendMsg (clt ,":"+clt.nickname+"!~"+clt.username+"@"+ " JOIN " + name );
 
 }
 //getters and setters

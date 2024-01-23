@@ -2,16 +2,11 @@
 #include <set>
 #include <fstream>
 #include "Command.hpp"
-// #include "Server.hpp"
 #include "Bot.hpp"
 #include "utils.hpp"
 #include "registrationCommands.hpp"
 #include <algorithm>
-// #include "client.hpp"
-// std::vector<int> channel::get_id_clients_in_channel;
 
-
-//split command into vector of string to check it
 std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &commands,std :: string msg)
 {
     std::stringstream   ss(msg);
@@ -34,108 +29,92 @@ void sendError(int fd, std::string error,std::string prefix)
         std::cout << "write Error \n";
 }
 
-int check_is_valid(std::string name,std::string key, std::map<std::string,channel> &channelsInServer,int id )
+int check_is_valid(std::string name,std::string key, std::map<std::string,channel> &channelsInServer,Client clt)
 {
-    (void)id;
     channel& foundChannel = channelsInServer[name];
     if (foundChannel.getKey().compare (key) == 0)
         return 1;
-    // else 
-        // sendError(id,ERR_BADCHANNELKEY,name);
+    else 
+         Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_BADCHANNELKEY));
     return 0;
        
 }
-int check_modes (std::string name,std::map<std::string,channel> &channelsInServer)
+int check_modes (std::string name,std::map<std::string,channel> &channelsInServer,Client clt)
 {
      channel& foundChannel = channelsInServer[name];
-     if (!foundChannel.getInviteMode() && !foundChannel.getkeyMode())
+    if (!foundChannel.getInviteMode())
         return (1);
     else 
+         Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_INVITEONLYCHAN));
         return (0);
 }
-int check_limit (std::string name,std::map<std::string,channel> &channelsInServer,int id )
+int check_limit (std::string name,std::map<std::string,channel> &channelsInServer,Client clt)
 {
     channel& foundChannel = channelsInServer[name];
     std::__1::vector<int> vector_ids = foundChannel.get_id_clients_in_channel();
-    std::__1::vector<int> ::iterator it =std::find(vector_ids .begin() ,vector_ids .end(),id);
+    std::__1::vector<int> ::iterator it =std::find(vector_ids .begin() ,vector_ids .end(),clt.fd);
     for (size_t i =0; i <vector_ids.size();i++)
         std::cout << "vec >>> " <<vector_ids[i] << "\n";
     if (it!=vector_ids .end())
     {
-        std::cout << "already in channel\n" << name << "\n";
+        Server::sendMsg(clt,": already in channel ");
         return (0);
     }
     if (static_cast<int>(vector_ids.size()+1)>foundChannel.getLimit())
     {
-        std::cout << "cant access  channel limit  \n";
+        Server::sendMsg(clt,": cant access  channel limit ");
         return (0);
     }
-
-    // }
     return (1);
 }
 
 void parse_command(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, Client clt)
 {
     std::map<std::vector<std::string>,std::vector<std::string> > channel_keys;
-            channel_keys = parse_join_command(commands,clt.fd);
-            if (!channel_keys.empty ())
+    channel_keys = parse_join_command(commands,clt.fd);
+    if (!channel_keys.empty ())
+    {
+       std::map<std::vector<std::string>,std::vector<std::string> > ::iterator it = channel_keys.begin();
+        if (it!= channel_keys.end())
+        {
+            for (std::vector<std::string>::const_iterator nameIt = it->first.begin(), keyIt = it->second.begin(); \
+                nameIt != it->first.end() || keyIt != it->second.end(); ++nameIt)
             {
-            std::map<std::vector<std::string>,std::vector<std::string> > ::iterator it = channel_keys.begin();
-                if (it!= channel_keys.end())
+                    std::string lol = keyIt != it->second.end() ? *keyIt : "";
+                if (channelsInServer.find (*nameIt) !=  channelsInServer.end()) //channel already exists
                 {
-                    for (std::vector<std::string>::const_iterator nameIt = it->first.begin(), keyIt = it->second.begin(); \
-                        nameIt != it->first.end() || keyIt != it->second.end(); ++nameIt)
+                    if (check_is_valid(*nameIt,*keyIt,channelsInServer,clt)&& check_limit(*nameIt,channelsInServer,clt) && check_modes(*nameIt,channelsInServer,clt))
                     {
-                            std::string lol = keyIt != it->second.end() ? *keyIt : "";
-                        if (channelsInServer.find (*nameIt) !=  channelsInServer.end()) //channel already exists
-                        {
-                            if (check_is_valid(*nameIt,*keyIt,channelsInServer,clt.fd)&& check_limit(*nameIt,channelsInServer,clt.fd) && check_modes(*nameIt,channelsInServer))
-                                {
-                                    std::vector<int>& channelData = channelsInServer[*nameIt].get_id_clients_in_channel();
-                                    channelData.push_back (clt.fd);
-                                    channelData.insert(channelData.end(), 0, clt.fd);
-                                   for (unsigned long i = 0; i < channelsInServer[*nameIt].get_id_clients_in_channel().size(); i++) {
-                                        std::cout << "id : " << *nameIt << " value ==> " <<  channelsInServer[*nameIt].get_id_clients_in_channel()[i] << std::endl;
-                                   }
-                                //    Server::sendMsg (clt ,getId(clt," JOIN :" + *nameIt );
-                                    // std::cout << "client :"  << id <<"joined channel succesfly \n";
-                                }
-                            else {
-                                // Client  tmp = clients[clt.fd];
-                                std::cout << "can't join channel" <<std::endl ;
-                                // Server::sendMSG(setmp, ERR_BADCHANNELKEY);
-                                Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_BADCHANNELKEY));
+                            std::vector<int>& channelData = channelsInServer[*nameIt].get_id_clients_in_channel();
+                            channelData.push_back (clt.fd);
+                            channelData.insert(channelData.end(), 0, clt.fd);
+                            clt.inChannel .push_back (*nameIt);
+                            for (unsigned long i = 0; i < channelsInServer[*nameIt].get_id_clients_in_channel().size(); i++) {
+                                std::cout << "id : " << *nameIt << " value ==> " <<  channelsInServer[*nameIt].get_id_clients_in_channel()[i] << std::endl;
                             }
+                            Server::sendMsg(clt, ":"+clt.nickname+"!~"+clt.username+"@"+ " JOIN :" + *nameIt);
+                            // Server::sendMsg(clt, ":"+ static_cast<std::string>(IRC_NAME) + " 353 " + clt.nickname + " = " + *nameIt + " :" + get_clients_in_channel(clt) + "\r\n");
+			                Server::sendMsg(clt, ":" +static_cast<std::string>(IRC_NAME) + " 366 " + clt.nickname + " " + *nameIt + " :End of /NAMES list\r\n");
+                            // std::cout << "client :"  << id <<"joined channel succesfly \n";
                         }
-                        else //new channel
-                        {
-                            std::string lol = keyIt != it->second.end() ? *keyIt : ""; 
-                            channel a(clt.fd,*nameIt,*keyIt ,1);
-                            channelsInServer[*nameIt] = a;
-                            
-                        }
-                        if (keyIt != it->second.end())
-                            keyIt++;
-                    }
                 }
-                // else
-                // {
-                    
-                //     // std::cout << "here";
-                //      Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_BADCHANNELKEY));
-                // // Client  tmp = clients[clt.fd];
-                // // Server::sendMsg(tmp, ERR_BADCHANNELKEY);
-                // }
+                else //new channel
+                {
+                    std::string lol = keyIt != it->second.end() ? *keyIt : "";
+                    channel a(clt, *nameIt, *keyIt ,1);
+                    channelsInServer[*nameIt] = a;
+                    clt.inChannel .push_back (*nameIt);
+                    clt.isOperator = 1;
+                }
+                if (keyIt != it->second.end())
+                    keyIt++;
+            }
         }
-// else 
-//     {
-//          Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
-//     }
+}
 }
 
 
-// check command if it's valide and exucte it
+// check command if it's valide and execute it
 void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> &commands, int id,std::map<int,channel> &channels,std::map<std::string, channel> &channelsInServer)
 {
 
