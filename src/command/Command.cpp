@@ -104,7 +104,30 @@ std::string host_name()
 
 
 
+void sendMsg_to_channel(std::string name,  std::map<std::string,channel> &channelsInServer,std::string msg,Client clt )
+{
+    // std::vector <std::string>  clients_names;
+    std::map <std::string,channel > :: iterator it = channelsInServer.find (name);
+    if(it != channelsInServer.end ())
+    {
+        std::map <int,Client > :: iterator it_c = it->second.get_id_clients_in_channel().begin();
+        for (;it_c != it->second.get_id_clients_in_channel().end(); ++it_c)
+        {
+            if (it_c->first != clt.fd)
+            {
+                Server::sendMsg (it_c->second,msg);
+            }
+        //  std::cout << "fd  >>>>>> " << it_c->second.fd << std::endl;
+        // std::cout << "clients in channel  name operator  = " << it_c->second.isOperator  << " fd " << it_c->second.fd<< std::endl; 
+        //     std::string v_name = it_c->second.nickname;
+        //     if (it_c->second.isOperator == 1)
+        //         v_name = "@"+ v_name;
 
+        //     clients_names.push_back(v_name);
+        }
+        // std::cout << "clients names =  >>> " << clients_names[0] <<std::endl;
+    }
+}
 void join(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, Client clt)
 {
     // (void)clients;
@@ -128,6 +151,7 @@ void join(std::vector<std::string> & commands, std::map<std::string,channel> &ch
                             // get_clients_in_channel(channelsInServer,*nameIt,clt );
                             // Server::sendMsg(clt, ":" + clt.nickname + "!~" + clt.username + "@" + "localhost" + " JOIN " + *nameIt);
                              Server::sendMsg(clt, ":" + clt.nickname + "!" + clt.username + "@" + "localhost" + " JOIN " + *nameIt);
+                             sendMsg_to_channel(*nameIt,channelsInServer, ":" + clt.nickname + "!" + clt.username + "@" + "localhost" + " JOIN " + *nameIt , clt );
                             Server::sendMsg(clt, ":"+ host_name() + " 353 " + clt.nickname + " = " + *nameIt + " :" + get_clients_in_channel (channelsInServer,*nameIt));
 			                Server::sendMsg(clt, ":" + host_name() + " 366 " + clt.nickname + " " + *nameIt + " :End of /NAMES list");
                             // std::map<int,Client>& channelData = channelsInServer[*nameIt].get_id_clients_in_channel();
