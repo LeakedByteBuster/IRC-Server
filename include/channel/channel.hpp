@@ -24,7 +24,7 @@ private:
 	bool limitMode;
 public:
 	channel();
-	channel(Client &clt,std::string name,std::string key ,bool isoperator);
+	channel(Client &clt,std::string name,std::string key );
 	~channel();
 	std::map <int,Client> &get_id_clients_in_channel (void);
 	const std::string & getKey (void) const;

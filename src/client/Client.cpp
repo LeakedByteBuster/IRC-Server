@@ -42,8 +42,8 @@ Client::~Client() { }
 
 void    Client::sendMsg(const Client &target, std::string msg)
 {
-    if (msg.size() > 0) { 
-        msg.append("\r\n");
+    // if (msg.size() > 0) { 
+    //     msg.append("\r\n");
 
         ssize_t bytes;
         if ((bytes = send(target.fd, msg.data(), msg.size(), 0)) == -1) {
@@ -53,9 +53,9 @@ void    Client::sendMsg(const Client &target, std::string msg)
             std::cerr << "Warning : data loss : buff = " << msg.size() 
                 << " sent = " << bytes << std::endl;
         }
-    } else {
-        std::cerr << "Error sendMsg() : error message is empty";
-    }
+    // } else {
+    //     std::cerr << "Error sendMsg() : error message is empty";
+    // }
 }
 // std::vector <std::string> &Client::clients_in_channel(Client clt)
 // {

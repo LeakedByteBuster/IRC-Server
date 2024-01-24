@@ -4,8 +4,9 @@ channel::channel()
 {
 
 }
-channel::channel(Client  &clt ,std::string name,std::string key ,bool isoperator)
+channel::channel(Client  &clt ,std::string name,std::string key)
 {
+    clt.isOperator = 1 ;
     this->name = name;
     this->key = key;
     this->keyMode = 0 ;
@@ -13,8 +14,6 @@ channel::channel(Client  &clt ,std::string name,std::string key ,bool isoperator
     this->limitMode = 0;
     this->topicMode = 0;
     this->limit = 20 ;
-    isoperator  = 1 ;
-    clt.isOperator = 1 ;
 	this->id_clients_in_channel.insert(std::make_pair (clt.fd,clt));
    
 

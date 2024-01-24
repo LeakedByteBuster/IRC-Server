@@ -59,9 +59,9 @@ int check_limit (std::string name,std::map<std::string,channel> &channelsInServe
     }
     return (1);
 }
-std::string get_clients_in_channel( std::map<std::string,channel> &channelsInServer,std::string name,Client clt)
+std::string get_clients_in_channel( std::map<std::string,channel> &channelsInServer,std::string name)
 {
-    (void) clt ;
+    // (void) clt ;
     std::vector <std::string>  clients_names;
     std::map <std::string,channel > :: iterator it = channelsInServer.find (name);
     if(it != channelsInServer.end ())
@@ -69,24 +69,24 @@ std::string get_clients_in_channel( std::map<std::string,channel> &channelsInSer
         std::map <int,Client > :: iterator it_c = it->second.get_id_clients_in_channel().begin();
         for (;it_c != it->second.get_id_clients_in_channel().end(); ++it_c)
         {
+        //  std::cout << "fd  >>>>>> " << it_c->second.fd << std::endl;
+        std::cout << "clients in channel  name operator  = " << it_c->second.isOperator  << " fd " << it_c->second.fd<< std::endl; 
             std::string v_name = it_c->second.nickname;
             if (it_c->second.isOperator == 1)
-                v_name = "@"+ v_name+ " ";
-            else
-                v_name = v_name + " ";
+                v_name = "@"+ v_name;
+
             clients_names.push_back(v_name);
         }
-        std::cout << "clients in channel  name operator  = " << it_c->second.isOperator  << " fd " << it_c->second.fd<< std::endl; 
-        std::cout << "clients names =  >>> " << clients_names.size() <<std::endl;
+        // std::cout << "clients names =  >>> " << clients_names[0] <<std::endl;
     }
     std::string result;
     if (!clients_names.empty())
     {
     for (std::vector<std::string>::const_iterator it = clients_names.begin(); it != clients_names.end(); ++it) {
-        // std::cout << "channnels clients --->" << *it <<" ";
-        result += *it;
+        std::cout << "channnels clients --->" << *it <<" ";
+        result += (*it+" ");
         }   
-    std::cout <<result <<std::endl ;
+    std::cout << result <<std::endl ;
     }
     return result;
 }
@@ -125,9 +125,10 @@ void join(std::vector<std::string> & commands, std::map<std::string,channel> &ch
                     {
                             channelsInServer[*nameIt].get_id_clients_in_channel().insert(std::make_pair (clt.fd,clt));
                             clt.inChannel.push_back(*nameIt);
-                            get_clients_in_channel(channelsInServer,*nameIt,clt );
-                            Server::sendMsg(clt, ":"+clt.nickname+"!~"+clt.username+"@"+ static_cast<std::string>(IRC_NAME)+ " JOIN :" + *nameIt);
-                            // Server::sendMsg(clt, ":"+  () + " 353 " + clt.nickname + " = " + *nameIt + " :" + get_clients_in_channel (channelsInServer,*nameIt,clt));
+                            // get_clients_in_channel(channelsInServer,*nameIt,clt );
+                            // Server::sendMsg(clt, ":" + clt.nickname + "!~" + clt.username + "@" + "localhost" + " JOIN " + *nameIt);
+                             Server::sendMsg(clt, ":" + clt.nickname + "!" + clt.username + "@" + "localhost" + " JOIN " + *nameIt);
+                            Server::sendMsg(clt, ":"+ host_name() + " 353 " + clt.nickname + " = " + *nameIt + " :" + get_clients_in_channel (channelsInServer,*nameIt));
 			                Server::sendMsg(clt, ":" + host_name() + " 366 " + clt.nickname + " " + *nameIt + " :End of /NAMES list");
                             // std::map<int,Client>& channelData = channelsInServer[*nameIt].get_id_clients_in_channel();
                             // channelData.push_back (clt.fd);
@@ -139,14 +140,15 @@ void join(std::vector<std::string> & commands, std::map<std::string,channel> &ch
                 }
                 else //new channel
                 {
+               
                     std::string lol = keyIt != it->second.end() ? *keyIt : "";
-                    channel a(clt, *nameIt, *keyIt ,1);
+                    channel a(clt, *nameIt, *keyIt );
                     channelsInServer[*nameIt] = a;
                     clt.inChannel .push_back (*nameIt);
-                    if (!get_clients_in_channel (channelsInServer,*nameIt,clt).empty())
+                    if (!get_clients_in_channel (channelsInServer,*nameIt).empty())
                     {
-                        Server::sendMsg(clt, ":" + clt.nickname + "!~" + clt.username + "@" + " JOIN " + *nameIt);
-                        Server::sendMsg(clt, ":"+ host_name() + " 353 " + clt.nickname + " = " + *nameIt + " :@" + get_clients_in_channel (channelsInServer,*nameIt,clt));
+                        Server::sendMsg(clt, ":" + clt.nickname + "!" + clt.username + "@" + "localhost" + " JOIN " + *nameIt);
+                        Server::sendMsg(clt, ":"+ host_name() + " 353 " + clt.nickname + " = " + *nameIt + " :" + get_clients_in_channel (channelsInServer,*nameIt));
 			            Server::sendMsg(clt, ":" + host_name() + " 366 " + clt.nickname + " " + *nameIt + " :End of /NAMES list");
                     }
                 }

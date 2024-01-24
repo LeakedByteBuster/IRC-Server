@@ -8,13 +8,18 @@ std::string Message::registrationSuccess(const std::string &nick)
 {
     std::string str;
 
-    str = IRC_NAME + static_cast<std::string>("001 * ");
-    str.append(
-        ":Welcome to the Camel Internet Relay Chat Network " + nick
-    );
+    str = IRC_NAME + static_cast<std::string>(" 001 ")+nick+" :Welcome " + nick +  " to the ft_irc network !\r\n" \
+    + IRC_NAME + static_cast<std::string>(" 002 ")+nick+ " :Your host is ircCamel.localhost"  +  " to the ft_irc network !\r\n" \
+    + IRC_NAME + static_cast<std::string>(" 003 ")+nick+ " :This server was created 2023-9-15 !\r\n"\
+    + IRC_NAME + static_cast<std::string>(" 004 ")+nick+ " :Host: " + "ircCamel.localhost"+ ", Version: 1.0, User mode: none, Channel modes: o, t, k, i !\r\n";
+    // str.append ()
 
     return (str);
 }
+    // str = IRC_NAME + static_cast<std::string>("002 ")+nick+ +" :Your host is " +IRC_NAME + " running version 1.0 !\r\n";
+    // str.append(
+    //     ":Welcome to the Camel Internet Relay Chat Network " + nick
+    // );
 // Server::sendMsg(clt, getError(nick, ERR_...))
 // std::string    Message::getError(const std::string &nick, short type)
 // {
