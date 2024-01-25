@@ -234,13 +234,13 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
 
         switch (res)
         {
-        // case SENDFILE:
-        //     send_file(clients,commands,it->second);
-        //     break;
+        case SENDFILE:
+            send_file(clients,commands,it->second);
+            break;
 
-        // case GETFILE:
-        //     get_file(clients,commands,it->second);
-        //     break;
+        case GETFILE:
+            get_file(clients,commands,it->second);
+            break;
 
         case NICK:
             try {
@@ -260,9 +260,9 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
             Server::sendMsg(it->second, Message::getError(it->second.nickname, Message::ERR_ALREADYREGISTRED));
             break;
 
-        // case PRVMSG:
-        //     prv_msg(channels, commands, it->second,clients);
-        //     break ;
+        case PRVMSG:
+            prv_msg(channels, commands, it->second,clients);
+            break ;
 
         // case PONG: // ignore PONG
         //     break;
