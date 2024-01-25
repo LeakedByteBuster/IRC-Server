@@ -25,7 +25,7 @@ Server :
     - MSG_NOSIGNAL (SIGPIPE)
 
 PASS 0000
-NICK Doug
+NICK Doum
 USER hoba 0 * loba hoba douga
 
 SENDFILE

@@ -62,6 +62,7 @@ std::string  Message :: rplAwayMsg(Client &clt,std :: string str)
     BUILD_MESSAGE(Message::ERR_BADCHANNELKEY, 475 *  , :Cannot join channel (+k) - bad key) \
     BUILD_MESSAGE(Message::ERR_BADCHANMASK, 476 *  , :Bad Channel Mask) \
     BUILD_MESSAGE(Message::ERR_NEEDMOREPARAMS, 461 *  ,: Not enough parameters) \
+    BUILD_MESSAGE(Message::ERR_USERONCHANNEL, 443 *  ,:is already on channel) \
     // BUILD_MESSAGE(Message::ERR_CHANOPRIVSNEEDED, 482 *  ,: You're not channel operator)
 
 
