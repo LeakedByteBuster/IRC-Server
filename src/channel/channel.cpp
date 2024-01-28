@@ -28,7 +28,7 @@ channel::channel(Client  &clt ,std::string name,std::string key)
 	bool channel::getkeyMode (void) const{return this->keyMode;}
 	bool channel::getOperatorMode (void) const{return this->operatorMode;}
 	bool channel::getLimitMode (void) const {return this->inviteMode;}
-channel::~channel()
+    channel::~channel()
 {
 }
 
@@ -176,8 +176,11 @@ std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(
 
 int check_existed_channel (std::map<std::string,channel> &channelsInServer , std::string name)
 {
-    std::map <std::string,channel > :: iterator it = channelsInServer.find (name);
-    if(it != channelsInServer.end ())
-        return (1);
-    return 0 ;
+    (void)name ;
+        for (std::map<std::string, channel>::iterator iter = channelsInServer.begin(); iter != channelsInServer.end(); ++iter)
+        {
+        std::cout <<"...................."<< iter->first << " ";
+        }
+
+    return 1;
 }   

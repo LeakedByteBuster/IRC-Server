@@ -40,10 +40,11 @@ public:
 	void setTopic (std::string topic) ;
 	std::string getName();
 };
-	int check_existed_channel ();
+	// int check_existed_channel ();
 	std::vector<std::string>  check_key(std::string &line) ;
 	std::vector<std::string> parse_channel_key (std::string &key);
 	std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(std::vector<std::string> & commands,Client clt);
 	int  parse_channel_name_token (std::string token);
 	bool is_duplicated(std::vector<std::string>& channel_names);
 	void sendError(int fd, std::string error,std::string prefix);
+	int check_existed_channel (std::map<std::string,channel> &channelsInServer , std::string name);

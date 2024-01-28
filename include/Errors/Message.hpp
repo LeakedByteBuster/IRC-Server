@@ -34,7 +34,9 @@ public :
         ERR_NEEDMOREPARAMS,
         ERR_INVITEONLYCHAN,
         ERR_CHANOPRIVSNEEDED,
-        ERR_USERONCHANNEL
+        ERR_USERONCHANNEL,
+        ERR_NOSUCHCHANNEL,
+        ERR_USERNOTINCHANNEL
     };
 
     static std::string  getError(const std::string &clt, short type);

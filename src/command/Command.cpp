@@ -101,10 +101,27 @@ std::string host_name()
     return host;
 }
 
+int is_client_in_channel (std::string name,std::map<std::string,channel> &channelsInServer,std::string cltname)
+{
+    std::map <std::string,channel > :: iterator it = channelsInServer.find (name);
+       std::cout << "name" << name <<std::endl;
+    if(it != channelsInServer.end ())
+    {
+        std::map <int,Client > :: iterator it_c = it->second.get_id_clients_in_channel().begin();
+        for (;it_c != it->second.get_id_clients_in_channel().end(); ++it_c)
+        {
+            if (it_c->second.nickname == cltname)
+            {
+                std::cout << "clt " << it_c->second.nickname << "target " << cltname  << std::endl ; 
+                return (1);
+            }
+        }
+    }
+    return (0);
+}
 
 
-
-void sendMsg_to_channel(std::string name,  std::map<std::string,channel> &channelsInServer,std::string msg,Client clt )
+void sendMsg_to_channel(std::string name,std::map<std::string,channel> &channelsInServer,std::string msg,Client clt )
 {
     // std::vector <std::string>  clients_names;
     std::map <std::string,channel > :: iterator it = channelsInServer.find (name);
@@ -121,22 +138,67 @@ void sendMsg_to_channel(std::string name,  std::map<std::string,channel> &channe
     }
 }
 
-// void parse_invite_command (std::vector<std::string> & commands,client clt)
+// kick ()
 // {
-//     if (commands.size ()  < 3 )
-//          Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
-//     else if (!search_a_client(clt,clt.nickname))
-//         Server::sendMsg(clt ,Message::getError (clt.nickname, Message ::ERR_USERONCHANNEL));
-
+//     if (clt.inChannel [name])
+//         clt.inChannel.erase(name);
+    
 // }
-// void invite(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, Client clt) 
+// void parse_invite_command (std::vector<std::string> & commands,Client clt, std::map<std::string,channel> &channelsInServer)
 // {
-//     parse_invite_command(commands);
-// }
-
-void join(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, Client clt)
+   
+void list (std::map<std::string,channel> &channelsInServer) 
 {
-    // (void)clients;
+    std::map<std::string,channel> ::iterator it = channelsInServer.begin ();
+        std::cout << "channels --> " ; 
+    for (;it != channelsInServer.end ();++it)
+    {
+        std::cout << it->first << " ";
+    }
+std::cout << "\n";
+
+}
+// }
+// parse_invite_command(commands,clt ,channelsInServer);
+void kick(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, Client &clt) 
+{
+    if (commands.size() == 3 || commands.size() == 4)
+    {   
+            // std::cout << "commands--->" << commands[0] << std::endl ;
+            // std::cout << "commands--->" << commands[1] << std::endl ;
+            // std::cout << "commands--->" << commands[2] << std::endl ;
+            // std::cout << "commands--->" << commands[3] << std::endl ;
+                std::cout << "clt.isOperator  >>>> " << clt.isOperator << std::endl;
+        if (parse_channel_name_token (commands[1]) && check_existed_channel(channelsInServer,commands[1]))
+        {
+            if (is_client_in_channel(commands[1] ,channelsInServer,clt.nickname) && is_client_in_channel (commands[1],channelsInServer, commands[2]))
+            {
+                        if (clt.isOperator == 1)
+                        {
+                            clt.inChannel.erase(std::remove(clt.inChannel.begin (),clt.inChannel.end (),commands[1]),clt.inChannel.end());
+                            Server::sendMsg (clt, ":" + clt.nickname + "!" + clt.username + "@" + host_name() + " KICK " + commands[1] + " " + commands[2] + " :" + clt.nickname);
+                            channelsInServer.erase(commands[1]);
+                            sendMsg_to_channel(commands[1],channelsInServer, ":" + clt.nickname + "!" + clt.username + "@" + host_name() + " KICK " + commands[1] + " " + commands[2] + " :" + clt.nickname , clt );
+                            // Server::sendMsg (, ":" + clt.nickname + "!" + clt.username + "@" + host_name() + " KICK " + commands[1] + " " + commands[2] + " :" + clt.nickname);
+                           
+                            // std::cout << "deleted clt n : " << clt.fd << std::endl;
+                        }
+                        else
+                       Server::sendMsg(clt ,Message::getError (clt.nickname, Message ::ERR_CHANOPRIVSNEEDED));
+            }
+            else
+                Server::sendMsg(clt ,Message::getError (clt.nickname, Message ::ERR_USERNOTINCHANNEL));
+                /// 401 here no such nick /channel 
+        }
+        else
+            Server::sendMsg(clt ,Message::getError (clt.nickname, Message ::ERR_NOSUCHCHANNEL));
+    }
+    else
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
+}
+
+void join(std::vector<std::string> & commands, std::map<std::string,channel> &channelsInServer, Client &clt)
+{
     std::map<std::vector<std::string>,std::vector<std::string> > channel_keys;
     channel_keys = parse_join_command(commands,clt.fd);
     if (!channel_keys.empty ())
@@ -155,9 +217,9 @@ void join(std::vector<std::string> & commands, std::map<std::string,channel> &ch
                             channelsInServer[*nameIt].get_id_clients_in_channel().insert(std::make_pair (clt.fd,clt));
                             clt.inChannel.push_back(*nameIt);
                             // get_clients_in_channel(channelsInServer,*nameIt,clt );
-                            // Server::sendMsg(clt, ":" + clt.nickname + "!~" + clt.username + "@" + "localhost" + " JOIN " + *nameIt);
-                            Server::sendMsg(clt, ":" + clt.nickname + "!" + clt.username + "@" + "localhost" + " JOIN " + *nameIt);
-                            sendMsg_to_channel(*nameIt,channelsInServer, ":" + clt.nickname + "!" + clt.username + "@" + "localhost" + " JOIN " + *nameIt , clt );
+                            // Server::sendMsg(clt, ":" + clt.nickname + "!~" + clt.username + "@" + "host_name" + " JOIN " + *nameIt);
+                            Server::sendMsg(clt, ":" + clt.nickname + "!" + clt.username + "@" + host_name() + " JOIN " + *nameIt);
+                            sendMsg_to_channel(*nameIt,channelsInServer, ":" + clt.nickname + "!" + clt.username + "@" + host_name() + " JOIN " + *nameIt , clt );
                             Server::sendMsg(clt, ":"+ host_name() + " 353 " + clt.nickname + " = " + *nameIt + " :" + get_clients_in_channel (channelsInServer,*nameIt));
 			                Server::sendMsg(clt, ":" + host_name() + " 366 " + clt.nickname + " " + *nameIt + " :End of /NAMES list");
                             // std::map<int,Client>& channelData = channelsInServer[*nameIt].get_id_clients_in_channel();
@@ -175,13 +237,13 @@ void join(std::vector<std::string> & commands, std::map<std::string,channel> &ch
                     channel a(clt, *nameIt, *keyIt );
                     channelsInServer[*nameIt] = a;
                     clt.inChannel .push_back (*nameIt);
+                    std::cout << " join clt.isOperator  >>>> " << clt.isOperator << std::endl;
                     if (!get_clients_in_channel (channelsInServer,*nameIt).empty())
                     {
-                        Server::sendMsg(clt, ":" + clt.nickname + "!" + clt.username + "@" + "localhost" + " JOIN " + *nameIt);
+                        Server::sendMsg(clt, ":" + clt.nickname + "!" + clt.username + "@" + host_name() + " JOIN " + *nameIt);
                         Server::sendMsg(clt, ":"+ host_name() + " 353 " + clt.nickname + " = " + *nameIt + " :" + get_clients_in_channel (channelsInServer,*nameIt));
 			            Server::sendMsg(clt, ":" + host_name() + " 366 " + clt.nickname + " " + *nameIt + " :End of /NAMES list");
-                        // sendMsg_to_channel(*nameIt,channelsInServer, ":" + clt.nickname + "!" + clt.username + "@" + "localhost" + " JOIN " + *nameIt , clt );
-
+                        // sendMsg_to_channel(*nameIt,channelsInServer, ":" + clt.nickname + "!" + clt.username + "@" + "host_name" + " JOIN " + *nameIt , clt );
                     }
                 }
                 if (keyIt != it->second.end())
@@ -212,7 +274,6 @@ void join(std::vector<std::string> & commands, std::map<std::string,channel> &ch
 // check command if it's valide and execute it
 
 
-
 void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> &commands, int id,std::map<int,channel> &channels,std::map<std::string, channel> &channelsInServer)
 {
 
@@ -236,9 +297,10 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
                 + (first_argument.compare("USER") == 0)     * 4 \
                 + (first_argument.compare("PRVMSG") == 0)   * 5 \
                 + (first_argument.compare("join") == 0)   * 6   \
-                + (first_argument.compare("JOIN") == 0)   * 6;   \
-                // + (first_argument.compare("INVITE") == 0)   * 7   \
-                // + (first_argument.compare("invite") == 0)   * 7   ;
+                + (first_argument.compare("JOIN") == 0)   * 6   \
+                + (first_argument.compare("kick") == 0)   * 7   \
+                + (first_argument.compare("KICK") == 0)   * 7   \
+                + (first_argument.compare("list") == 0)   * 8   ;
 
         switch (res)
         {
@@ -279,9 +341,13 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
             join(commands,channelsInServer,it->second);
             break;
         
-        // case 7:
-            // invite(commands,channelsInServer,it->second);
-            // break;
+        case 7:
+            kick(commands,channelsInServer,it->second);
+            break;
+
+        case 8 :
+            list (channelsInServer);
+            break;
         default:
             Server::sendMsg(it->second, Message::getError(it->second.nickname, Message::ERR_UNKNOWNCOMMAND));
             break;
