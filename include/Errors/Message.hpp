@@ -37,7 +37,7 @@ public :
         ERR_USERONCHANNEL,
         ERR_NOSUCHCHANNEL,
         ERR_USERNOTINCHANNEL,
-        ERR_NOTONCHANNEL
+        ERR_NOTONCHANNEL,
     };
 
     static std::string  getError(const std::string &clt, short type);

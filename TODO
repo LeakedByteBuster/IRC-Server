@@ -28,6 +28,10 @@ PASS 0000
 NICK Dou
 USER hoba 0 * loba hoba douga
 
+PASS 0000
+NICK zack
+USER unser 0 * fiberoptique
+
 SENDFILE
 SENDFILE
 SENDFILE
@@ -56,3 +60,5 @@ if(it == sev->clients.end()) {
 
 PRVMSG :ChanServ!services@services.freenode.net MODE #Help +l :77
 :Harambe!~harambe@freenode/service/Harambe PRIVMSG Mushii :VERSION
+
+//":" + senderNick + "!~" + senderUsername + "@" + senderHostname + " PRIVMSG " + receiver + " :" + message + "\r\n"

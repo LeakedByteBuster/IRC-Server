@@ -269,10 +269,10 @@ void            Server::handleIncomingConnections()
                                     }
                                     for (size_t n = 0; n < commandStrings.size(); n++) {
                                         std::vector<std::string> commands = splitBySpace(commandStrings[n]);
-                                        for (size_t i = 0; i < commands.size(); i++) {
-                                            std::cout << commands[i] << " ";
-                                        }
-                                        std::cout << std::endl ;
+                                        // for (size_t i = 0; i < commands.size(); i++) {
+                                        //     std::cout << commands[i] << " ";
+                                        // }
+                                        // std::cout << std::endl ;
                                         execute_commmand(clients, commands, pollFds[i].fd,channles,this->channelsInServer);
                                     }
                                 }

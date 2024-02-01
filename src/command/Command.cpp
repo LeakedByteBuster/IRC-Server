@@ -71,7 +71,6 @@ std::string get_clients_names_in_channel( std::map<std::string,channel> &channel
         for (;it_c != it->second.get_id_clients_in_channel().end(); ++it_c)
         {
         //  std::cout << "fd  >>>>>> " << it_c->second.fd << std::endl;
-            std::cout << "clients in channel  name operator  = " << it_c->second.isOperator  << " fd " << it_c->second.fd<< std::endl; 
             std::string v_name = it_c->second.nickname;
             if (it_c->second.isOperator == 1)
                 v_name = "@"+ v_name;
@@ -277,7 +276,6 @@ void join(std::vector<std::string> & commands, std::map<std::string,channel> &ch
                     channel a(clt, *nameIt, *keyIt );
                     channelsInServer[*nameIt] = a;
                     clt.inChannel .push_back (*nameIt);
-                    std::cout << " join clt.isOperator  >>>> " << clt.isOperator << std::endl;
                     if (!get_clients_names_in_channel (channelsInServer,*nameIt).empty())
                     {
                         Server::sendMsg(clt, ":" + clt.nickname + "!" + clt.username + "@" + host_name() + " JOIN " + *nameIt);
@@ -579,11 +577,23 @@ int search_msg(std::vector<std::string> command)
     return(0);
 }
 
+int check_text_msg(std ::string msg)
+{
+    int two_point = std::count(msg.begin(),msg.end(),':');
+    return(two_point);
+}
+
+
 void prv_msg(std::map<std::string,channel> &channels, std::vector<std ::string> command, Client clt,std::map<int,Client> clients)
 {
     if (command.size() < 3)
     {
         Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAM));
+        return;
+    }
+    if(check_text_msg(command[2]) < 1 && command.size() > 3)
+    {
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NOTEXTTOSEND));
         return;
     }
     std::vector<std::string> client_and_channels = parse_such(command[1]);
@@ -592,11 +602,18 @@ void prv_msg(std::map<std::string,channel> &channels, std::vector<std ::string> 
 
 std :: string compile_msg(std::vector<std::string> commands,int position)
 {
+    std :: string first = commands[position];
     size_t i = position;
-    std :: string msg;
 
+    if(first.front() == ':' && first.at(1) == ':')
+    {
+        first = first.substr(1,first.size());
+        commands[position] = first;
+    }
+    std :: string msg;
     for(; i < commands.size();i++)
     {
+        std::cout << commands[i] << " ";
         if(i != commands.size() - 1)
             msg = msg.append(commands[i] + " ");
         else
@@ -625,15 +642,22 @@ void check_targets(std::map<std::string,channel> channelsinserver, std::vector<s
     {
         if(params[i].find('#') == 0)
         {
-            int id = check_existed_channel(channelsinserver,params[i]);
-            if(id)
+            int id = check_channel(channelsinserver,params[i],clt);
+            if(!id)
+            {
+                Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NOSUCHNICK));
+                return;
+            }
+            else if(id == 2)
             {
                 std::map<std::string,channel>::iterator it = channelsinserver.find(params[i]);
                 sendMsg_to_channel(it->first,channelsinserver,msg,clt);
+                return;
             }
             else
             {
-                Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NOSUCHNICK));
+                Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_CANNOTSENDTOCHAN));
+                return;
             }
         }
         else
@@ -681,10 +705,28 @@ const char *getDownMsg()
     return (Down);
 }
 
+
+//":" + senderNick + "!~" + senderUsername + "@" + senderHostname + " PRIVMSG " + receiver + " :" + message + "\r\n"
 void sendPrvmsg(Client sender,std::string str,Client recv)
 {
     std::string msg = getId(sender);
     msg.append(" PRIVMSG " + recv.nickname + " " + str);
     Server::sendMsg(recv, msg);
     Server::sendMsg(sender, Message::rplAwayMsg(sender, msg));
+}
+
+int check_channel(std::map<std::string,channel> channles_server,std::string channel_name,Client clt)
+{
+    if (check_existed_channel(channles_server,channel_name))
+    {
+       if(is_client_in_channel(channel_name,channles_server,clt.nickname))
+       {
+            return(2);
+       }
+       else
+       {
+            return(1);
+       }
+    }
+    return 0;
 }

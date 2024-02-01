@@ -9,6 +9,7 @@
 #include "TFile.hpp"
 #include "Message.hpp"
 #include "channel.hpp"
+#include <algorithm> 
 #include <utility>
 
 class Server;
@@ -43,3 +44,4 @@ int                        search_in_channels(std::map<int,channel> channels,std
 int                        search_client_inChannel(Client clt,channel channel);
 void                       sendPrvmsg(Client sender,std::string msg,Client recv);
 std::vector<std::string>   parse_such(std::string str);
+int                        check_channel(std::map<std::string,channel> channles_server,std::string channel_name,Client clt);
