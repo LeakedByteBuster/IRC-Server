@@ -25,7 +25,7 @@ Server :
     - MSG_NOSIGNAL (SIGPIPE)
 
 PASS 0000
-NICK Doug
+NICK Doum
 USER hoba 0 * loba hoba douga
 
 SENDFILE
@@ -35,6 +35,9 @@ SENDFILE
 SENDFILE
 SENDFILE
 SENDFILE
+
+PRIVMSG #CHANNEL:JKD
+PRIVMSG #CANNEL KLJDAKJDFS
 
 ircserv(22538,0x112534dc0) malloc: can't allocate region
 :*** mach_vm_map(size=5497002079367290880, flags: 100) failed (error code=3)

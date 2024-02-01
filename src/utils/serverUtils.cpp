@@ -159,7 +159,7 @@ int whichCommand(const std::string &first_argument)
             + (first_argument.compare("USER") == 0)     * PASS_USER \
             + (first_argument.compare("user") == 0)     * PASS_USER \
 
-            + (first_argument.compare("PRIVMSG") == 0)   * PRVMSG \
+            + (first_argument.compare("PRIVMSG") == 0)   * PRIVMSG \
 
             + (first_argument.compare("PONG") == 0)     * PONG \
 

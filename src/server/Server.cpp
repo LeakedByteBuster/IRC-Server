@@ -269,7 +269,6 @@ void            Server::handleIncomingConnections()
                                     }
                                     for (size_t n = 0; n < commandStrings.size(); n++) {
                                         std::vector<std::string> commands = splitBySpace(commandStrings[n]);
-                                    std::cout << "commands = " << commands[0] << std::endl ;
                                         execute_commmand(clients, commands, pollFds[i].fd,channles,this->channelsInServer);
                                     }
                                 }

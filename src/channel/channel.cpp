@@ -174,3 +174,10 @@ std::map<std::vector<std::string>,std::vector<std::string> > parse_join_command(
 
 }
 
+int check_existed_channel (std::map<std::string,channel> &channelsInServer , std::string name)
+{
+    std::map <std::string,channel > :: iterator it = channelsInServer.find (name);
+    if(it != channelsInServer.end ())
+        return (1);
+    return 0 ;
+}   
