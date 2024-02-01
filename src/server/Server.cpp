@@ -264,12 +264,15 @@ void            Server::handleIncomingConnections()
                                 if (commandStrings.size() > 0) {
                                     if (clients[id].isRegistred == 0) {
                                         userRegistration(id, commandStrings);
-                                        fdsLeft--;
-                                        continue;
+                                        fdsLeft-- ;
+                                        continue ;
                                     }
                                     for (size_t n = 0; n < commandStrings.size(); n++) {
                                         std::vector<std::string> commands = splitBySpace(commandStrings[n]);
-                                    std::cout << "commands = " << commands[0] << std::endl ;
+                                        for (size_t i = 0; i < commands.size(); i++) {
+                                            std::cout << commands[i] << " ";
+                                        }
+                                        std::cout << std::endl ;
                                         execute_commmand(clients, commands, pollFds[i].fd,channles,this->channelsInServer);
                                     }
                                 }

@@ -65,6 +65,7 @@ std::string  Message :: rplAwayMsg(Client &clt,std :: string str)
     BUILD_MESSAGE(Message::ERR_USERONCHANNEL, 443 *  ,: is already on channel) \
     BUILD_MESSAGE(Message::ERR_NOSUCHCHANNEL, 403 *  ,: No such channel) \
     BUILD_MESSAGE(Message::ERR_USERNOTINCHANNEL, 403 *  ,: They aren t on that channel)\
+    BUILD_MESSAGE(Message::ERR_NOTONCHANNEL, 442 *  ,:  :You re not on that channel)\
     BUILD_MESSAGE(Message::ERR_CHANOPRIVSNEEDED, 403 *  ,: :You re not channel operator)
     // BUILD_MESSAGE(Message::ERR_CHANOPRIVSNEEDED, 482 *  ,: You're not channel operator)
 

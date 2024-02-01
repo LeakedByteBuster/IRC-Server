@@ -36,7 +36,8 @@ public :
         ERR_CHANOPRIVSNEEDED,
         ERR_USERONCHANNEL,
         ERR_NOSUCHCHANNEL,
-        ERR_USERNOTINCHANNEL
+        ERR_USERNOTINCHANNEL,
+        ERR_NOTONCHANNEL
     };
 
     static std::string  getError(const std::string &clt, short type);

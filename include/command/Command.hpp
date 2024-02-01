@@ -19,7 +19,13 @@ enum    Commands {
     GETFILE,
     NICK,
     PASS_USER,
-    PRVMSG,
+    PRIVMSG,
+    JOIN,
+    KICK,
+    LIST,
+    INVITE,
+    TOPIC,
+    MODE,
     PONG,
     IRCBOT
 };
