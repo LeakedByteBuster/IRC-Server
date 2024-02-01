@@ -53,7 +53,7 @@ std::string  Message :: rplAwayMsg(Client &clt,std :: string str)
     BUILD_MESSAGE(Message::ERR_ALREADYREGISTRED, 462 * , : You may not reregister) \
     BUILD_MESSAGE(Message::ERR_UNKNOWNCOMMAND, 421 * , : Unknown command)          \
     BUILD_MESSAGE(Message::ERR_NOSUCHFILE, 1336 * , : No such a file in /DIR)      \
-    BUILD_MESSAGE(Message::ERR_NOSUCHNICK, 133 * , : No such nick/channel)         \
+    BUILD_MESSAGE(Message::ERR_NOSUCHNICK, 401 * , : No such nick/channel)         \
     BUILD_MESSAGE(Message::ERR_NOSUCHFILENAME, 1336 * , : /file name not found)    \
     BUILD_MESSAGE(Message::ERR_NOFILEFROMSENDER, 1335 * , : No file from sender)   \
     BUILD_MESSAGE(Message::ERR_NOTEXTTOSEND, 412 * , : No text to send)            \

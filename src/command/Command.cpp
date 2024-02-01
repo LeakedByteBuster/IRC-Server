@@ -6,6 +6,7 @@
 #include "utils.hpp"
 #include "registrationCommands.hpp"
 #include <algorithm>
+#include "channel.hpp"
 
 std :: vector<std :: string> HandleIncomingMsg(std :: vector <std :: string> &commands,std :: string msg)
 {
@@ -83,10 +84,10 @@ std::string get_clients_names_in_channel( std::map<std::string,channel> &channel
     if (!clients_names.empty())
     {
     for (std::vector<std::string>::const_iterator it = clients_names.begin(); it != clients_names.end(); ++it) {
-        std::cout << "channnels clients --->" << *it <<" ";
+        // std::cout << "channnels clients --->" << *it <<" ";
         result += (*it+" ");
         }   
-    std::cout << result <<std::endl ;
+    // std::cout << result <<std::endl ;
     }
     return result;
 }
@@ -121,18 +122,23 @@ int is_client_in_channel (std::string & name,std::map<std::string,channel> &chan
 }
 
 
-void sendMsg_to_channel(std::string name,std::map<std::string,channel> &channelsInServer,std::string msg,Client clt )
+void sendMsg_to_channel(std::string name,std::map<std::string,channel> &channelsInServer,std::string str, Client clt)
 {
     // std::vector <std::string>  clients_names;
     std::map <std::string,channel > :: iterator it = channelsInServer.find (name);
     if(it != channelsInServer.end ())
     {
-        std::map <int,Client > :: iterator it_c = it->second.get_id_clients_in_channel().begin();
+        std::map <int, Client> :: iterator it_c = it->second.get_id_clients_in_channel().begin();
         for (;it_c != it->second.get_id_clients_in_channel().end(); ++it_c)
         {
             if (it_c->first != clt.fd)
             {
-                Server::sendMsg (it_c->second,msg);
+                // :kadigh!~as@197.230.30.146 PRIVMSG #ch0 : hey there
+                std::string msg = getId(clt);
+
+                msg.append(" PRIVMSG " + name + " :" + str);
+                // std::cout << "msg : " << msg << std::endl;
+                Server::sendMsg (it_c->second, msg);
             }
         }
     }
@@ -310,7 +316,6 @@ void join(std::vector<std::string> & commands, std::map<std::string,channel> &ch
 
 void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> &commands, int id,std::map<int,channel> &channels,std::map<std::string, channel> &channelsInServer)
 {
-
     int res = 0;
     (void)channels;
     if (!commands.empty())
@@ -369,7 +374,7 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
             break;
 
         case PRIVMSG:
-            prv_msg(channels, commands, it->second,clients);
+            prv_msg(channelsInServer, commands, it->second,clients);
             break ;
 
         // case PONG: // ignore PONG
@@ -574,20 +579,15 @@ int search_msg(std::vector<std::string> command)
     return(0);
 }
 
-void prv_msg(std::map<int,channel> &channels, std::vector<std ::string> command, Client clt,std::map<int,Client> clients)
+void prv_msg(std::map<std::string,channel> &channels, std::vector<std ::string> command, Client clt,std::map<int,Client> clients)
 {
-    size_t position = search_msg(command);
     if (command.size() < 3)
     {
         Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAM));
         return;
     }
-    else if (position == 0)
-    {
-        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NOTEXTTOSEND));
-        return;
-    }
-    check_targets(channels,command,clt,position,clients);
+    std::vector<std::string> client_and_channels = parse_such(command[1]);
+    check_targets(channels,command,client_and_channels,clt,clients);
 }
 
 std :: string compile_msg(std::vector<std::string> commands,int position)
@@ -604,22 +604,32 @@ std :: string compile_msg(std::vector<std::string> commands,int position)
     }
     return(msg);
 }
-
-
-void check_targets(std::map<int,channel> channels, std::vector<std::string> command, Client clt,size_t position,std::map<int,Client> clients)
+std::vector<std::string> parse_such(std::string str)
 {
-    std :: string msg = compile_msg(command,position);
-    for(size_t i = 1; i < position;i++)
+    std::stringstream virgule(str);
+
+    std :: string word;
+    std :: vector<std::string> twords;
+
+    while(std::getline(virgule,word,','))
     {
-        if(command[i].find('#') == 0)
+        twords.push_back(word);
+    }
+    return(twords);
+}
+
+void check_targets(std::map<std::string,channel> channelsinserver, std::vector<std::string> command,std::vector<std::string> params, Client clt,std::map<int,Client> clients)
+{
+    std :: string msg = compile_msg(command,2);
+    for(size_t i = 0; i < params.size();i++)
+    {
+        if(params[i].find('#') == 0)
         {
-            int id = search_in_channels(channels,command[i],clt);
+            int id = check_existed_channel(channelsinserver,params[i]);
             if(id)
             {
-                std::map<int,channel>::iterator it = channels.find(id);
-                (void) it;
-
-                // send Massege to channel
+                std::map<std::string,channel>::iterator it = channelsinserver.find(params[i]);
+                sendMsg_to_channel(it->first,channelsinserver,msg,clt);
             }
             else
             {
@@ -628,7 +638,7 @@ void check_targets(std::map<int,channel> channels, std::vector<std::string> comm
         }
         else
         {
-            int id = search_a_client(clients,command[i]);
+            int id = search_a_client(clients,params[i]);
             if(id)
             {
                 std::map<int,Client>::iterator it = clients.find(id);
