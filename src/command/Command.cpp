@@ -337,18 +337,19 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
                 + (first_argument.compare("list") == 0)   * 8   \
                 + (first_argument.compare("INVITE") == 0)   * 9 \
                 + (first_argument.compare("invite") == 0)   * 9 \
+                + (first_argument.compare("MODE") == 0)   * 11  \
                 + (first_argument.compare("PONG") == 0)   * 12 ;
 
         switch (res)
         {
-        // case SENDFILE:
-        //     send_file(clients,commands,it->second);
-        //     break;
+        case SENDFILE:
+            send_file(clients,commands,it->second);
+            break;
 
-        // case GETFILE:
-        //     get_file(clients,commands,it->second);
-        //     break;
-        std::cout << "first "<< first_argument << std::endl;
+        case GETFILE:
+            get_file(clients,commands,it->second);
+            break;
+
         case NICK:
             try {
                 std::string buff;
@@ -368,9 +369,11 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
             break;
 
         case PRIVMSG:
-            std::cout << "here " << std::endl;
             prv_msg(channels, commands, it->second,clients);
             break ;
+
+        // case PONG: // ignore PONG
+        //     break;
         
         case JOIN:
             join(commands,channelsInServer,it->second);
