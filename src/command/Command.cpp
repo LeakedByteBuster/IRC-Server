@@ -5,30 +5,22 @@
 #include "registrationCommands.hpp"
 
 // check command if it's valide and exucte it
-void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> &commands, int id,std::map<int,channel> &channels)
+void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> &commands, int id)
 {
     int res = 0;
 
     if (!commands.empty())
     {
-
-        std ::string first_argument = commands[0];
-        std::map<int, Client>::iterator it = clients.find(id);
-
-        if(it == clients.end())
-        {
-            return;
-        }
-        res =  whichCommand(first_argument);
+        res =  whichCommand(commands[0]);
 
         switch (res)
         {
         case SENDFILE:
-            send_file(clients,commands,it->second);
+            send_file(clients,commands,clients[id]);
             break;
 
         case GETFILE:
-            get_file(clients,commands,it->second);
+            get_file(clients,commands, clients[id]);
             break;
 
         case NICK:
@@ -40,28 +32,29 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
                         buff = buff.append(" ");
                     buff = buff.append(commands[i]);
                 }
-                parseNick(clients, it->second, buff);
+                parseNick(clients, clients[id], buff);
             }
             catch (std::exception &e) { }
             break;
         
         case PASS_USER:
-            Server::sendMsg(it->second, LogError::getError(it->second.nickname, LogError::ERR_ALREADYREGISTRED));
+            Server::sendMsg(clients[id], LogError::getError(clients[id].nickname, LogError::ERR_ALREADYREGISTRED));
             break;
 
         case PRVMSG:
-            prv_msg(channels, commands, it->second,clients);
+            // prv_msg(channels, commands, clients[id],clients);
             break ;
 
         case PONG: // ignore PONG
             break;
 
         case IRCBOT : // bot (time)
-            Server::sendMsg(it->second, Bot::botExecuter(commands[0], it->second));
+            // needs privmsg to be refractored after
+            // Server::sendMsg(clients[id], Bot::botExecuter(commands[0], clients[id]));
             break;
 
         default:
-            Server::sendMsg(it->second, LogError::getError(it->second.nickname, LogError::ERR_UNKNOWNCOMMAND));
+            Server::sendMsg(clients[id], LogError::getError(clients[id].nickname, LogError::ERR_UNKNOWNCOMMAND));
             break;
         }
     }
@@ -217,89 +210,89 @@ void creat_file(Client clt, std ::string sender, std ::string filename)
     clt.Files.clear();
 }
 
-int search_msg(std::vector<std::string> command)
-{
-    int i = 0;
-    std::vector<std::string>::iterator it = command.begin();
-    for(; it != command.end();it++)
-    {
-        if(it->find(":") != std::string::npos)
-        {
-            return(i);
-        }
-        i++;
-    }
-    return(0);
-}
+// int search_msg(std::vector<std::string> command)
+// {
+//     int i = 0;
+//     std::vector<std::string>::iterator it = command.begin();
+//     for(; it != command.end();it++)
+//     {
+//         if(it->find(":") != std::string::npos)
+//         {
+//             return(i);
+//         }
+//         i++;
+//     }
+//     return(0);
+// }
 
-void prv_msg(std::map<int,channel> &channels, std::vector<std ::string> command, Client clt,std::map<int,Client> clients)
-{
-    size_t position = search_msg(command);
-    if (command.size() < 3)
-    {
-        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NEEDMOREPARAM));
-        return;
-    }
-    else if (position == 0)
-    {
-        Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOTEXTTOSEND));
-        return;
-    }
-    check_targets(channels,command,clt,position,clients);
-}
+// void prv_msg(std::map<int,channel> &channels, std::vector<std ::string> command, Client clt,std::map<int,Client> clients)
+// {
+//     size_t position = search_msg(command);
+//     if (command.size() < 3)
+//     {
+//         Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NEEDMOREPARAM));
+//         return;
+//     }
+//     else if (position == 0)
+//     {
+//         Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOTEXTTOSEND));
+//         return;
+//     }
+//     check_targets(channels,command,clt,position,clients);
+// }
 
-std :: string compile_msg(std::vector<std::string> commands,int position)
-{
-    size_t i = position;
-    std :: string msg;
+// std :: string compile_msg(std::vector<std::string> commands,int position)
+// {
+//     size_t i = position;
+//     std :: string msg;
 
-    for(; i < commands.size();i++)
-    {
-        if(i != commands.size() - 1)
-            msg = msg.append(commands[i] + " ");
-        else
-            msg = msg.append(commands[i]);
-    }
-    return(msg);
-}
+//     for(; i < commands.size();i++)
+//     {
+//         if(i != commands.size() - 1)
+//             msg = msg.append(commands[i] + " ");
+//         else
+//             msg = msg.append(commands[i]);
+//     }
+//     return(msg);
+// }
 
 
-void check_targets(std::map<int,channel> channels, std::vector<std::string> command, Client clt,size_t position,std::map<int,Client> clients)
-{
-    std :: string msg = compile_msg(command,position);
-    for(size_t i = 1; i < position;i++)
-    {
-        if(command[i].find('#') == 0)
-        {
-            int id = search_in_channels(channels,command[i],clt);
-            if(id)
-            {
-                std::map<int,channel>::iterator it = channels.find(id);
-                (void) it;
+// void check_targets(std::map<int,channel> channels, std::vector<std::string> command, Client clt,size_t position,std::map<int,Client> clients)
+// {
+//     std :: string msg = compile_msg(command,position);
+//     for(size_t i = 1; i < position;i++)
+//     {
+//         if(command[i].find('#') == 0)
+//         {
+//             int id = search_in_channels(channels,command[i],clt);
+//             if(id)
+//             {
+//                 std::map<int,channel>::iterator it = channels.find(id);
+//                 (void) it;
 
-                // send Massege to channel
-            }
-            else
-            {
-                Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOSUCHNICK));
-            }
-        }
-        else
-        {
-            int id = search_a_client(clients,command[i]);
-            if(id)
-            {
-                std::map<int,Client>::iterator it = clients.find(id);
-                sendPrvmsg(clt,msg,it->second);
-                // send Massege to client;
-            }
-            else
-            {
-                Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOSUCHNICK));
-            }
-        }
-    }
-}
+//                 // send Massege to channel
+//             }
+//             else
+//             {
+//                 Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOSUCHNICK));
+//             }
+//         }
+//         else
+//         {
+//             int id = search_a_client(clients,command[i]);
+//             if(id)
+//             {
+//                 std::map<int,Client>::iterator it = clients.find(id);
+//                 sendPrvmsg(clt,msg,it->second);
+//                 // send Massege to client;
+//             }
+//             else
+//             {
+//                 Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOSUCHNICK));
+//             }
+//         }
+//     }
+// }
 
 const char *getDownMsg()
 {

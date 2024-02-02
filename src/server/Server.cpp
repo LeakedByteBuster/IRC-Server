@@ -219,6 +219,10 @@ void Server::userRegistration(int fd, std::vector<std::string> string)
                 parseRegistrationCommands(clients, gbuff[fd], clients[fd], password);
                 clients[fd].isRegistred = 1;
                 gbuff.erase(fd);
+
+                // client sent all the information correctly, sending welcome message
+                // Server::sendMsg(clients[fd], LogError::registrationSuccess(clients[fd].nickname));
+
             } catch (std::exception &e) {
                 clients[fd].nickname.clear();
                 clients[fd].realname.clear();
@@ -264,7 +268,7 @@ void            Server::handleIncomingConnections()
                                     }
                                     for (size_t n = 0; n < commandStrings.size(); n++) {
                                         std::vector<std::string> commands = splitBySpace(commandStrings[n]);
-                                        execute_commmand(clients, commands, pollFds[i].fd,channles);
+                                        execute_commmand(clients, commands, pollFds[i].fd);
                                     }
                                 }
                             }

@@ -65,7 +65,7 @@ std::string getId(Client &clt, int type)
         str = clt.nickname.append(" ");
         break;
     case 1 :    /* [<nick> '!' <user> ] ['@' <host> ] */
-        str = clt.nickname.append("!~");
+        str = clt.nickname.append("!");
         str.append(clt.username.append("@"));
         str.append(inet_ntoa(clt.hints.sin_addr));
         break;
@@ -206,7 +206,6 @@ void    serverWelcomeMessage(const struct sockaddr_in &srvSock, int)
 
 void    clientWelcomeMessage(unsigned short cfd)
 {
-
     std::string s(
         getBigMsg() + 
         static_cast<std::string>("\n\n") + 
