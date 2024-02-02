@@ -6,7 +6,7 @@
 #include "FTP.hpp"
 
 // check command if it's valide and exucte it
-void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> &commands, int id)
+void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &commands, int id)
 {
     int res = 0;
 
@@ -17,11 +17,11 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
         switch (res)
         {
         case SENDFILE:
-            send_file(clients,commands,clients[id]);
+            send_file(clients, commands, clients[id]);
             break;
 
         case GETFILE:
-            get_file(clients,commands, clients[id]);
+            get_file(clients, commands, clients[id]);
             break;
 
         case NICK:
@@ -37,7 +37,7 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
             }
             catch (std::exception &e) { }
             break;
-        
+
         case PASS_USER:
             Server::sendMsg(clients[id], Message::getError(clients[id].nickname, Message::ERR_ALREADYREGISTRED));
             break;

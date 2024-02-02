@@ -36,3 +36,5 @@ USER Mushi @ * Douga
     :lead.libera.chat 376 upps1 :End of /MOTD command.
     :upps1 MODE upps1 :+iw
     :NickServ!NickServ@services.libera.chat NOTICE upps1 :upps1 is not a registered nickname.
+
+//  --------------------------------------------------------------------------------------------------------------------------

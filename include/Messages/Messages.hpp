@@ -4,10 +4,6 @@
 #include <string>
 #include "Client.hpp"
 
-// #define ERR_NEEDMOREPARAMS ":Not enough parameters"
-// #define ERR_NORECIPIENT ":No recipient given"
-// #define ERR_NOTEXTTOSEND ":No text to send"
-
 #define IRC_NAME    ":ircCamel.localhost "
 #define SERVER_VERSION    "ircCamel 1.0"
 
@@ -32,7 +28,7 @@ public :
     };
 
     static std::string  getError(const std::string &clt, short type);
-    static std::string  rplAwayMsg(Client &clt,std :: string str);
+    static std::string  rplAwayMsg(Client &clt, std::string str);
 
 };
 

@@ -30,11 +30,15 @@ bool                        isError(int revents, int fd, int listenFd);
 bool                        isNewConnection(const struct pollfd &fd, int srvfd);
                             //  type=0 : <client> || type=1 : nick!~user@hostname
 std::string                 getId(Client &clt, int type);
+
 std::vector<std::string>    splitByLines(std::string buff);
 std::vector<std::string>    splitBySpace(std::string str);
+std::vector<std::string>    splitByValue(std::string s, char c)
+
 int                         parseInput(const char *port, std::string pass);
-const char *                getBigMsg();
 int                         whichCommand(const std::string &first_argument);
+
+const char *                getBigMsg();
 bool                        readIncomingMsg(char ptr[], const int id);
 void                        deleteClient(std::map<int, std::string> &map, std::vector<struct pollfd> &fds, 
             std::map<int, Client> &clients, std::map<int, std::vector<std::string> > &gbuff,

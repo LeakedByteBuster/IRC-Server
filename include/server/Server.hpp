@@ -53,17 +53,18 @@ public :
 	    //  returns 0 if connection is done successfully, otherwise 0 is returned
     bool    addNewClient(std::vector<struct pollfd> &fds, nfds_t *nfds, int &fdsLeft);
     void    userRegistration(int fd, std::vector<std::string> string);
+
     static void    sendMsg(const Client &target, std::string msg);
     // void    sendMsg(const Channels &target, const std::string &msg);
 
-    std::string  postRegistration(const Client &clt);
-
+    std::string postRegistration(const Client &clt);
 
     //  list of clients connected to the server || Nickname, Client class
     std::map<int, Client>       clients;
     std::string                 serverCreationDate;
     //  list of channels in the server
-    // std::map<int, channel>       channles;
+    static std::map<std::string, channel>  ChannelsInServer;
+
 private :
 
 	// server's password
@@ -76,5 +77,7 @@ private :
     // make class command a friend to server class to get client id from class command
     friend class command;
 };
+
+std::map<std::string, channel>  Server::ChannelsInServer;
 
 #endif // SERVER_HPP

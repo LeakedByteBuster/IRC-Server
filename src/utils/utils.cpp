@@ -27,6 +27,19 @@ std::vector<std::string> splitBySpace(std::string str)
     return (tokens);
 }
 
+std::vector<std::string> splitByValue(std::string s, char c)
+{
+    std::stringstream           ss(s);
+    std::vector<std::string>    tokens;
+    std::string                 token;
+
+    while (std::getline(ss, line, c)) {
+        if (!token.empty())
+            tokens.push_back(token);
+    }
+    return (tokens);
+}
+
 //  Returns local current time
 std::string  geTime()
 {

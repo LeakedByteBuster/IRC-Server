@@ -4,22 +4,10 @@
 #include <iostream>
 #include <arpa/inet.h>
 #include "TFile.hpp"
+#include "Modes.hpp"
 #include <vector>
 
-class   Operator {
-
-public :
-    /* Eject a client from the channel */
-    void    kick(){}
-    /* invite a client to a channel */
-    void    invite(){}
-    /* Change or view the channel topic */
-    void    topic(){}
-    /* Change the channel’s mode */
-    void    mode(/* int mode */){}
-};
-
-class   Client : public Operator {
+class   Client : public ClientOperator {
 
 public :
     std :: vector<TFile> Files;
@@ -28,7 +16,6 @@ public :
     std::string         realname;
     std::string         nickname;
     const int           fd;
-    bool                isOperator; // has operator privilige
     bool                isRegistred; // Successfully registered
 
 public :
@@ -38,8 +25,7 @@ public :
     Client& operator=(const Client &rhs);
     virtual ~Client();
 
-    void    sendMsg(const Client &target, std::string msg);
-    // void    sendMsg(const Channels &target, const std::string &msg);
 };
 
 #endif // CLIENT_HPP
+

@@ -57,13 +57,13 @@ void creat_file(Client clt, std ::string sender, std ::string filename)
         line = new(std::nothrow)char[file_size];
     if(!line)
     {
-        clt.sendMsg(clt, "I think the file is too big can you be kind with us :)");
+        Server::sendMsg(clt, "I think the file is too big can you be kind with us :)");
     }
     // open the new file in client /dir
     myfile.open("transferd_" + filename, std::ios::out | std::ios::binary);
     if (myfile.is_open() == 0)
     {
-        clt.sendMsg(clt, "C 'ant open file ");
+        Server::sendMsg(clt, "C 'ant open file ");
         myfile.close();
         clt.Files.clear();
         clt.Files.clear();
@@ -72,7 +72,7 @@ void creat_file(Client clt, std ::string sender, std ::string filename)
     int readbytes = fread(line, 1, file_size, fd);
     if (readbytes == -1)
     {
-        clt.sendMsg(clt, "C'ant read from file");
+        Server::sendMsg(clt, "C'ant read from file");
         myfile.close();
         clt.Files.clear();
     }
@@ -110,7 +110,7 @@ void send_file(std::map<int,Client> &clients, std ::vector<std ::string> &comman
     TFile fl(FileName, commands[1].c_str(), cl.nickname, commands[2].c_str());
     std::map<int, Client>::iterator rec = clients.find(fd);
     rec->second.Files.push_back(fl);
-    cl.sendMsg(cl, getDownMsg());
+    Server::sendMsg(cl, getDownMsg());
 }
 
 // SYNTAXE : GETFILE FILENAME SENDER
