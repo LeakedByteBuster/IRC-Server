@@ -17,6 +17,7 @@ bool    isChannelNameCorrect(std::string name)
 
 std::vector<std::pair<std::string, std::string> >   parseJoinCommand(std::vector<std::string> &strList)
 {
+    // pair<channel name, channel password>
     std::vector<std::pair<std::string, std::string> >   tokens;
     std::vector<std::string>                            splited;
 
@@ -39,7 +40,8 @@ std::vector<std::pair<std::string, std::string> >   parseJoinCommand(std::vector
             }
         }
     }
-
+    if (strList.empty())
+        tokens.push_back(std::make_pair("#", ""));
     return (tokens);
 }
 
@@ -49,11 +51,11 @@ void    join(Client &, std::vector<std::string> &command)
     std::vector<std::pair<std::string, std::string> >   tmpChannels;
 
     tmpChannels = parseJoinCommand(command);
+
+    // Loop through vector to set varianles of each channel 
     for (size_t i = 0; i < tmpChannels.size(); i++) {
         std::cout << "tmpChan: " << tmpChannels[i].first << " " << tmpChannels[i].second << std::endl;
     }
-
-    // Loop through vector to check and set each channel 
     return ;
 }
 

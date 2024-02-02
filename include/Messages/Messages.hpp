@@ -4,7 +4,7 @@
 #include <string>
 #include "Client.hpp"
 
-#define IRC_NAME    ":ircCamel.localhost "
+#define IRC_NAME    "ircCamel.localhost "
 #define SERVER_VERSION    "ircCamel 1.0"
 
 class   Message {

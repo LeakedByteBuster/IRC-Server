@@ -5,7 +5,7 @@ std::string  Message :: rplAwayMsg(Client &clt,std :: string str)
 {
     std :: string msg;
 
-    msg = IRC_NAME + static_cast<std::string>("301 ");
+    msg = static_cast<std::string>(":") + IRC_NAME + "301 ";
     msg.append(clt.username + static_cast<std::string>(" "));
     msg.append(str);
     
@@ -36,7 +36,9 @@ std::string Message::getError(const std::string &, short type)
     {
         #define BUILD_MESSAGE(errorType, errorNum, errorMsg) \
             case Message::errorType: \
-                error = IRC_NAME + static_cast<std::string>(#errorNum); \
+                error = static_cast<std::string>(":") \
+                        + IRC_NAME \
+                        + #errorNum; \
                 error.append(#errorMsg); \
                 break;
 

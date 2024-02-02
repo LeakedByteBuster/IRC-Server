@@ -33,6 +33,10 @@
 class   Server {
 
 public :
+    //  list of clients connected to the server || Nickname, Client class
+    std::map<int, Client>           clients; 
+    std::string                     serverCreationDate;
+    std::map<std::string, channel>  ChannelsInServer; // all channels
 
     //	creates a TCP, IPv4, Passive socket
     Server(std::string portNum, std::string password);
@@ -44,26 +48,23 @@ public :
     const int &                 getListenFd() const;
     const std::string &         getPassword() const;
 
-	    //  Accepts clients connections
+    //      Accepts clients connections
     void    handleIncomingConnections();
-	    //  Add socket fd to the vector and increment nfds by 1
+    //      Add socket fd to the vector and increment nfds by 1
     void    addNewPollfd(int fd, std::vector<struct pollfd> &fds, nfds_t &nfds);
-	    //  checks if checks if there is a revents in one of the fds
+    //      Checks if checks if there is a revents in one of the fds
     int     isPollReady(std::vector<struct pollfd> &fds, nfds_t &nfds);
-	    //  returns 0 if connection is done successfully, otherwise 0 is returned
+    //      Returns 0 if connection is done successfully, otherwise 0 is returned
     bool    addNewClient(std::vector<struct pollfd> &fds, nfds_t *nfds, int &fdsLeft);
+    //      parse NICK, USER, PASS and, Registers the new client
     void    userRegistration(int fd, std::vector<std::string> string);
-
+    //      Sends a message to a specific client
     static void    sendMsg(const Client &target, std::string msg);
+    //      Sends a message to a specific channel
     // void    sendMsg(const Channels &target, const std::string &msg);
-
+    //          Sends 001, 002, 003, 004 messages
     std::string postRegistration(const Client &clt);
 
-    //  list of clients connected to the server || Nickname, Client class
-    std::map<int, Client>       clients;
-    std::string                 serverCreationDate;
-    //  list of channels in the server
-    std::map<std::string, channel>  ChannelsInServer;
 
 private :
 
