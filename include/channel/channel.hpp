@@ -4,6 +4,7 @@
 #include <map>
 #include "Client.hpp"
 #include "Modes.hpp"
+#include "Operator.hpp"
 
 class channel : public ChannelModes, public Operator {
 

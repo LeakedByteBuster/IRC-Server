@@ -260,6 +260,8 @@ void            Server::handleIncomingConnections()
                             buff = ptr;
                             std::pair<std::string, bool>    str = parseInput(buff, map, pollFds, i);
                             if (str.second == 1) { // '\n' is in the message
+                                std::cout << "Input: " << str.first;
+                                std::cout.flush();
                                 std::vector<std::string> commandStrings = splitByLines(str.first);
                                 if (commandStrings.size() > 0) {
                                     if (clients[id].isRegistred == 0) {

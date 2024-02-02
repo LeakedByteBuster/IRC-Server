@@ -167,26 +167,24 @@ int whichCommand(const std::string &first_argument)
             + (first_argument.compare("USER") == 0)     * PASS_USER \
             + (first_argument.compare("user") == 0)     * PASS_USER \
 
-            + (first_argument.compare("PRVMSG") == 0)   * PRVMSG \
+            + (first_argument.compare("PRIVMSG") == 0)   * PRVMSG \
 
             + (first_argument.compare("PONG") == 0)     * PONG \
 
-            + (first_argument.compare("/DATE") == 0)    * IRCBOT \
-            + (first_argument.compare("/date") == 0)    * IRCBOT \
+            + (first_argument.compare("/DATE") == 0)    * DATE \
+            + (first_argument.compare("/date") == 0)    * DATE \
 
-            + (first_argument.compare("/JOKE") == 0)    * IRCBOT \
-            + (first_argument.compare("/joke") == 0)    * IRCBOT \
+            + (first_argument.compare("/JOKE") == 0)    * JOKE \
+            + (first_argument.compare("/joke") == 0)    * JOKE \
 
-            + (first_argument.compare("/whoami") == 0)  * IRCBOT \
-            + (first_argument.compare("/WHOAMI") == 0)  * IRCBOT;
-
+            + (first_argument.compare("/whoami") == 0)  * WHOAMI \
+            + (first_argument.compare("/WHOAMI") == 0)  * WHOAMI \
+            
+            + (first_argument.compare("join") == 0 ||
+                first_argument.compare("JOIN") == 0)  * JOIN;
     return (ret);
 }
 
-/*
-  "<client> <servername> <version> <available user modes>
-  <available channel modes> [<channel modes with a parameter>]"
-*/
 std::string Server::postRegistration(const Client &clt)
 {
     std::string str;

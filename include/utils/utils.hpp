@@ -33,7 +33,7 @@ std::string                 getId(Client &clt, int type);
 
 std::vector<std::string>    splitByLines(std::string buff);
 std::vector<std::string>    splitBySpace(std::string str);
-std::vector<std::string>    splitByValue(std::string s, char c)
+std::vector<std::string>    splitByValue(std::string s, char c);
 
 int                         parseInput(const char *port, std::string pass);
 int                         whichCommand(const std::string &first_argument);

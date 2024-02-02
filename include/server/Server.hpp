@@ -63,7 +63,7 @@ public :
     std::map<int, Client>       clients;
     std::string                 serverCreationDate;
     //  list of channels in the server
-    static std::map<std::string, channel>  ChannelsInServer;
+    std::map<std::string, channel>  ChannelsInServer;
 
 private :
 
@@ -77,7 +77,5 @@ private :
     // make class command a friend to server class to get client id from class command
     friend class command;
 };
-
-std::map<std::string, channel>  Server::ChannelsInServer;
 
 #endif // SERVER_HPP

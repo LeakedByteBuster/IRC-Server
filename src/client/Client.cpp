@@ -6,8 +6,9 @@ Client::Client() : fd(0)
 
 }
 
-Client::Client(const int rfd) : fd(rfd), isOperator(0), isRegistred(0)
+Client::Client(const int rfd) : fd(rfd), isRegistred(0)
 {
+    isOperator = 0;
     memset(&hints, 0, sizeof(hints));
 }
 

@@ -1,5 +1,68 @@
 #include "Server.hpp"
 
+bool    isChannelNameCorrect(std::string name)
+{
+    std::string specials = " ,\a\r\n\0";
+
+    if (name[0] != '#') 
+        return (0);
+    for (size_t i = 0; i < name.size(); i++) {
+        if (specials.compare(name) == 0) {
+            return (0);
+        }
+    }
+
+    return (1);
+}
+
+std::vector<std::pair<std::string, std::string> >   parseJoinCommand(std::vector<std::string> &strList)
+{
+    std::vector<std::pair<std::string, std::string> >   tokens;
+    std::vector<std::string>                            splited;
+
+    // skip first argument "join"
+    strList.erase(strList.begin());
+
+    if (strList.size() >= 1) {
+        
+        splited = splitByValue(strList[0], ',');
+        std::cout << "strListSize " <<  strList[0] << std::endl;
+        for (size_t i = 0; i < splited.size(); i++) {
+            if (isChannelNameCorrect(splited[i]))
+                tokens.push_back(std::make_pair(splited[i], ""));
+        }
+
+        if (strList.size() >= 2) {
+            std::vector<std::string>    passwords = splitByValue(strList[1], ',');
+            for (size_t i = 0; (i < passwords.size()) && (i < tokens.size()); i++) {
+                tokens[i].second = passwords[i];
+            }
+        }
+    }
+
+    return (tokens);
+}
+
+void    join(Client &, std::vector<std::string> &command)
+{
+    // parse command input/keys
+    std::vector<std::pair<std::string, std::string> >   tmpChannels;
+
+    tmpChannels = parseJoinCommand(command);
+    for (size_t i = 0; i < tmpChannels.size(); i++) {
+        std::cout << "tmpChan: " << tmpChannels[i].first << " " << tmpChannels[i].second << std::endl;
+    }
+
+    // Loop through vector to check and set each channel 
+    return ;
+}
+
+
+
+
+
+
+
 // bool is_duplicated(std::vector<std::string>& channel_names) 
 // {
 //     std::set<std::string> unique_channels;
@@ -148,55 +211,3 @@
                      comma (',')>
 */
 
-bool    isChannelNameCorrect(std::string name)
-{
-    std::string specials = " ,\a\r\n\0"
-
-    for (int i = 0; i < name.size(); i++) {
-        if (specials.compare(name[i]) == 0) {
-            return (0);
-        }
-    }
-
-    return (1);
-}
-
-std::vector<std::pair<std::string, std::string> >   parseJoinCommand(std::vector<std::string> &strList)
-{
-    std::vector<std::pair<std::string, std::string> >   tokens;
-    std::vector<std::string>                            splited;
-
-    // skip first argument "join"
-    strList.erase(0);
-
-    if (strList.size() > 2)
-        /* this is an error */
-
-    splited = splitByValue(strList[0], ',');
-    for (size_t i = 0; i < splited.size(); i++) {
-        if (!isChannelNameCorrect(splited[i]))
-            tokens.push_back(std::make_pair(splited[i], ""));
-    }
-
-    if (strList.size() == 2) {
-        std::vector<std::string>    passwords = splitByValue(strList[1], ',');
-        for (size_t i = 0; (i < passwords.size()) && (i < tokens.size()); i++) {
-            tokens[i].second = passwords[i];
-        }
-    }
-
-    return (tokens);
-}
-
-void    join(Client &clt, std::vector<std::string> &command)
-{
-    // parse command input/keys
-    std::vector<std::pair<std::string, std::string> >   tmpChannels;
-
-    tmpChannels = parseJoinCommand(command);
-
-
-
-    // Loop through vector to check and set each channel 
-    return ;
-}

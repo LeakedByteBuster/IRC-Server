@@ -21,7 +21,11 @@ enum    Commands {
     PASS_USER,
     PRVMSG,
     PONG,
-    IRCBOT
+    IRCBOT,
+    DATE,
+    JOKE,
+    WHOAMI,
+    JOIN
 };
 
 // compare first string in vector too see if is a valid command
@@ -33,7 +37,7 @@ void                        get_file(std::map<int,Client> &clients,std :: vector
 int                         search_a_file(Client clt,std :: string sender);
 void                        creat_file(Client clt,std :: string sender,std :: string filename);
 const char *                getDownMsg(void);
-
+void                        join(Client &clt, std::vector<std::string> &command);
 
 
 // void                        prv_msg(std::map<int,channel> &channels,std::vector<std :: string>command,Client clt,std::map<int,Client> Clients);

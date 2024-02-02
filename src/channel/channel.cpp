@@ -4,7 +4,10 @@ channel::channel()
 {
 
 }
+channel::~channel()
+{
 
+}
 // channel::channel(int id,std::string name,std::string key ,bool isoperator)
 // {
 // 	this->id_clients_in_channel.push_back(id);
