@@ -221,7 +221,7 @@ void Server::userRegistration(int fd, std::vector<std::string> string)
                 gbuff.erase(fd);
 
                 // client sent all the information correctly, sending welcome message
-                // Server::sendMsg(clients[fd], LogError::registrationSuccess(clients[fd].nickname));
+                // Server::sendMsg(clients[fd], Message::registrationSuccess(clients[fd].nickname));
 
             } catch (std::exception &e) {
                 clients[fd].nickname.clear();

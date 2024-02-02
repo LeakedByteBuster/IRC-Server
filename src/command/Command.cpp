@@ -39,7 +39,7 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
             break;
         
         case PASS_USER:
-            Server::sendMsg(clients[id], LogError::getError(clients[id].nickname, LogError::ERR_ALREADYREGISTRED));
+            Server::sendMsg(clients[id], Message::getError(clients[id].nickname, Message::ERR_ALREADYREGISTRED));
             break;
 
         case PRVMSG:
@@ -55,7 +55,7 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
             break;
 
         default:
-            Server::sendMsg(clients[id], LogError::getError(clients[id].nickname, LogError::ERR_UNKNOWNCOMMAND));
+            Server::sendMsg(clients[id], Message::getError(clients[id].nickname, Message::ERR_UNKNOWNCOMMAND));
             break;
         }
     }
@@ -86,21 +86,21 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
 
 //     if (commands.size() < 3)
 //     {
-//         Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NEEDMOREPARAM));
+//         Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NEEDMOREPARAM));
 //         return;
 //     }
 //     // open file both binary and text
 //     FileName = fopen(commands[1].c_str(), "rb");
 //     if (!FileName)
 //     {
-//         Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILE));
+//         Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHFILE));
 //         return;
 //     }
 //     // if not found reciever
 //     int fd = search_a_client(clients, commands[2]);
 //     if (!fd)
 //     {
-//         Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHNICK));
+//         Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHNICK));
 //         return;
 //     }
 //     // creat object file and push it in client vector of files
@@ -116,31 +116,31 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
 // {
 //     if (command.size() != 3)
 //     {
-//         Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NEEDMOREPARAM));
+//         Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NEEDMOREPARAM));
 //         return;
 //     }
 //     else if (command[1].empty())
 //     {
-//         Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILENAME));
+//         Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHFILENAME));
 //         return;
 //     }
 //     // if c'ant find the sender of file
 //     else if (!search_a_client(clients, command[2]))
 //     {
-//         Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHNICK));
+//         Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHNICK));
 //         return;
 //     }
 //     //if there is no files in client vector files
 //     else if (cl.Files.empty())
 //     {
 //         // std::cout << "reciever :"<<cl.fd<<std::endl;
-//         Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILENAME));
+//         Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHFILENAME));
 //         return;
 //     }
 //     // if there is no file from sender
 //     else if (!search_a_file(cl, command[2].c_str()))
 //     {
-//         Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOFILEFROMSENDER));
+//         Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOFILEFROMSENDER));
 //         return;
 //     }
 //     else
@@ -231,12 +231,12 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
 //     size_t position = search_msg(command);
 //     if (command.size() < 3)
 //     {
-//         Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NEEDMOREPARAM));
+//         Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAM));
 //         return;
 //     }
 //     else if (position == 0)
 //     {
-//         Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOTEXTTOSEND));
+//         Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NOTEXTTOSEND));
 //         return;
 //     }
 //     check_targets(channels,command,clt,position,clients);
@@ -275,7 +275,7 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
 //             }
 //             else
 //             {
-//                 Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOSUCHNICK));
+//                 Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NOSUCHNICK));
 //             }
 //         }
 //         else
@@ -289,7 +289,7 @@ void execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> 
 //             }
 //             else
 //             {
-//                 Server::sendMsg(clt, LogError::getError(clt.nickname, LogError::ERR_NOSUCHNICK));
+//                 Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NOSUCHNICK));
 //             }
 //         }
 //     }
@@ -328,5 +328,5 @@ void sendPrvmsg(Client sender,std::string str,Client recv)
     std::string msg = sender.nickname + " PRVMSG " + recv.nickname;
     msg.append(" " + str);
     Server::sendMsg(recv,msg);
-    LogError::rplAwayMsg(sender,msg); 
+    Message::rplAwayMsg(sender,msg); 
 }

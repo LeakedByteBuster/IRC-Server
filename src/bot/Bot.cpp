@@ -1,5 +1,5 @@
 #include "Bot.hpp"
-#include "Errors.hpp"
+#include "Messages.hpp"
 #include<stdlib.h>
 
 Bot::Bot()
@@ -102,7 +102,7 @@ std::string   Bot::botExecuter(std::string buff, const Client &clt)
                     break ;
 
                 default:
-                    ret = LogError::getError(clt.nickname, LogError::ERR_UNKNOWNCOMMAND);
+                    ret = Message::getError(clt.nickname, Message::ERR_UNKNOWNCOMMAND);
                     break ;
                 }
             }

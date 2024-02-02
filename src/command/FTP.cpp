@@ -1,6 +1,6 @@
 #include "Server.hpp"
 #include "FTP.hpp"
-#include "Errors.hpp"
+#include "Messages.hpp"
 
 // search for a client by his nickname
 int search_a_client(std::map<int,Client> clients, std ::string NickName)
@@ -88,21 +88,21 @@ void send_file(std::map<int,Client> &clients, std ::vector<std ::string> &comman
 
     if (commands.size() < 3)
     {
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NEEDMOREPARAM));
+        Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NEEDMOREPARAM));
         return;
     }
     // open file both binary and text
     FileName = fopen(commands[1].c_str(), "rb");
     if (!FileName)
     {
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILE));
+        Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHFILE));
         return;
     }
     // if not found reciever
     int fd = search_a_client(clients, commands[2]);
     if (!fd)
     {
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHNICK));
+        Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHNICK));
         return;
     }
     // creat object file and push it in client vector of files
@@ -118,31 +118,31 @@ void get_file(std::map<int,Client> &clients, std ::vector<std ::string> &command
 {
     if (command.size() != 3)
     {
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NEEDMOREPARAM));
+        Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NEEDMOREPARAM));
         return;
     }
     else if (command[1].empty())
     {
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILENAME));
+        Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHFILENAME));
         return;
     }
     // if c'ant find the sender of file
     else if (!search_a_client(clients, command[2]))
     {
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHNICK));
+        Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHNICK));
         return;
     }
     //if there is no files in client vector files
     else if (cl.Files.empty())
     {
         // std::cout << "reciever :"<<cl.fd<<std::endl;
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOSUCHFILENAME));
+        Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOSUCHFILENAME));
         return;
     }
     // if there is no file from sender
     else if (!search_a_file(cl, command[2].c_str()))
     {
-        Server::sendMsg(cl, LogError::getError(cl.nickname, LogError::ERR_NOFILEFROMSENDER));
+        Server::sendMsg(cl, Message::getError(cl.nickname, Message::ERR_NOFILEFROMSENDER));
         return;
     }
     else

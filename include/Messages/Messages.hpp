@@ -4,16 +4,16 @@
 #include <string>
 #include "Client.hpp"
 
-#define ERR_NEEDMOREPARAMS ":Not enough parameters"
-#define ERR_NORECIPIENT ":No recipient given"
+// #define ERR_NEEDMOREPARAMS ":Not enough parameters"
+// #define ERR_NORECIPIENT ":No recipient given"
 // #define ERR_NOTEXTTOSEND ":No text to send"
 
 #define IRC_NAME    ":ircCamel.localhost "
 
-class   LogError {
+class   Message {
 public :
     enum    ErrorsTypes {
-        
+
         INCORRECT_PASS,
         ERR_ERRONEUSNICKNAME,
         ERR_ERRONEUSUSERNAME,
@@ -32,7 +32,7 @@ public :
     };
 
     static std::string  getError(const std::string &clt, short type);
-    static std::string  registrationSuccess(const std::string &nick);
+    static std::string  postRegistration(const std::string &nick);
     static std::string  rplAwayMsg(Client &clt,std :: string str);
 
 };
