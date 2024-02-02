@@ -5,10 +5,10 @@
 #include <arpa/inet.h> // inet_aton(), htons()
 #include <iostream> // std::cout...
 #include "registrationCommands.hpp"
-#include "Client.hpp"
 #include "utils.hpp"
 #include "Command.hpp"
-
+#include "Messages.hpp"
+#include "Server.hpp"
 
 /* -------------------------------------------------------------------------- */
 /*                          Server helper functions                           */
@@ -155,7 +155,7 @@ bool    readIncomingMsg(char ptr[], const int id)
 int whichCommand(const std::string &first_argument)
 {
     int ret =   0;
-    ret =   (first_argument.compare("SENDFILE") == 0) * SENDFILE \
+    ret =   (first_argument.compare("SENDFILE") == 0)   * SENDFILE \
             + (first_argument.compare("GETFILE") == 0)  * GETFILE \
 
             + (first_argument.compare("NICK") == 0)     * NICK \
@@ -177,10 +177,46 @@ int whichCommand(const std::string &first_argument)
             + (first_argument.compare("/JOKE") == 0)    * IRCBOT \
             + (first_argument.compare("/joke") == 0)    * IRCBOT \
 
-            + (first_argument.compare("/whoami") == 0) * IRCBOT \
-            + (first_argument.compare("/WHOAMI") == 0)   * IRCBOT;
+            + (first_argument.compare("/whoami") == 0)  * IRCBOT \
+            + (first_argument.compare("/WHOAMI") == 0)  * IRCBOT;
 
     return (ret);
+}
+
+/*
+  "<client> <servername> <version> <available user modes>
+  <available channel modes> [<channel modes with a parameter>]"
+*/
+std::string Server::postRegistration(const Client &clt)
+{
+    std::string str;
+    
+    // RPL_WELCOME
+    str = IRC_NAME + static_cast<std::string>("001 " + clt.nickname);
+    str.append(
+        " :Welcome to the Camel Internet Relay Chat Network " + clt.nickname
+    );
+    Server::sendMsg(clt, str);
+    str.clear();
+    
+    // RPL_YOURHOST
+    str = IRC_NAME + static_cast<std::string>("002 " + clt.nickname);
+    str.append(
+        static_cast<std::string>(" :Your host is ") + IRC_NAME + ", running version " + SERVER_VERSION
+    );
+    Server::sendMsg(clt, str);
+    str.clear();
+
+    // RPL_CREATED
+    str = IRC_NAME + static_cast<std::string>("003 " + clt.nickname);
+    str.append(
+        " :This server was created on " + serverCreationDate
+    );
+    Server::sendMsg(clt, str);
+    str.clear();
+
+
+    return (str);
 }
 
 /* -------------------------------------------------------------------------- */

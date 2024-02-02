@@ -9,6 +9,7 @@
 // #define ERR_NOTEXTTOSEND ":No text to send"
 
 #define IRC_NAME    ":ircCamel.localhost "
+#define SERVER_VERSION    "ircCamel 1.0"
 
 class   Message {
 public :
@@ -22,7 +23,6 @@ public :
         ERR_NEEDMOREPARAM,
         ERR_ALREADYREGISTRED,
         ERR_UNKNOWNCOMMAND,
-        REGISTERED_SUCCESS,
         ERR_NOSUCHFILE,
         ERR_NOSUCHNICK,
         ERR_NOSUCHFILENAME,
@@ -32,7 +32,6 @@ public :
     };
 
     static std::string  getError(const std::string &clt, short type);
-    static std::string  postRegistration(const std::string &nick);
     static std::string  rplAwayMsg(Client &clt,std :: string str);
 
 };

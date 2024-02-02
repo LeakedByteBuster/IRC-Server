@@ -75,6 +75,8 @@ Server::Server(std::string portNum, std::string password) : password(password), 
     freeaddrinfo(res0);
     if (check)
         throw std::runtime_error("Error getaddrinfo");
+    
+    serverCreationDate = geTime();
 }
 
 Server::Server(Server &rhs) : password(rhs.password), listenPort(rhs.listenPort),
@@ -218,10 +220,9 @@ void Server::userRegistration(int fd, std::vector<std::string> string)
             try  {
                 parseRegistrationCommands(clients, gbuff[fd], clients[fd], password);
                 clients[fd].isRegistred = 1;
-                gbuff.erase(fd);
-
                 // client sent all the information correctly, sending welcome message
-                // Server::sendMsg(clients[fd], Message::registrationSuccess(clients[fd].nickname));
+                Server::postRegistration(clients[fd]);
+                gbuff.erase(fd);
 
             } catch (std::exception &e) {
                 clients[fd].nickname.clear();

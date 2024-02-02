@@ -1,18 +1,6 @@
 #include "Messages.hpp"
 #include "Server.hpp"
 
-std::string Message::postRegistration(const std::string &nick)
-{
-    std::string str;
-
-    str = IRC_NAME + static_cast<std::string>("001 * ");
-    str.append(
-        ":Welcome to the Camel Internet Relay Chat Network " + nick
-    );
-
-    return (str);
-}
-
 std::string  Message :: rplAwayMsg(Client &clt,std :: string str)
 {
     std :: string msg;
