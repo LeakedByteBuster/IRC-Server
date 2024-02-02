@@ -202,7 +202,10 @@ std::string Server::postRegistration(const Client &clt)
     // RPL_YOURHOST
     str = IRC_NAME + static_cast<std::string>("002 " + clt.nickname);
     str.append(
-        static_cast<std::string>(" :Your host is ") + IRC_NAME + ", running version " + SERVER_VERSION
+        static_cast<std::string>(" :Your host is ") 
+        + IRC_NAME 
+        + ", running version " 
+        + SERVER_VERSION
     );
     Server::sendMsg(clt, str);
     str.clear();
@@ -215,6 +218,24 @@ std::string Server::postRegistration(const Client &clt)
     Server::sendMsg(clt, str);
     str.clear();
 
+    // RPL_MYINFO
+    /*
+        <client> <servername> <version>
+        <available user modes>              : ol
+        <available channel modes>           : itkol
+        <channel modes with a parameter>    : lok
+    */
+    str = IRC_NAME + static_cast<std::string>("004 " + clt.nickname);
+    str.append(
+        static_cast<std::string>(IRC_NAME)
+        + " " 
+        + SERVER_VERSION 
+        + " ol "
+        + "itkol " 
+        + "lok"
+    );
+    Server::sendMsg(clt, str);
+    str.clear();
 
     return (str);
 }
