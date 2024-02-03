@@ -36,6 +36,8 @@ AFTER REGISTRATION :
     send 5 welcoming messages in userRegistration()
 
 JOIN :
+    JOIN 0 succeeding or 
+    JOIN 0 failing
 
 :pao001!~kj@197.230.30.146 QUIT :Ping timeout: 260 seconds
     :pao001!~kj@197.230.30.146 QUIT :Ping timeout: 260 seconds

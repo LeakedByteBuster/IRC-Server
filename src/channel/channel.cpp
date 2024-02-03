@@ -4,6 +4,13 @@ Channel::Channel()
 {
 
 }
+
+Channel::Channel(const std::string name, const std::string key) : key(key), 
+                                name(name), maxUsersLimit(25)
+{
+
+}
+
 Channel::~Channel()
 {
 

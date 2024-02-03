@@ -42,19 +42,19 @@ class Channel;
         getStaticErrorMsg(Message::ERR_NOSUCHFILENAME))
 
 #define FOR_LIST_OF_JOIN_ERRORS(BUILD_JOIN_ERROR) \
-    BUILD_JOIN_ERROR(Message::ERR_NOSUCHCHANNEL, Message::ERR_NOSUCHCHANNEL, \
+    BUILD_JOIN_ERROR(Message::ERR_NOSUCHCHANNEL,    403, \
         getStaticErrorMsg(Message::ERR_NOSUCHCHANNEL)) \
-    BUILD_JOIN_ERROR(Message::ERR_TOOMANYCHANNELS, Message::ERR_TOOMANYCHANNELS, \
+    BUILD_JOIN_ERROR(Message::ERR_TOOMANYCHANNELS,  405, \
         getStaticErrorMsg(Message::ERR_TOOMANYCHANNELS)) \
-    BUILD_JOIN_ERROR(Message::ERR_CHANNELISFULL, Message::ERR_CHANNELISFULL, \
+    BUILD_JOIN_ERROR(Message::ERR_CHANNELISFULL,    471, \
         getStaticErrorMsg(Message::ERR_CHANNELISFULL)) \
-    BUILD_JOIN_ERROR(Message::ERR_INVITEONLYCHAN, Message::ERR_INVITEONLYCHAN, \
+    BUILD_JOIN_ERROR(Message::ERR_INVITEONLYCHAN,   473, \
         getStaticErrorMsg(Message::ERR_INVITEONLYCHAN)) \
-    BUILD_JOIN_ERROR(Message::ERR_BANNEDFROMCHAN, Message::ERR_BANNEDFROMCHAN, \
+    BUILD_JOIN_ERROR(Message::ERR_BANNEDFROMCHAN,   474, \
         getStaticErrorMsg(Message::ERR_BANNEDFROMCHAN)) \
-    BUILD_JOIN_ERROR(Message::ERR_BADCHANNELKEY, Message::ERR_BADCHANNELKEY, \
+    BUILD_JOIN_ERROR(Message::ERR_BADCHANNELKEY,    475, \
         getStaticErrorMsg(Message::ERR_BADCHANNELKEY)) \
-    BUILD_JOIN_ERROR(Message::ERR_BADCHANMASK, Message::ERR_BADCHANMASK, \
+    BUILD_JOIN_ERROR(Message::ERR_BADCHANMASK,      476, \
         getStaticErrorMsg(Message::ERR_BADCHANMASK))
 
 
@@ -103,17 +103,12 @@ public :
         ERR_BADCHANMASK = 476 //    "<channel> :Bad Channel Mask" // Invalid channel name
         // ERR_TOOMANYTARGETS = 407,
         // ERR_UNAVAILRESOURCE = 15
-
         /*
         NOTICE FOR ME :
             FROM 4xx static 
             FROM 3xx volatile
         */
-
-        
-
     } ;
-
 
     enum    JoinReplies {
         RPL_ENDOFNAMES = 366, // "<client> <channel> :End of /NAMES list" // S <-   :irc.example.com 366 patty #irctoast :End of /NAMES list.

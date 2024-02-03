@@ -12,13 +12,14 @@ private:
 	const std::string	key;
 
 public:
-	const std::string	name;
+	const std::string	name; 
 	// <client's fd, client>
 	std::map<int, Client>	ClientsInChannel;
 	int						maxUsersLimit;
 	// std::vector<int>		ClientsOperators;
 
 	Channel();
+	Channel(const std::string name, const std::string key);
 	~Channel();
 
 };

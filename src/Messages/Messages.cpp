@@ -9,7 +9,7 @@ std::string getMessageFirstPart(const Client &clt, const std::string errNum)
 {
     std::string buff(":");
 
-    buff = IRC_NAME + errNum; + " " + clt.nickname;
+    buff = IRC_NAME + errNum + " " + clt.nickname;
 
     return (buff);
 }
@@ -80,7 +80,7 @@ std::string Message::getJoinError(const Channel &ch, const Client &clt, short ty
             case Message::errorType: \
                 error = static_cast<std::string>(":") \
                         + getMessageFirstPart(clt, #errorNum) \
-                        + ch.name + " "; \
+                        + " " +  ch.name + " "; \
                 error.append(errorMsg); \
                 break;
 
@@ -145,7 +145,7 @@ void    Message::setErrorsDatabase()
         std::make_pair(Message::ERR_NOTEXTTOSEND, ":No text to send")
     );
     ErrorsDatabase.insert(
-        std::make_pair(Message::ERR_NOSUCHCHANNEL, ":End of /NAMES list")
+        std::make_pair(Message::ERR_NOSUCHCHANNEL, ":No such channel")
     );
     ErrorsDatabase.insert(
         std::make_pair(Message::ERR_TOOMANYCHANNELS, ":You have joined too many channels")
