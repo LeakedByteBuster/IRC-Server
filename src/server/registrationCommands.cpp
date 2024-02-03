@@ -118,13 +118,13 @@ void    parseUser(Client &clt, std::string str)
         if (special.find(tokens[1][i]) == std::string::npos) {
             continue ;
         } else {
-            Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_ERRONEUSUSERNAME));
+            Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
             throw std::invalid_argument("");
         }
     }
     // checks '0' and '*'
     if (tokens[2].compare("0") || tokens[3].compare("*")) {
-        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_ERRONEUSUSERNAME));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
         throw std::invalid_argument("");
     }
     //  looks for first character in realname
@@ -136,7 +136,7 @@ void    parseUser(Client &clt, std::string str)
     }
     //  checks if a realname is given
     if (i == rname.size()) {
-        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_ERRONEUSUSERNAME));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
         throw std::invalid_argument("");
     }
     rname = rname.substr(i, rname.size());

@@ -9,10 +9,10 @@
 class Channel : public ChannelModes, public Operator {
 
 private:
-	const std::string	name;
 	const std::string	key;
 
 public:
+	const std::string	name;
 	// <client's fd, client>
 	std::map<int, Client>	ClientsInChannel;
 	int						maxUsersLimit;

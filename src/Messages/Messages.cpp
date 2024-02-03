@@ -4,7 +4,105 @@
 //  Stores all static error messages
 std::map<short, std::string>    Message::ErrorsDatabase;
 
+/* <':'><ircCamel.localhost> <Error Number> <Client Nickname> */
+std::string getMessageFirstPart(const Client &clt, const std::string errNum)
+{
+    std::string buff(":");
+
+    buff = IRC_NAME + errNum; + " " + clt.nickname;
+
+    return (buff);
+}
+
+/* Returns a string of the form nick!~user@hostname */
+std::string getId(const Client &clt)
+{
+    std::string str(":");
+
+    str = clt.nickname + " " + "!";
+    str.append(clt.username + "@");
+    str.append(inet_ntoa(clt.hints.sin_addr));
+
+    return (str);
+}
+
+std::string  Message :: rplAwayMsg(Client &clt,std :: string str)
+{
+    std :: string msg;
+
+    msg = static_cast<std::string>(":") + IRC_NAME + "301 ";
+    msg.append(clt.username + static_cast<std::string>(" "));
+    msg.append(str);
+
+    return(msg);
+}
+
+// Returns the string at index 'type' given in argument
+const char *getStaticErrorMsg(const short type) {
+    return (Message::ErrorsDatabase[type].data());
+}
+
+//  Returns a string that contain the error message :
+// :ircCamel.localhost <Error Number> <Client Nickname> :<error message>
+std::string Message::getError(const std::string &nick, short type)
+{
+    std::string error;
+
+    switch (type)
+    {
+        #define BUILD_ERROR(errorType, errorNum, errorMsg) \
+            case Message::errorType: \
+                error = static_cast<std::string>(":") \
+                        + IRC_NAME \
+                        + #errorNum \
+                        + " " + nick + " "; \
+                error.append(errorMsg); \
+                break;
+
+            FOR_LIST_OF_ERRORS(BUILD_ERROR)
+        #undef BUILD_ERROR
+
+    default:
+        std::cerr << "Warning getError(): Unknown type: " << type << std::endl;
+    }
+
+    return error;
+}
+
+//  Returns a string that contain the error message
+std::string Message::getJoinError(const Channel &ch, const Client &clt, short type)
+{
+    std::string error;
+
+    switch (type)
+    {
+        #define BUILD_JOIN_ERROR(errorType, errorNum, errorMsg) \
+            case Message::errorType: \
+                error = static_cast<std::string>(":") \
+                        + getMessageFirstPart(clt, #errorNum) \
+                        + ch.name + " "; \
+                error.append(errorMsg); \
+                break;
+
+            FOR_LIST_OF_JOIN_ERRORS(BUILD_JOIN_ERROR)
+        #undef BUILD_JOIN_ERROR
+
+    default:
+        std::cerr << "Warning getError(): Unknown type: " << type << std::endl;
+    }
+
+    return error;
+}
+
+// std::string Message::getJoinReply(const Channel &ch, const Client &clt, short type)
+// {
+//     std::string rpl;
+
+//     return(rpl);
+// }
+
 // Sets the map in Message class to the specified error msg
+// [ <ircCamel.localhost> <errNum> <nick> ] are already set
 void    Message::setErrorsDatabase()
 {
     ErrorsDatabase.insert(
@@ -46,97 +144,20 @@ void    Message::setErrorsDatabase()
     ErrorsDatabase.insert(
         std::make_pair(Message::ERR_NOTEXTTOSEND, ":No text to send")
     );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_NOSUCHCHANNEL, ":End of /NAMES list")
+    );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_TOOMANYCHANNELS, ":You have joined too many channels")
+    );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_CHANNELISFULL, ":Cannot join channel (+l)")
+    );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_INVITEONLYCHAN, ":Cannot join channel (+i)")
+    );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_BADCHANMASK, ":Bad Channel Mask")
+    );
 }
 
-/* <':'><ircCamel.localhost> <Error Number> <Client Nickname> */
-std::string getSource(const Client &clt, const std::string errNum)
-{
-    std::string buff(":");
-
-    buff = IRC_NAME + errNum; + " " + clt.nickname;
-
-    return (buff);
-}
-
-/* Returns a string of the form nick!~user@hostname */
-std::string getId(const Client &clt)
-{
-    std::string str(":");
-
-    str = clt.nickname + " " + "!";
-    str.append(clt.username + "@");
-    str.append(inet_ntoa(clt.hints.sin_addr));
-
-    return (str);
-}
-
-std::string  Message :: rplAwayMsg(Client &clt,std :: string str)
-{
-    std :: string msg;
-
-    msg = static_cast<std::string>(":") + IRC_NAME + "301 ";
-    msg.append(clt.username + static_cast<std::string>(" "));
-    msg.append(str);
-
-    return(msg);
-}
-
-// Returns the string at index 'type' given in argument
-const char *getStaticErrorMsg(const short type) {
-    return (Message::ErrorsDatabase[type].data());
-}
-
-#define FOR_LIST_OF_ERRORS(BUILD_ERROR) \
-    BUILD_ERROR(Message::ERR_NOSUCHNICK,       133, \
-        getStaticErrorMsg(Message::ERR_NOSUCHNICK)) \
-    BUILD_ERROR(Message::ERR_NOTEXTTOSEND,     412, \
-        getStaticErrorMsg(Message::ERR_NOTEXTTOSEND)) \
-    BUILD_ERROR(Message::ERR_UNKNOWNCOMMAND,   421, \
-        getStaticErrorMsg(Message::ERR_UNKNOWNCOMMAND)) \
-    BUILD_ERROR(Message::ERR_NONICKNAMEGIVEN,  431, \
-        getStaticErrorMsg(Message::ERR_NONICKNAMEGIVEN)) \
-    BUILD_ERROR(Message::ERR_ERRONEUSNICKNAME, 432, \
-        getStaticErrorMsg(Message::ERR_ERRONEUSNICKNAME)) \
-    BUILD_ERROR(Message::ERR_ERRONEUSUSERNAME, 432, \
-        getStaticErrorMsg(Message::ERR_ERRONEUSUSERNAME)) \
-    BUILD_ERROR(Message::ERR_NICKNAMEINUSE,    433, \
-        getStaticErrorMsg(Message::ERR_NICKNAMEINUSE)) \
-    BUILD_ERROR(Message::ERR_NEEDMOREPARAMS,   461, \
-        getStaticErrorMsg(Message::ERR_NEEDMOREPARAMS)) \
-    BUILD_ERROR(Message::ERR_ALREADYREGISTRED, 462, \
-        getStaticErrorMsg(Message::ERR_ALREADYREGISTRED)) \
-    BUILD_ERROR(Message::ERR_INCORRECT_PASS,   464, \
-        getStaticErrorMsg(Message::ERR_INCORRECT_PASS)) \
-    BUILD_ERROR(Message::ERR_NOFILEFROMSENDER, 1335, \
-        getStaticErrorMsg(Message::ERR_NOFILEFROMSENDER)) \
-    BUILD_ERROR(Message::ERR_NOSUCHFILE,       1336, \
-        getStaticErrorMsg(Message::ERR_NOSUCHFILE)) \
-    BUILD_ERROR(Message::ERR_NOSUCHFILENAME,   1336, \
-        getStaticErrorMsg(Message::ERR_NOSUCHFILENAME))
-    // BUILD_ERROR(Message::ERR_CANNOTSENDTOCHAN, 404 , : Cannot send to channel)
-
-//  Returns a string that contain the error message
-std::string Message::getError(const std::string &nick, short type)
-{
-    std::string error;
-
-    switch (type)
-    {
-        #define BUILD_ERROR(errorType, errorNum, errorMsg) \
-            case Message::errorType: \
-                error = static_cast<std::string>(":") \
-                        + IRC_NAME \
-                        + #errorNum \
-                        + " " + nick + " "; \
-                error.append(errorMsg); \
-                break;
-
-            FOR_LIST_OF_ERRORS(BUILD_ERROR)
-        #undef BUILD_ERROR
-
-    default:
-        std::cerr << "Warning getError(): Unknown type: " << type << std::endl;
-    }
-
-    return error;
-}

@@ -8,59 +8,119 @@
 #define IRC_NAME    "ircCamel.localhost "
 #define SERVER_VERSION    "ircCamel 1.0"
 
+class Message;
+class Channel;
+
+/*
+    error number in ERR_NONICKNAMEGIVEN and ERR_ERRONEUSNICKNAME
+    should stay hard coded because of switch case in getError()
+*/
+#define FOR_LIST_OF_ERRORS(BUILD_ERROR) \
+    BUILD_ERROR(Message::ERR_NOSUCHNICK,       133, \
+        getStaticErrorMsg(Message::ERR_NOSUCHNICK)) \
+    BUILD_ERROR(Message::ERR_NOTEXTTOSEND,     412, \
+        getStaticErrorMsg(Message::ERR_NOTEXTTOSEND)) \
+    BUILD_ERROR(Message::ERR_UNKNOWNCOMMAND,   421, \
+        getStaticErrorMsg(Message::ERR_UNKNOWNCOMMAND)) \
+    BUILD_ERROR(Message::ERR_NONICKNAMEGIVEN,  431, \
+        getStaticErrorMsg(Message::ERR_NONICKNAMEGIVEN)) \
+    BUILD_ERROR(Message::ERR_ERRONEUSNICKNAME, 432, \
+        getStaticErrorMsg(Message::ERR_ERRONEUSNICKNAME)) \
+    BUILD_ERROR(Message::ERR_NICKNAMEINUSE,    433, \
+        getStaticErrorMsg(Message::ERR_NICKNAMEINUSE)) \
+    BUILD_ERROR(Message::ERR_NEEDMOREPARAMS,   461, \
+        getStaticErrorMsg(Message::ERR_NEEDMOREPARAMS)) \
+    BUILD_ERROR(Message::ERR_ALREADYREGISTRED, 462, \
+        getStaticErrorMsg(Message::ERR_ALREADYREGISTRED)) \
+    BUILD_ERROR(Message::ERR_INCORRECT_PASS,   464, \
+        getStaticErrorMsg(Message::ERR_INCORRECT_PASS)) \
+    BUILD_ERROR(Message::ERR_NOFILEFROMSENDER, 1335, \
+        getStaticErrorMsg(Message::ERR_NOFILEFROMSENDER)) \
+    BUILD_ERROR(Message::ERR_NOSUCHFILE,       1336, \
+        getStaticErrorMsg(Message::ERR_NOSUCHFILE)) \
+    BUILD_ERROR(Message::ERR_NOSUCHFILENAME,   1336, \
+        getStaticErrorMsg(Message::ERR_NOSUCHFILENAME))
+
+#define FOR_LIST_OF_JOIN_ERRORS(BUILD_JOIN_ERROR) \
+    BUILD_JOIN_ERROR(Message::ERR_NOSUCHCHANNEL, Message::ERR_NOSUCHCHANNEL, \
+        getStaticErrorMsg(Message::ERR_NOSUCHCHANNEL)) \
+    BUILD_JOIN_ERROR(Message::ERR_TOOMANYCHANNELS, Message::ERR_TOOMANYCHANNELS, \
+        getStaticErrorMsg(Message::ERR_TOOMANYCHANNELS)) \
+    BUILD_JOIN_ERROR(Message::ERR_CHANNELISFULL, Message::ERR_CHANNELISFULL, \
+        getStaticErrorMsg(Message::ERR_CHANNELISFULL)) \
+    BUILD_JOIN_ERROR(Message::ERR_INVITEONLYCHAN, Message::ERR_INVITEONLYCHAN, \
+        getStaticErrorMsg(Message::ERR_INVITEONLYCHAN)) \
+    BUILD_JOIN_ERROR(Message::ERR_BANNEDFROMCHAN, Message::ERR_BANNEDFROMCHAN, \
+        getStaticErrorMsg(Message::ERR_BANNEDFROMCHAN)) \
+    BUILD_JOIN_ERROR(Message::ERR_BADCHANNELKEY, Message::ERR_BADCHANNELKEY, \
+        getStaticErrorMsg(Message::ERR_BADCHANNELKEY)) \
+    BUILD_JOIN_ERROR(Message::ERR_BADCHANMASK, Message::ERR_BADCHANMASK, \
+        getStaticErrorMsg(Message::ERR_BADCHANMASK))
+
+
 class   Message {
 public :
     static std::map<short, std::string> ErrorsDatabase;
     static void setErrorsDatabase();
+    static std::string  getError(const std::string &clt, short type);
+    static std::string  rplAwayMsg(Client &clt, std::string str);
+    static std::string getJoinError(const Channel &ch,
+            const Client &clt, short type);
 
     enum    GeneralErrors {
-        ERR_UNKNOWNCOMMAND = 0,
-        ERR_NEEDMOREPARAMS = 1
+        ERR_UNKNOWNCOMMAND = 421,
+        ERR_NEEDMOREPARAMS = 461
     } ;
 
     enum    RegistrationErrors {
 
-        ERR_ALREADYREGISTRED = 2,
-        ERR_INCORRECT_PASS = 3,
-        ERR_ERRONEUSNICKNAME = 4,
+        ERR_NONICKNAMEGIVEN = 431,
+        ERR_ERRONEUSNICKNAME = 432,
+        ERR_NICKNAMEINUSE = 433,
+        ERR_ALREADYREGISTRED = 462,
         ERR_ERRONEUSUSERNAME = 5,
-        ERR_NICKNAMEINUSE = 6,
-        ERR_NONICKNAMEGIVEN = 7,
+        ERR_INCORRECT_PASS = 3
         
         // ERR_CANNOTSENDTOCHAN
     };
 
-    enum    FileTransfertErros {
+    enum    FileTransfertErrors {
+        ERR_NOSUCHNICK = 401,
+        ERR_NOTEXTTOSEND = 412,
         ERR_NOSUCHFILE = 8,
-        ERR_NOSUCHNICK = 9,
         ERR_NOSUCHFILENAME = 10,
-        ERR_NOFILEFROMSENDER = 11,
-        ERR_NOTEXTTOSEND = 12
+        ERR_NOFILEFROMSENDER = 11
     } ;
 
-    enum    JoinReplies {
-        ERR_BADCHANMASK = 13,
-        // ERR_TOOMANYTARGETS = 14,        
+    enum    JoinErrors {
+        // ERR_BADCHANMASK is more powerfull 
+        ERR_NOSUCHCHANNEL = 403, //   "<client> <channel> :No such channel"
+        ERR_TOOMANYCHANNELS = 405, //   "<client> <channel> :You have joined too many channels"
+        ERR_CHANNELISFULL = 471, //   "<client> <channel> :Cannot join channel (+l)"
+        ERR_INVITEONLYCHAN = 473, //   "<client> <channel> :Cannot join channel (+i)"
+        ERR_BANNEDFROMCHAN = 474, //   "<client> <channel> :Cannot join channel (+b)"
+        ERR_BADCHANNELKEY = 475, //   "<client> <channel> :Cannot join channel (+k)"
+        ERR_BADCHANMASK = 476 //    "<channel> :Bad Channel Mask" // Invalid channel name
+        // ERR_TOOMANYTARGETS = 407,
         // ERR_UNAVAILRESOURCE = 15
 
+        /*
+        NOTICE FOR ME :
+            FROM 4xx static 
+            FROM 3xx volatile
+        */
 
-        // RPL_TOPIC (332)
-            // S <-   :irc.example.com 332 alice #test :This is my cool channel! https://irc.com
-            // 
-        // ERR_TOOMANYCHANNELS (405)
-        // ERR_NEEDMOREPARAMS (461)
-        // ERR_CHANNELISFULL (471)
-        // ERR_INVITEONLYCHAN (473)
-        // ERR_BANNEDFROMCHAN (474)
-        // ERR_BADCHANNELKEY (475)
+        
 
-// ERR_NOSUCHCHANNEL (403) // ERR_BADCHANMASK is more powerfull
-//// RPL_TOPICTIME (333)
-//// RPL_NAMREPLY (353)
     } ;
 
-    static std::string  getError(const std::string &clt, short type);
-    static std::string  rplAwayMsg(Client &clt, std::string str);
+
+    enum    JoinReplies {
+        RPL_ENDOFNAMES = 366, // "<client> <channel> :End of /NAMES list" // S <-   :irc.example.com 366 patty #irctoast :End of /NAMES list.
+        RPL_TOPIC = 332, // "<client> <channel> :<topic>"
+        RPL_TOPICWHOTIME = 333, // "<client> <channel> <nick> <setat>"
+        RPL_NAMREPLY = 353 // "<client> <symbol> <channel> :[prefix]<nick>{ [prefix]<nick>}"
+    } ;
 
 };
 
