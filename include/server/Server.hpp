@@ -61,7 +61,7 @@ public :
     //      Sends a message to a specific client
     static void    sendMsg(const Client &target, std::string msg);
     //      Sends a message to a specific channel
-    // void    sendMsg(const Channels &target, const std::string &msg);
+    static void    sendMsg(const Channel &target, const std::string &msg);
     //          Sends 001, 002, 003, 004 messages
     std::string postRegistration(const Client &clt);
 
