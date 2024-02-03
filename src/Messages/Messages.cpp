@@ -62,21 +62,34 @@ const char *getMsg(const short type) {
     return (Message::ErrorsDatabase[type].data());
 }
 
-#define FOR_LIST_OF_ERRORS(BUILD_MESSAGE) \
-    BUILD_MESSAGE(Message::ERR_NOSUCHNICK,       133, getMsg(Message::ERR_NOSUCHNICK))         \
-    BUILD_MESSAGE(Message::ERR_NOTEXTTOSEND,     412, getMsg(Message::ERR_NOTEXTTOSEND))            \
-    BUILD_MESSAGE(Message::ERR_UNKNOWNCOMMAND,   421, getMsg(Message::ERR_UNKNOWNCOMMAND))          \
-    BUILD_MESSAGE(Message::ERR_NONICKNAMEGIVEN,  431, getMsg(Message::ERR_NONICKNAMEGIVEN))       \
-    BUILD_MESSAGE(Message::ERR_ERRONEUSNICKNAME, 432, getMsg(Message::ERR_ERRONEUSNICKNAME))     \
-    BUILD_MESSAGE(Message::ERR_ERRONEUSUSERNAME, 432, getMsg(Message::ERR_ERRONEUSUSERNAME))     \
-    BUILD_MESSAGE(Message::ERR_NICKNAMEINUSE,    433, getMsg(Message::ERR_NICKNAMEINUSE))\
-    BUILD_MESSAGE(Message::ERR_NEEDMOREPARAMS,   461, getMsg(Message::ERR_NEEDMOREPARAMS))     \
-    BUILD_MESSAGE(Message::ERR_ALREADYREGISTRED, 462, getMsg(Message::ERR_ALREADYREGISTRED)) \
-    BUILD_MESSAGE(Message::ERR_INCORRECT_PASS,   464, getMsg(Message::ERR_INCORRECT_PASS))           \
-    BUILD_MESSAGE(Message::ERR_NOFILEFROMSENDER, 1335, getMsg(Message::ERR_NOFILEFROMSENDER))   \
-    BUILD_MESSAGE(Message::ERR_NOSUCHFILE,       1336, getMsg(Message::ERR_NOSUCHFILE))      \
-    BUILD_MESSAGE(Message::ERR_NOSUCHFILENAME,   1336, getMsg(Message::ERR_NOSUCHFILENAME))
-    // BUILD_MESSAGE(Message::ERR_CANNOTSENDTOCHAN, 404 , : Cannot send to channel)
+#define FOR_LIST_OF_ERRORS(BUILD_ERROR) \
+    BUILD_ERROR(Message::ERR_NOSUCHNICK,       133, \
+                        getMsg(Message::ERR_NOSUCHNICK)) \
+    BUILD_ERROR(Message::ERR_NOTEXTTOSEND,     412, \
+                        getMsg(Message::ERR_NOTEXTTOSEND)) \
+    BUILD_ERROR(Message::ERR_UNKNOWNCOMMAND,   421, \
+                        getMsg(Message::ERR_UNKNOWNCOMMAND)) \
+    BUILD_ERROR(Message::ERR_NONICKNAMEGIVEN,  431, \
+                        getMsg(Message::ERR_NONICKNAMEGIVEN)) \
+    BUILD_ERROR(Message::ERR_ERRONEUSNICKNAME, 432, \
+                        getMsg(Message::ERR_ERRONEUSNICKNAME)) \
+    BUILD_ERROR(Message::ERR_ERRONEUSUSERNAME, 432, \
+                        getMsg(Message::ERR_ERRONEUSUSERNAME)) \
+    BUILD_ERROR(Message::ERR_NICKNAMEINUSE,    433, \
+                        getMsg(Message::ERR_NICKNAMEINUSE)) \
+    BUILD_ERROR(Message::ERR_NEEDMOREPARAMS,   461, \
+                        getMsg(Message::ERR_NEEDMOREPARAMS)) \
+    BUILD_ERROR(Message::ERR_ALREADYREGISTRED, 462, \
+                        getMsg(Message::ERR_ALREADYREGISTRED)) \
+    BUILD_ERROR(Message::ERR_INCORRECT_PASS,   464, \
+                        getMsg(Message::ERR_INCORRECT_PASS)) \
+    BUILD_ERROR(Message::ERR_NOFILEFROMSENDER, 1335, \
+                         getMsg(Message::ERR_NOFILEFROMSENDER)) \
+    BUILD_ERROR(Message::ERR_NOSUCHFILE,       1336, \
+                         getMsg(Message::ERR_NOSUCHFILE)) \
+    BUILD_ERROR(Message::ERR_NOSUCHFILENAME,   1336, \
+                         getMsg(Message::ERR_NOSUCHFILENAME))
+    // BUILD_ERROR(Message::ERR_CANNOTSENDTOCHAN, 404 , : Cannot send to channel)
 
 std::string Message::getError(const std::string &nick, short type)
 {
@@ -84,7 +97,7 @@ std::string Message::getError(const std::string &nick, short type)
 
     switch (type)
     {
-        #define BUILD_MESSAGE(errorType, errorNum, errorMsg) \
+        #define BUILD_ERROR(errorType, errorNum, errorMsg) \
             case Message::errorType: \
                 error = static_cast<std::string>(":") \
                         + IRC_NAME \
@@ -93,8 +106,8 @@ std::string Message::getError(const std::string &nick, short type)
                 error.append(errorMsg); \
                 break;
 
-            FOR_LIST_OF_ERRORS(BUILD_MESSAGE)
-        #undef BUILD_MESSAGE
+            FOR_LIST_OF_ERRORS(BUILD_ERROR)
+        #undef BUILD_ERROR
 
     default:
         std::cerr << "Warning getError(): Unknown type: " << type << std::endl;
