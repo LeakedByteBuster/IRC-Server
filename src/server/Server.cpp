@@ -2,7 +2,7 @@
 #include <cstring>
 #include "registrationCommands.hpp"
 
-std::map<std::string, channel>  Server::ChannelsInServer; // all channels
+std::map<std::string, Channel>  Server::ChannelsInServer; // all channels
 
 /* -------------------------------------------------------------------------- */
 /*                            Server constructors                             */
@@ -308,7 +308,7 @@ void    Server::sendMsg(const Client &target, std::string msg)
     }
 }
 
-void    Server::sendMsg(const Channel &ch, const std::string &msg)
+void    Server::sendMsg(const Channel &ch, std::string msg)
 {
     if (msg.size() > 0) {
         std::map<int, Client> clts = ch.ClientsInChannel;
@@ -318,7 +318,7 @@ void    Server::sendMsg(const Channel &ch, const std::string &msg)
 
         msg.append("\r\n");
         std::strcpy(buff, msg.data());
-        for (; it != clts.end(); i++) {
+        for (; it != clts.end(); it++) {
             if ((bytes = send(it->second.fd, (const void *)buff, msg.size(), 0))
                 == -1) {
                 std::cerr << "Error sendMsg(): " << strerror(errno) << std::endl;

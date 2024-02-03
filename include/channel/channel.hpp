@@ -6,7 +6,7 @@
 #include "Modes.hpp"
 #include "Operator.hpp"
 
-class channel : public ChannelModes, public Operator {
+class Channel : public ChannelModes, public Operator {
 
 private:
 	const std::string	name;
@@ -17,8 +17,8 @@ public:
 	int						maxUsersLimit;
 	// std::vector<int>		ClientsOperators;
 
-	channel();
-	~channel();
+	Channel();
+	~Channel();
 
 };
 

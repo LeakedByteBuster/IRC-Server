@@ -1,10 +1,10 @@
 #include "channel.hpp"
 
-channel::channel()
+Channel::Channel()
 {
 
 }
-channel::~channel()
+Channel::~Channel()
 {
 
 }

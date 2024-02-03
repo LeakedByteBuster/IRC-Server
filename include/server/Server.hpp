@@ -36,7 +36,7 @@ public :
     //  list of clients connected to the server || Nickname, Client class
     std::map<int, Client>           clients; 
     std::string                     serverCreationDate;
-    static std::map<std::string, channel>  ChannelsInServer; // all channels
+    static std::map<std::string, Channel>  ChannelsInServer; // all channels
 
     //	creates a TCP, IPv4, Passive socket
     Server(std::string portNum, std::string password);
@@ -61,7 +61,7 @@ public :
     //      Sends a message to a specific client
     static void    sendMsg(const Client &target, std::string msg);
     //      Sends a message to a specific channel
-    static void    sendMsg(const Channel &target, const std::string &msg);
+    static void    sendMsg(const Channel &target, std::string msg);
     //          Sends 001, 002, 003, 004 messages
     std::string postRegistration(const Client &clt);
 
