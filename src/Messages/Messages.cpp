@@ -1,6 +1,52 @@
 #include "Messages.hpp"
 #include "Server.hpp"
 
+std::map<short, std::string>    Message::ErrorsDatabase;
+
+void    Message::setErrorsDatabase()
+{
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_INCORRECT_PASS, ":Password Incorrect")
+    );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_NONICKNAMEGIVEN, ":No nickname given")
+    );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_ERRONEUSNICKNAME, ":Erroneous nickname")
+    );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_ERRONEUSUSERNAME, ":Erroneous username")
+    );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_NICKNAMEINUSE, ":Nickname is already in use")
+    );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_NEEDMOREPARAMS, ":Not enough parameters")
+    );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_ALREADYREGISTRED, ":You may not reregister")
+    );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_UNKNOWNCOMMAND, ":Unknown command")
+    );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_NOSUCHFILE, ":No such a file in /DIR")
+    );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_NOSUCHNICK, ":No such nick/channel")
+    );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_NOSUCHFILENAME, ":/file name not found")
+    );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_NOFILEFROMSENDER, ":No file from sender")
+    );
+    ErrorsDatabase.insert(
+        std::make_pair(Message::ERR_NOTEXTTOSEND, ":No text to send")
+    );
+}
+
+
 std::string  Message :: rplAwayMsg(Client &clt,std :: string str)
 {
     std :: string msg;
@@ -12,23 +58,27 @@ std::string  Message :: rplAwayMsg(Client &clt,std :: string str)
     return(msg);
 }
 
-#define FOR_LIST_OF_ERRORS(BUILD_MESSAGE) \
-    BUILD_MESSAGE(Message::INCORRECT_PASS, 464 * , : Password Incorrect)           \
-    BUILD_MESSAGE(Message::ERR_NONICKNAMEGIVEN, 431 * , : No nickname given)       \
-    BUILD_MESSAGE(Message::ERR_ERRONEUSNICKNAME, 432 * , : Erroneous nickname)     \
-    BUILD_MESSAGE(Message::ERR_ERRONEUSUSERNAME, 432 * , : Erroneous username)     \
-    BUILD_MESSAGE(Message::ERR_NICKNAMEINUSE, 433 * , : Nickname is already in use)\
-    BUILD_MESSAGE(Message::ERR_NEEDMOREPARAM, 461 * , : Not enough parameters)     \
-    BUILD_MESSAGE(Message::ERR_ALREADYREGISTRED, 462 * , : You may not reregister) \
-    BUILD_MESSAGE(Message::ERR_UNKNOWNCOMMAND, 421 * , : Unknown command)          \
-    BUILD_MESSAGE(Message::ERR_NOSUCHFILE, 1336 * , : No such a file in /DIR)      \
-    BUILD_MESSAGE(Message::ERR_NOSUCHNICK, 133 * , : No such nick/channel)         \
-    BUILD_MESSAGE(Message::ERR_NOSUCHFILENAME, 1336 * , : /file name not found)    \
-    BUILD_MESSAGE(Message::ERR_NOFILEFROMSENDER, 1335 * , : No file from sender)   \
-    BUILD_MESSAGE(Message::ERR_NOTEXTTOSEND, 412 * , : No text to send)            \
-    BUILD_MESSAGE(Message::ERR_CANNOTSENDTOCHAN, 404 * , : Cannot send to channel)
+const char *getMsg(const short type) {
+    return (Message::ErrorsDatabase[type].data());
+}
 
-std::string Message::getError(const std::string &, short type)
+#define FOR_LIST_OF_ERRORS(BUILD_MESSAGE) \
+    BUILD_MESSAGE(Message::ERR_NOSUCHNICK,       133, getMsg(Message::ERR_NOSUCHNICK))         \
+    BUILD_MESSAGE(Message::ERR_NOTEXTTOSEND,     412, getMsg(Message::ERR_NOTEXTTOSEND))            \
+    BUILD_MESSAGE(Message::ERR_UNKNOWNCOMMAND,   421, getMsg(Message::ERR_UNKNOWNCOMMAND))          \
+    BUILD_MESSAGE(Message::ERR_NONICKNAMEGIVEN,  431, getMsg(Message::ERR_NONICKNAMEGIVEN))       \
+    BUILD_MESSAGE(Message::ERR_ERRONEUSNICKNAME, 432, getMsg(Message::ERR_ERRONEUSNICKNAME))     \
+    BUILD_MESSAGE(Message::ERR_ERRONEUSUSERNAME, 432, getMsg(Message::ERR_ERRONEUSUSERNAME))     \
+    BUILD_MESSAGE(Message::ERR_NICKNAMEINUSE,    433, getMsg(Message::ERR_NICKNAMEINUSE))\
+    BUILD_MESSAGE(Message::ERR_NEEDMOREPARAMS,   461, getMsg(Message::ERR_NEEDMOREPARAMS))     \
+    BUILD_MESSAGE(Message::ERR_ALREADYREGISTRED, 462, getMsg(Message::ERR_ALREADYREGISTRED)) \
+    BUILD_MESSAGE(Message::ERR_INCORRECT_PASS,   464, getMsg(Message::ERR_INCORRECT_PASS))           \
+    BUILD_MESSAGE(Message::ERR_NOFILEFROMSENDER, 1335, getMsg(Message::ERR_NOFILEFROMSENDER))   \
+    BUILD_MESSAGE(Message::ERR_NOSUCHFILE,       1336, getMsg(Message::ERR_NOSUCHFILE))      \
+    BUILD_MESSAGE(Message::ERR_NOSUCHFILENAME,   1336, getMsg(Message::ERR_NOSUCHFILENAME))
+    // BUILD_MESSAGE(Message::ERR_CANNOTSENDTOCHAN, 404 , : Cannot send to channel)
+
+std::string Message::getError(const std::string &nick, short type)
 {
     std::string error;
 
@@ -38,8 +88,9 @@ std::string Message::getError(const std::string &, short type)
             case Message::errorType: \
                 error = static_cast<std::string>(":") \
                         + IRC_NAME \
-                        + #errorNum; \
-                error.append(#errorMsg); \
+                        + #errorNum \
+                        + " " + nick + " "; \
+                error.append(errorMsg); \
                 break;
 
             FOR_LIST_OF_ERRORS(BUILD_MESSAGE)

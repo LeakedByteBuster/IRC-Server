@@ -36,7 +36,7 @@ public :
     //  list of clients connected to the server || Nickname, Client class
     std::map<int, Client>           clients; 
     std::string                     serverCreationDate;
-    std::map<std::string, channel>  ChannelsInServer; // all channels
+    static std::map<std::string, channel>  ChannelsInServer; // all channels
 
     //	creates a TCP, IPv4, Passive socket
     Server(std::string portNum, std::string password);
@@ -65,7 +65,6 @@ public :
     //          Sends 001, 002, 003, 004 messages
     std::string postRegistration(const Client &clt);
 
-
 private :
 
 	// server's password
@@ -78,5 +77,9 @@ private :
     // make class command a friend to server class to get client id from class command
     friend class command;
 };
+
+#if !defined(CHANNELSINSERVER)
+#define CHANNELSINSERVER
+#endif // CHANNELSINSERVER
 
 #endif // SERVER_HPP

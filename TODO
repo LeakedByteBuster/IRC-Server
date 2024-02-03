@@ -9,6 +9,14 @@ Registration :
     - check number of spaces in user, NICK, and PASS
     - user is not deleted correctly when is disconnected 
 
+NICK dasdasdasd // errors :No nickname given not returned to check why
+NICK dasdasdasd
+NICK dasdasdasd
+NICK
+:ircCamel.localhost 431 dasdasdas :No nickname given
+NICK aa
+NICK aa
+
 LimeChat :
     - Error sendMsg(): Socket operation on non-socket
         (happens sometimes after send nick command)
@@ -26,4 +34,7 @@ AFTER REGISTRATION :
 
 JOIN :
 
-
+:pao001!~kj@197.230.30.146 QUIT :Ping timeout: 260 seconds
+    :pao001!~kj@197.230.30.146 QUIT :Ping timeout: 260 seconds
+MODE #alk001 +o pao001
+    :ioa002!~kj@197.230.30.146 MODE #alk001 +o pao001

@@ -17,15 +17,15 @@ void    parsePass(Client &clt, std::string str, const std::string &pass)
         throw std::invalid_argument("");
     }
     if (tokens.size() != 2) {
-        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAM));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
         throw std::invalid_argument("");
     }
     if (tokens[0].compare("PASS") != 0) {
-        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAM));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
         throw std::invalid_argument("");
     }
     if (tokens[1].compare(pass) != 0) {
-        Server::sendMsg(clt, Message::getError(clt.nickname, Message::INCORRECT_PASS));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_INCORRECT_PASS));
         throw std::invalid_argument("");
     }
 }
@@ -54,12 +54,12 @@ void    parseNick(std::map<int, Client> &clients, Client &clt, std::string str)
     str = tokens[1];
     //  check command
     if (tokens[0].compare("NICK") != 0) {
-        Server::sendMsg(clt, Message::getError(str, Message::ERR_ERRONEUSNICKNAME));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_ERRONEUSNICKNAME));
         throw std::invalid_argument("");
     }
     //  checks if first character is a letter
     if (!isalpha(str[0])) {
-        Server::sendMsg(clt, Message::getError(str, Message::ERR_ERRONEUSNICKNAME));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_ERRONEUSNICKNAME));
         throw std::invalid_argument("");
     }
     //  checks if rest of characters is valid
@@ -68,7 +68,7 @@ void    parseNick(std::map<int, Client> &clients, Client &clt, std::string str)
         if (isalnum(str[i])) {
             continue ;
         } else if (special.find(str[i]) == std::string::npos) {
-            Server::sendMsg(clt, Message::getError(str, Message::ERR_ERRONEUSNICKNAME));
+            Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_ERRONEUSNICKNAME));
             throw std::invalid_argument("");
         }
     }
@@ -76,7 +76,7 @@ void    parseNick(std::map<int, Client> &clients, Client &clt, std::string str)
     it = clients.begin();
     for (; it != clients.end(); it++) {
         if (str.compare(it->second.nickname) == 0) {
-            Server::sendMsg(clt, Message::getError(str, Message::ERR_NICKNAMEINUSE));
+            Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NICKNAMEINUSE));
             throw std::invalid_argument("");
         }
     }
@@ -104,12 +104,12 @@ void    parseUser(Client &clt, std::string str)
     
     // checks if parameter number is > 5
     if (tokens.size() < 5) {
-        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAM));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
         throw std::invalid_argument("");
     }
     // checks USER
     if (tokens[0].compare("USER") != 0) {
-        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAM));
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
         throw std::invalid_argument("");
     }
     // checks if username has some invalid characters

@@ -29,7 +29,6 @@ std::vector<std::string> splitBySpace(std::string str)
 
 std::vector<std::string> splitByValue(std::string s, char c)
 {
-    std::cout << "hey " << std::endl;
     std::cout.flush();
     std::stringstream           ss(s);
     std::vector<std::string>    tokens;

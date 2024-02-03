@@ -15,6 +15,7 @@ private:
 public:
 	std::map<int, Client>	ClientsInChannel;
 	int						maxUsersLimit;
+	// std::vector<int>		ClientsOperators;
 
 	channel();
 	~channel();

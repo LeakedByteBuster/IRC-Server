@@ -2,6 +2,8 @@
 #include <cstring>
 #include "registrationCommands.hpp"
 
+std::map<std::string, channel>  Server::ChannelsInServer; // all channels
+
 /* -------------------------------------------------------------------------- */
 /*                            Server constructors                             */
 /* -------------------------------------------------------------------------- */
@@ -77,6 +79,7 @@ Server::Server(std::string portNum, std::string password) : password(password), 
         throw std::runtime_error("Error getaddrinfo");
     
     serverCreationDate = geTime();
+    Message::setErrorsDatabase();
 }
 
 Server::Server(Server &rhs) : password(rhs.password), listenPort(rhs.listenPort),

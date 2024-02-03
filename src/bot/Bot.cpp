@@ -65,7 +65,7 @@ const std::string & Bot::getJoke()
     return (jokes[i++]);
 }
 
-std::string   Bot::botExecuter(std::string buff, const Client &clt)
+std::string   Bot::botExecuter(std::string buff, const Client &)
 {
     std::vector<std::string>    commands(splitByLines(buff));
     std::vector<std::string>    tokens;
@@ -86,24 +86,24 @@ std::string   Bot::botExecuter(std::string buff, const Client &clt)
 
                 switch (res)
                 {
-                case 1:
+                // case 1:
 
-                    ret = static_cast<std::string>("003: ");
-                    ret.append(geTime());
-                    break ;
+                //     ret = static_cast<std::string>("003: ");
+                //     ret.append(geTime());
+                //     break ;
 
-                case 2:
-                    ret = static_cast<std::string>("003: ");
-                    ret.append(b.getJoke());
-                    break ;
+                // case 2:
+                //     ret = static_cast<std::string>("003: ");
+                //     ret.append(b.getJoke());
+                //     break ;
 
-                case 3:
-                    ret.append(getInfos(clt));
-                    break ;
+                // case 3:
+                //     ret.append(getInfos(clt));
+                //     break ;
 
-                default:
-                    ret = Message::getError(clt.nickname, Message::ERR_UNKNOWNCOMMAND);
-                    break ;
+                // default:
+                //     ret = Message::getError(clt.nickname, Message::ERR_UNKNOWNCOMMAND);
+                //     break ;
                 }
             }
         }

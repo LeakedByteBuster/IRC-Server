@@ -27,7 +27,6 @@ std::vector<std::pair<std::string, std::string> >   parseJoinCommand(std::vector
     if (strList.size() >= 1) {
         
         splited = splitByValue(strList[0], ',');
-        std::cout << "strListSize " <<  strList[0] << std::endl;
         for (size_t i = 0; i < splited.size(); i++) {
             if (isChannelNameCorrect(splited[i]))
                 tokens.push_back(std::make_pair(splited[i], ""));
@@ -45,17 +44,36 @@ std::vector<std::pair<std::string, std::string> >   parseJoinCommand(std::vector
     return (tokens);
 }
 
+
+/*
+While a user is joined to a channel, they receive all status messages 
+related to that channel including new JOIN, PART, KICK, and MODE messages.
+
+If a user’s JOIN command is successful, the server:
+
+Sends them a JOIN message described above.
+May send a MODE message with the current channel’s modes.
+Sends them RPL_TOPIC and RPL_TOPICTIME numerics if the channel has a topic set (if the topic is not set, the user is sent no numerics).
+Sends them one or more RPL_NAMREPLY numerics (which also contain the name of the user that’s joining).
+*/
 void    join(Client &, std::vector<std::string> &command)
 {
     // parse command input/keys
     std::vector<std::pair<std::string, std::string> >   tmpChannels;
 
     tmpChannels = parseJoinCommand(command);
-
-    // Loop through vector to set varianles of each channel 
     for (size_t i = 0; i < tmpChannels.size(); i++) {
-        std::cout << "tmpChan: " << tmpChannels[i].first << " " << tmpChannels[i].second << std::endl;
+        // check if channel existed
+            // store channel
+            // store channel key
+            // send messages
     }
+
+    // Loop through vector to set varianles of each channel
+
+    // for (size_t i = 0; i < tmpChannels.size(); i++) {
+    //     std::cout << "tmpChan: " << tmpChannels[i].first << " " << tmpChannels[i].second << std::endl;
+    // }
     return ;
 }
 
@@ -164,7 +182,7 @@ void    join(Client &, std::vector<std::string> &command)
 //     if (commands.size()==1)
 //     {
         
-//         // sendError(id ,ERR_NEEDMOREPARAMS,commands[0]);
+//         // sendError(id ,Message::ERR_NEEDMOREPARAMS,commands[0]);
 //         return std::map<std::vector<std::string>,std::vector<std::string> >();
 //     }
 //     else if (commands.size()== 2)
@@ -178,8 +196,8 @@ void    join(Client &, std::vector<std::string> &command)
 //         }
 //         else 
 //         {
-//             // sendError(id ,ERR_BADCHANMASK);
-//             std::cout << ERR_BADCHANMASK << std::endl;
+//             // sendError(id ,Message::ERR_BADCHANMASK);
+//             std::cout << Message::ERR_BADCHANMASK << std::endl;
 //              return std::map<std::vector<std::string>,std::vector<std::string> >();
 //         }
 //     }
@@ -195,13 +213,13 @@ void    join(Client &, std::vector<std::string> &command)
 //         }
 //         else
 //         {
-//             // sendError(id ,ERR_BADCHANNELKEY,"1");
+//             // sendError(id ,Message::ERR_BADCHANNELKEY,"1");
 //             return std::map<std::vector<std::string>,std::vector<std::string> >();
 //         }
 //     }
 //     else 
 //     {
-//         // sendError(id ,ERR_NEEDMOREPARAMS,"");
+//         // sendError(id ,Message::ERR_NEEDMOREPARAMS,"");
 //         return std::map<std::vector<std::string>,std::vector<std::string> >();
 //     }
 
