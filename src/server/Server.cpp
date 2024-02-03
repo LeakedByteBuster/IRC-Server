@@ -311,29 +311,11 @@ void    Server::sendMsg(const Client &target, std::string msg)
 void    Server::sendMsg(const Channel &ch, std::string msg)
 {
     if (msg.size() > 0) {
-        std::map<int, Client> clts = ch.ClientsInChannel;
-        std::map<int, Client>::iterator it = clts.begin();
-        ssize_t bytes;
-        char    buff[BYTES_TO_READ];
+        const std::map<int, Client> &clts = ch.ClientsInChannel;
+        std::map<int, Client>::const_iterator it = clts.begin();
 
-        msg.append("\r\n");
-        std::strcpy(buff, msg.data());
         for (; it != clts.end(); it++) {
-            if ((bytes = send(it->second.fd, (const void *)buff, msg.size(), 0))
-                == -1) {
-                std::cerr << "Error sendMsg(): " << strerror(errno) << std::endl;
-            } else if (static_cast<size_t>(bytes) != msg.size()) {
-                std::cerr << "Warning sendMsg: data loss : input = " << msg.size() 
-                    << " sent = " << bytes << std::endl;
-            }
+            Server::sendMsg(it->second, msg);
         }
     }
-    
-    // for (all clients in channel) {
-    //     if (bytes = send(target.fd, msg.data(), msg.size(), 0) == -1) {
-    //         std::cerr << "Error : " << strerror(errno) << std::endl;
-    //     }
-    //     if (bytes )
-    // }
-
 }
