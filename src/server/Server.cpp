@@ -310,12 +310,10 @@ void    Server::sendMsg(const Client &target, std::string msg)
 
 void    Server::sendMsg(const Channel &ch, std::string msg)
 {
-    if (msg.size() > 0) {
-        const std::map<int, Client> &clts = ch.ClientsInChannel;
-        std::map<int, Client>::const_iterator it = clts.begin();
+    const std::map<int, Client> &clts = ch.ClientsInChannel;
+    std::map<int, Client>::const_iterator it = clts.begin();
 
-        for (; it != clts.end(); it++) {
-            Server::sendMsg(it->second, msg);
-        }
+    for (; it != clts.end(); it++) {
+        Server::sendMsg(it->second, msg);
     }
 }
