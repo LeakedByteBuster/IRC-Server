@@ -64,4 +64,10 @@ public :
 
 };
 
+/* [<nick> '!' <user> ] ['@' <host> ] : nick!~user@hostname */
+std::string getId(const Client &clt);
+/* :ircCamel.localhost <Error Number> <Client Nickname> */
+std::string getSource(const Client &clt, const std::string errNum);
+
+
 #endif // ERRORS_HPP

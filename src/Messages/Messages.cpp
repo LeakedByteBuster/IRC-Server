@@ -1,8 +1,10 @@
 #include "Messages.hpp"
 #include "Server.hpp"
 
+//  Stores all static error messages
 std::map<short, std::string>    Message::ErrorsDatabase;
 
+// Sets the map in Message class to the specified error msg
 void    Message::setErrorsDatabase()
 {
     ErrorsDatabase.insert(
@@ -46,6 +48,27 @@ void    Message::setErrorsDatabase()
     );
 }
 
+/* <':'><ircCamel.localhost> <Error Number> <Client Nickname> */
+std::string getSource(const Client &clt, const std::string errNum)
+{
+    std::string buff(":");
+
+    buff = IRC_NAME + errNum; + " " + clt.nickname;
+
+    return (buff);
+}
+
+/* Returns a string of the form nick!~user@hostname */
+std::string getId(const Client &clt)
+{
+    std::string str(":");
+
+    str = clt.nickname + " " + "!";
+    str.append(clt.username + "@");
+    str.append(inet_ntoa(clt.hints.sin_addr));
+
+    return (str);
+}
 
 std::string  Message :: rplAwayMsg(Client &clt,std :: string str)
 {
@@ -54,43 +77,45 @@ std::string  Message :: rplAwayMsg(Client &clt,std :: string str)
     msg = static_cast<std::string>(":") + IRC_NAME + "301 ";
     msg.append(clt.username + static_cast<std::string>(" "));
     msg.append(str);
-    
+
     return(msg);
 }
 
-const char *getMsg(const short type) {
+// Returns the string at index 'type' given in argument
+const char *getStaticErrorMsg(const short type) {
     return (Message::ErrorsDatabase[type].data());
 }
 
 #define FOR_LIST_OF_ERRORS(BUILD_ERROR) \
     BUILD_ERROR(Message::ERR_NOSUCHNICK,       133, \
-                        getMsg(Message::ERR_NOSUCHNICK)) \
+        getStaticErrorMsg(Message::ERR_NOSUCHNICK)) \
     BUILD_ERROR(Message::ERR_NOTEXTTOSEND,     412, \
-                        getMsg(Message::ERR_NOTEXTTOSEND)) \
+        getStaticErrorMsg(Message::ERR_NOTEXTTOSEND)) \
     BUILD_ERROR(Message::ERR_UNKNOWNCOMMAND,   421, \
-                        getMsg(Message::ERR_UNKNOWNCOMMAND)) \
+        getStaticErrorMsg(Message::ERR_UNKNOWNCOMMAND)) \
     BUILD_ERROR(Message::ERR_NONICKNAMEGIVEN,  431, \
-                        getMsg(Message::ERR_NONICKNAMEGIVEN)) \
+        getStaticErrorMsg(Message::ERR_NONICKNAMEGIVEN)) \
     BUILD_ERROR(Message::ERR_ERRONEUSNICKNAME, 432, \
-                        getMsg(Message::ERR_ERRONEUSNICKNAME)) \
+        getStaticErrorMsg(Message::ERR_ERRONEUSNICKNAME)) \
     BUILD_ERROR(Message::ERR_ERRONEUSUSERNAME, 432, \
-                        getMsg(Message::ERR_ERRONEUSUSERNAME)) \
+        getStaticErrorMsg(Message::ERR_ERRONEUSUSERNAME)) \
     BUILD_ERROR(Message::ERR_NICKNAMEINUSE,    433, \
-                        getMsg(Message::ERR_NICKNAMEINUSE)) \
+        getStaticErrorMsg(Message::ERR_NICKNAMEINUSE)) \
     BUILD_ERROR(Message::ERR_NEEDMOREPARAMS,   461, \
-                        getMsg(Message::ERR_NEEDMOREPARAMS)) \
+        getStaticErrorMsg(Message::ERR_NEEDMOREPARAMS)) \
     BUILD_ERROR(Message::ERR_ALREADYREGISTRED, 462, \
-                        getMsg(Message::ERR_ALREADYREGISTRED)) \
+        getStaticErrorMsg(Message::ERR_ALREADYREGISTRED)) \
     BUILD_ERROR(Message::ERR_INCORRECT_PASS,   464, \
-                        getMsg(Message::ERR_INCORRECT_PASS)) \
+        getStaticErrorMsg(Message::ERR_INCORRECT_PASS)) \
     BUILD_ERROR(Message::ERR_NOFILEFROMSENDER, 1335, \
-                         getMsg(Message::ERR_NOFILEFROMSENDER)) \
+        getStaticErrorMsg(Message::ERR_NOFILEFROMSENDER)) \
     BUILD_ERROR(Message::ERR_NOSUCHFILE,       1336, \
-                         getMsg(Message::ERR_NOSUCHFILE)) \
+        getStaticErrorMsg(Message::ERR_NOSUCHFILE)) \
     BUILD_ERROR(Message::ERR_NOSUCHFILENAME,   1336, \
-                         getMsg(Message::ERR_NOSUCHFILENAME))
+        getStaticErrorMsg(Message::ERR_NOSUCHFILENAME))
     // BUILD_ERROR(Message::ERR_CANNOTSENDTOCHAN, 404 , : Cannot send to channel)
 
+//  Returns a string that contain the error message
 std::string Message::getError(const std::string &nick, short type)
 {
     std::string error;

@@ -1,6 +1,6 @@
 #include "Bot.hpp"
 #include "Messages.hpp"
-#include<stdlib.h>
+#include <stdlib.h>
 
 Bot::Bot()
 {

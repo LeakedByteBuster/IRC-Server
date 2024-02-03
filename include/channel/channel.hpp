@@ -13,6 +13,7 @@ private:
 	const std::string	key;
 
 public:
+	// <client's fd, client>
 	std::map<int, Client>	ClientsInChannel;
 	int						maxUsersLimit;
 	// std::vector<int>		ClientsOperators;

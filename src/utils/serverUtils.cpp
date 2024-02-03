@@ -54,26 +54,6 @@ bool    parseRegistrationCommands(std::map<int, Client> &clients,
     return (0);
 }
 
-//  type=0 : <client> || type=1 : nick!~user@hostname
-std::string getId(Client &clt, int type)
-{
-    std::string str;
-
-    switch (type)
-    {
-    case 0 :    /* <client> */
-        str = clt.nickname.append(" ");
-        break;
-    case 1 :    /* [<nick> '!' <user> ] ['@' <host> ] */
-        str = clt.nickname.append("!");
-        str.append(clt.username.append("@"));
-        str.append(inet_ntoa(clt.hints.sin_addr));
-        break;
-    }
-    std::cout << "string ==> " << str << std::endl;
-    return (str);
-}
-
 int  parseInput(const char *port, std::string pass)
 {
     char    *endptr = NULL;
