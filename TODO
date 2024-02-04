@@ -36,7 +36,7 @@ Server :
     - MSG_NOSIGNAL (SIGPIPE)
 
 PASS 3
-NICK Doug
+NICK Doug00754
 USER hoba 0 * loba hoba douga
 
 AFTER REGISTRATION :

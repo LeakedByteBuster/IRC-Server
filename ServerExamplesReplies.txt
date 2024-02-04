@@ -38,3 +38,19 @@ USER Mushi @ * Douga
     :NickServ!NickServ@services.libera.chat NOTICE upps1 :upps1 is not a registered nickname.
 
 //  --------------------------------------------------------------------------------------------------------------------------
+
+:Mathieu  joining a new channel
+    join #poai
+        :Mathieu!~hoba@197.230.30.146 JOIN #poai
+        :silver.libera.chat MODE #poai +Cnst
+        :silver.libera.chat 353 Mathieu @ #poai :@Mathieu
+        :silver.libera.chat 366 Mathieu #poai :End of /NAMES list.
+
+:Jack joining an existing channel
+    join #poai
+        :Jack!~hoba@197.230.30.146 JOIN #poai
+        :silver.libera.chat 353 Jack @ #poai :Jack @Mathieu
+        :silver.libera.chat 366 Jack #poai :End of /NAMES list.
+
+:Mathieu seeing Jack join a channel
+        :Jack!~hoba@197.230.30.146 JOIN #poai

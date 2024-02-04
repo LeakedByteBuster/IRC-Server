@@ -3,8 +3,8 @@
 bool    isChannelNameCorrect(std::string name)
 {
     std::string specials = " ,\a\r\n\0";
-
-    if (name[0] != '#') {
+    // disables leaving all channels : (name.compare("0") == 0)
+    if (name[0] != '#' || name.compare("0") == 0) {
         return (0);
     }
     for (size_t i = 0; i < specials.size(); i++) {
@@ -31,7 +31,7 @@ std::vector<std::pair<std::string, std::string> >
         for (size_t i = 0; i < splited.size(); i++) {
             if (!isChannelNameCorrect(splited[i])) {
                 Server::sendMsg( clt,
-                    Message::getJoinError(Channel(splited[i], ""), clt,
+                    Message::getJoinError( Channel(splited[i], ""), clt,
                         Message::ERR_BADCHANMASK));
                 continue ;
             }

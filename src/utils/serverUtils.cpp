@@ -170,7 +170,7 @@ std::string Server::postRegistration(const Client &clt)
     std::string str;
     
     // RPL_WELCOME
-    str = static_cast<std::string>(":") + IRC_NAME + "001 " + clt.nickname;
+    str = static_cast<std::string>(":") + SERVER_PREFIX + "001 " + clt.nickname;
     str.append(
         " :Welcome to the Camel Internet Relay Chat Network " + clt.nickname
     );
@@ -178,10 +178,10 @@ std::string Server::postRegistration(const Client &clt)
     str.clear();
     
     // RPL_YOURHOST
-    str = static_cast<std::string>(":") + IRC_NAME + "002 " + clt.nickname;
+    str = static_cast<std::string>(":") + SERVER_PREFIX + "002 " + clt.nickname;
     str.append(
         static_cast<std::string>(" :Your host is ") 
-        + IRC_NAME
+        + SERVER_PREFIX
         + ", running version " 
         + SERVER_VERSION
     );
@@ -189,7 +189,7 @@ std::string Server::postRegistration(const Client &clt)
     str.clear();
 
     // RPL_CREATED
-    str = static_cast<std::string>(":") + IRC_NAME + "003 " + clt.nickname;
+    str = static_cast<std::string>(":") + SERVER_PREFIX + "003 " + clt.nickname;
     str.append(
         " :This server was created on " + serverCreationDate
     );
@@ -203,10 +203,10 @@ std::string Server::postRegistration(const Client &clt)
         <available channel modes>           : itkol
         <channel modes with a parameter>    : lok
     */
-    str = static_cast<std::string>(":") + IRC_NAME + "004 " + clt.nickname + " ";
+    str = static_cast<std::string>(":") + SERVER_PREFIX + "004 " + clt.nickname + " ";
     str.append(
         static_cast<std::string>(":")
-        + IRC_NAME
+        + SERVER_PREFIX
         + SERVER_VERSION 
         + " ol "
         + "itkol " 

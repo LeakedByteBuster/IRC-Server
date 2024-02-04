@@ -47,7 +47,7 @@
     BUILD_JOIN_ERROR(Message::ERR_BADCHANMASK,      476, \
         getStaticErrorMsg(Message::ERR_BADCHANMASK))
 
-#define IRC_NAME    "ircCamel.localhost "
+#define SERVER_PREFIX    "ircCamel.localhost "
 #define SERVER_VERSION    "ircCamel 1.0"
 #define ERRORS_SIZE 18
 
@@ -58,6 +58,14 @@
 class   Message;
 class   Channel;
 struct  ListOfErrorsNum;
+
+enum    s_types {
+    TYPE_REPLY,
+    TYPE_ERROR,
+    TYPE_USER,
+    TYPE_SERVER,
+    TYPE_JOIN_CHANNEL // used in getJoinError()
+};
 
 class   Message {
 
@@ -71,20 +79,21 @@ public :
 /* -------------------------------------------------------------------------- */
 /*                                  Methods                                   */
 /* -------------------------------------------------------------------------- */
+    // Sets the map in Message class to the specified static error message
     static void         setErrorsDatabase();
     static std::string  getError(const std::string &clt, short type);
     static std::string  rplAwayMsg(Client &clt, std::string str);
     static std::string  getJoinError(const Channel &ch,
-            const Client &clt, short type);
+            const Client &clt, short symbol);
 
-    typedef enum    ListOfErrorsNum {
+    typedef enum    MessageErrorNumber {
 /* -------------------------------------------------------------------------- */
-/*                               GeneralErrors                                */
+/*                               General Errors                               */
 /* -------------------------------------------------------------------------- */
         ERR_UNKNOWNCOMMAND = 421,
         ERR_NEEDMOREPARAMS = 461,
 /* -------------------------------------------------------------------------- */
-/*                             RegistrationErrors                             */
+/*                             Registration Errors                            */
 /* -------------------------------------------------------------------------- */
         ERR_NONICKNAMEGIVEN = 431,
         ERR_ERRONEUSNICKNAME = 432,
@@ -93,7 +102,7 @@ public :
         ERR_ERRONEUSUSERNAME = 5,
         ERR_INCORRECT_PASS = 3,
 /* -------------------------------------------------------------------------- */
-/*                            FileTransfertErrors                             */
+/*                            FileTransfert Errors                            */
 /* -------------------------------------------------------------------------- */
         ERR_NOSUCHNICK = 401,
         ERR_NOTEXTTOSEND = 412,
@@ -101,26 +110,26 @@ public :
         ERR_NOSUCHFILENAME = 10,
         ERR_NOFILEFROMSENDER = 11,
 /* -------------------------------------------------------------------------- */
-/*                                 JoinErrors                                 */
+/*                                 Join Errors                                */
 /* -------------------------------------------------------------------------- */
-        ERR_NOSUCHCHANNEL = 403, //   "<client> <channel> :No such channel" | ERR_BADCHANMASK is more powerfull 
-        ERR_TOOMANYCHANNELS = 405, //   "<client> <channel> :You have joined too many channels"
-        ERR_CHANNELISFULL = 471, //   "<client> <channel> :Cannot join channel (+l)"
-        ERR_INVITEONLYCHAN = 473, //   "<client> <channel> :Cannot join channel (+i)"
-        ERR_BANNEDFROMCHAN = 474, //   "<client> <channel> :Cannot join channel (+b)"
-        ERR_BADCHANNELKEY = 475, //   "<client> <channel> :Cannot join channel (+k)"
-        ERR_BADCHANMASK = 476, //    "<channel> :Bad Channel Mask" // Invalid channel name
+        ERR_NOSUCHCHANNEL = 403,    // "<client> <channel> :No such channel" | ERR_BADCHANMASK is more powerfull 
+        ERR_TOOMANYCHANNELS = 405,  // "<client> <channel> :You have joined too many channels"
+        ERR_CHANNELISFULL = 471,    // "<client> <channel> :Cannot join channel (+l)"
+        ERR_INVITEONLYCHAN = 473,   // "<client> <channel> :Cannot join channel (+i)"
+        ERR_BANNEDFROMCHAN = 474,   // "<client> <channel> :Cannot join channel (+b)"
+        ERR_BADCHANNELKEY = 475,    // "<client> <channel> :Cannot join channel (+k)"
+        ERR_BADCHANMASK = 476,      // "<client> <channel> :Invalid channel name"
 /* -------------------------------------------------------------------------- */
-/*                                JoinReplies                                 */
+/*                                Join Replies                                */
 /* -------------------------------------------------------------------------- */
-        RPL_ENDOFNAMES = 366, // "<client> <channel> :End of /NAMES list" // S <-   :irc.example.com 366 patty #irctoast :End of /NAMES list.
-        RPL_TOPIC = 332, // "<client> <channel> :<topic>"
-        RPL_TOPICWHOTIME = 333, // "<client> <channel> <nick> <setat>"
-        RPL_NAMREPLY = 353 // "<client> <symbol> <channel> :[prefix]<nick>{ [prefix]<nick>}"
+        RPL_ENDOFNAMES = 366,   // "<client> <channel> :End of /NAMES list" || S <-   :irc.example.com 366 patty #irctoast :End of /NAMES list.
+        RPL_TOPIC = 332,        // "<client> <channel> :<topic>"            || S <-   :irc.example.com 332 alice #test :This is my cool channel! https://irc.com
+        RPL_TOPICWHOTIME = 333, // "<client> <channel> <nick> <setat>"      || S <-   :irc.example.com 333 alice #test dan!~d@localhost 1547691506
+        RPL_NAMREPLY = 353      // "<client> <symbol> <channel> :[prefix]<nick>{ [prefix]<nick>}" || S <-   :irc.example.com 353 alice @ #test :alice @dan
 
         // ERR_TOOMANYTARGETS = 407,
         // ERR_UNAVAILRESOURCE = 15
-    } ListOfErrors_t;
+    } MessageErrorNumber;
 
 };
 
@@ -128,10 +137,12 @@ public :
 /*                               Function Utils                               */
 /* -------------------------------------------------------------------------- */
 
-/* [<nick> '!' <user> ] ['@' <host> ] : nick!~user@hostname */
-std::string getId(const Client &clt);
-/* :ircCamel.localhost <Error Number> <Client Nickname> */
-std::string getMessageFirstPart(const Client &clt, const std::string errNum);
+// :ircCamel.localhost <Error Number> <Client Nickname>
+std::string errorPrefix(const Client &clt, const std::string errNum);
+// nick!~user@hostname
+std::string userPrefix(const Client &clt);
+//  <nick!~user@hostname> <command> <channel name>
+std::string replyCommandPrefix(const Channel &ch, const Client &clt, const std::string command, int user_or_server);
 // Returns the error string stored at index 'type' in ErrorsDatabase map
 const char *getStaticErrorMsg(const short type);
 
