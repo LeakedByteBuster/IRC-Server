@@ -2,6 +2,7 @@
 #include <cstring>
 #include "registrationCommands.hpp"
 
+//  holds all the channels created in the server : map<channel name, channel class>
 std::map<std::string, Channel>  Server::ChannelsInServer; // all channels
 
 /* -------------------------------------------------------------------------- */
@@ -310,7 +311,7 @@ void    Server::sendMsg(const Client &target, std::string msg)
 
 void    Server::sendMsg(const Channel &ch, std::string msg)
 {
-    const std::map<int, Client> &clts = ch.ClientsInChannel;
+    const std::map<int, Client> &clts = ch.clientsInChannel;
     std::map<int, Client>::const_iterator it = clts.begin();
 
     for (; it != clts.end(); it++) {

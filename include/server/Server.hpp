@@ -78,8 +78,4 @@ private :
     friend class command;
 };
 
-#if !defined(CHANNELSINSERVER)
-#define CHANNELSINSERVER
-#endif // CHANNELSINSERVER
-
 #endif // SERVER_HPP

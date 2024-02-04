@@ -31,7 +31,7 @@ std::vector<std::pair<std::string, std::string> >
         for (size_t i = 0; i < splited.size(); i++) {
             if (!isChannelNameCorrect(splited[i])) {
                 Server::sendMsg( clt,
-                    Message::getJoinError( Channel(splited[i], ""), clt,
+                    Message::getJoinError( Channel(splited[i]), clt,
                         Message::ERR_BADCHANMASK));
                 continue ;
             }
@@ -64,21 +64,33 @@ Sends them one or more RPL_NAMREPLY numerics (which also contain the name of the
 */
 void    join(Client &clt, std::vector<std::string> &command)
 {
-    // parse command input/keys
+    // pair<channel name, channel key>
     std::vector<std::pair<std::string, std::string> >   tmpChannels;
 
+
+    std::cout << "here 1 " << std::endl;
     tmpChannels = parseJoinCommand(command, clt);
+    if (tmpChannels.empty())
+        return ;
     for (size_t i = 0; i < tmpChannels.size(); i++) {
+        std::cout << "tmpChan: " << tmpChannels[i].first << " " << tmpChannels[i].second << std::endl;
+    }
+    std::string id(tmpChannels[0].first);
+
+    Server::ChannelsInServer.insert( std::make_pair ( id, Channel() ) );
+
+    Server::ChannelsInServer[id].clientsInChannel[clt.fd] = clt;
+    std::cout << "PP:" <<  Server::ChannelsInServer[id].getClientsInString() << std::endl;
+
+    // std::cerr << "{ " << Message::joinPostReply( Channel( id, ""), clt, "MODE" ) << " }" << std::endl;
+    
+    // Loop through vector to set varianles of each channel
+    // for (size_t i = 0; i < tmpChannels.size(); i++) {
         // check if channel existed
             // store channel
             // store channel key
             // send messages
-    }
-
-    // Loop through vector to set varianles of each channel
-
-    // for (size_t i = 0; i < tmpChannels.size(); i++) {
-    //     std::cout << "tmpChan: " << tmpChannels[i].first << " " << tmpChannels[i].second << std::endl;
     // }
+
     return ;
 }

@@ -60,11 +60,8 @@ class   Channel;
 struct  ListOfErrorsNum;
 
 enum    s_types {
-    TYPE_REPLY,
-    TYPE_ERROR,
-    TYPE_USER,
-    TYPE_SERVER,
-    TYPE_JOIN_CHANNEL // used in getJoinError()
+    TYPE_USER, // used in newInChannelReply()
+    TYPE_SERVER, // used in newInChannelReply()
 };
 
 class   Message {
@@ -79,14 +76,27 @@ public :
 /* -------------------------------------------------------------------------- */
 /*                                  Methods                                   */
 /* -------------------------------------------------------------------------- */
-    // Sets the map in Message class to the specified static error message
-    static void         setErrorsDatabase();
     static std::string  getError(const std::string &clt, short type);
-    static std::string  rplAwayMsg(Client &clt, std::string str);
     static std::string  getJoinError(const Channel &ch,
             const Client &clt, short symbol);
+    
+    static std::string  rplAwayMsg(Client &clt, std::string str);
+    // sends replies 
+    static std::string  newInChannelReply( const Channel &ch,
+        const Client &clt, const std::string command );
 
-    typedef enum    MessageErrorNumber {
+    // Sets the map in Message class to the specified static error message
+    static void         setErrorsDatabase();
+    // Returns the error string stored at index 'type' in ErrorsDatabase map
+    static const char   *getStaticErrorMsg(const short type);
+
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/*                           Enum Struct Of Errors                            */
+/* -------------------------------------------------------------------------- */
+    typedef enum    s_errorNumbers {
+
 /* -------------------------------------------------------------------------- */
 /*                               General Errors                               */
 /* -------------------------------------------------------------------------- */
@@ -119,6 +129,21 @@ public :
         ERR_BANNEDFROMCHAN = 474,   // "<client> <channel> :Cannot join channel (+b)"
         ERR_BADCHANNELKEY = 475,    // "<client> <channel> :Cannot join channel (+k)"
         ERR_BADCHANMASK = 476,      // "<client> <channel> :Invalid channel name"
+
+        // ERR_TOOMANYTARGETS = 407,
+        // ERR_UNAVAILRESOURCE = 15
+    } error_t;
+
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+
+
+/* -------------------------------------------------------------------------- */
+/*                           Enum Struct Of Replies                           */
+/* -------------------------------------------------------------------------- */
+    typedef enum    s_replyNumbers {
+
 /* -------------------------------------------------------------------------- */
 /*                                Join Replies                                */
 /* -------------------------------------------------------------------------- */
@@ -127,9 +152,7 @@ public :
         RPL_TOPICWHOTIME = 333, // "<client> <channel> <nick> <setat>"      || S <-   :irc.example.com 333 alice #test dan!~d@localhost 1547691506
         RPL_NAMREPLY = 353      // "<client> <symbol> <channel> :[prefix]<nick>{ [prefix]<nick>}" || S <-   :irc.example.com 353 alice @ #test :alice @dan
 
-        // ERR_TOOMANYTARGETS = 407,
-        // ERR_UNAVAILRESOURCE = 15
-    } MessageErrorNumber;
+    } reply_t;
 
 };
 
@@ -137,13 +160,15 @@ public :
 /*                               Function Utils                               */
 /* -------------------------------------------------------------------------- */
 
+
 // :ircCamel.localhost <Error Number> <Client Nickname>
-std::string errorPrefix(const Client &clt, const std::string errNum);
-// nick!~user@hostname
-std::string userPrefix(const Client &clt);
-//  <nick!~user@hostname> <command> <channel name>
-std::string replyCommandPrefix(const Channel &ch, const Client &clt, const std::string command, int user_or_server);
-// Returns the error string stored at index 'type' in ErrorsDatabase map
-const char *getStaticErrorMsg(const short type);
+std::string  errorPrefix(const Client &clt, const std::string errNum);
+// <nick!~user><@><hostname>
+std::string  userPrefix(const Client &clt);
+//  <nick!~user><@><hostname>
+std::string  replyCommandPrefix(const Channel &ch, const Client &clt, const std::string command, int user_or_server);
+// <':'>< ircCamel.localhost / <nick!~user><@><hostname> > <command> <channel name>
+// prefix types : TYPE_SERVER, TYPE_USER
+std::string commandReply(const Channel &ch, const Client &clt, std::string command, int prefixType);
 
 #endif // ERRORS_HPP

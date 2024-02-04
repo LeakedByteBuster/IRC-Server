@@ -1,4 +1,3 @@
-#include "Messages.hpp"
 #include "Server.hpp"
 
 /* -------------------------------------------------------------------------- */
@@ -8,92 +7,17 @@
 std::map<short, std::string>    Message::ErrorsDatabase;
 
 /* -------------------------------------------------------------------------- */
-/*                              Messages Prefix                               */
-/* -------------------------------------------------------------------------- */
-
-// <':'><ircCamel.localhost> <Error Number> <Client Nickname>
-std::string errorPrefix(const Client &clt, const std::string errNum)
-{
-    std::string buff(":");
-    buff = SERVER_PREFIX + errNum + " " + clt.nickname;
-    return (buff);
-}
-
-// nick!~user@hostname
-std::string userPrefix(const Client &clt)
-{
-    std::string str(":");
-
-    str = clt.nickname + " " + "!";
-    str.append(clt.username + "@");
-    str.append(inet_ntoa(clt.hints.sin_addr));
-    return (str);
-}
-
-//  <nick!~user@hostname> <command> <channel name>
-std::string replyCommandPrefix(const Channel &ch, const Client &clt, const std::string command, int user_or_server)
-{
-    std::string prefix = (user_or_server == TYPE_SERVER) ? SERVER_PREFIX : userPrefix(clt);
-
-    std::string replyPrfx(
-        prefix  +
-        " "     +
-        command +
-        ch.name
-    );
-    return (replyPrfx);
-}
-
-
-/* -------------------------------------------------------------------------- */
-/*                             Gets Static Error                              */
+/*                      Getter of static database errors                      */
 /* -------------------------------------------------------------------------- */
 
 // Returns the error string stored at index 'type' in ErrorsDatabase map
-const char *getStaticErrorMsg(const short type) {
+const char *    Message::getStaticErrorMsg(const short type) {
     return (Message::ErrorsDatabase[type].data());
 }
 
 /* -------------------------------------------------------------------------- */
-/*                           Append Messages                                  */
+/*                          Error Message Handlers                            */
 /* -------------------------------------------------------------------------- */
-
-std::string  Message :: rplAwayMsg(Client &clt,std :: string str)
-{
-    std :: string msg;
-
-    msg = static_cast<std::string>(":") + SERVER_PREFIX + "301 ";
-    msg.append(clt.username + static_cast<std::string>(" "));
-    msg.append(str);
-
-    return(msg);
-}
-
-/* -------------------------------------------------------------------------- */
-/*                          Error Messages Handlers                           */
-/* -------------------------------------------------------------------------- */
-
-// std::string nameReply(const Channel &ch, const Client &clt, const std::string command)
-// {
-//     std::vector<std::string>    users;
-//     std::string                 reply;
-//     std::string                 tmp;
-//     size_t                      i = 0;
-    
-//     users.insert(ch.ClientsInChannel.begin(), ch.ClientsInChannel.end());
-//     do {
-//         tmp.append(users[i]);
-
-//     } while (i < users.size())
-
-//     for (size_t i = 0; ; i++) {
-//         if (i != 0)
-//     }
-
-    
-//     reply = errorPrefix(clt, Message::RPL_NAMREPLY) + " @ " + ch.name; // "@" because all channel are public
-//     return (reply);
-// }
 
 //  Returns a string that contain the error message :
 // :ircCamel.localhost <Error Number> <Client Nickname> :<error message>
@@ -122,10 +46,6 @@ std::string Message::getError(const std::string &nick, short type)
     return error;
 }
 
-/* -------------------------------------------------------------------------- */
-/*                          Reply Messages Handlers                           */
-/* -------------------------------------------------------------------------- */
-
 //  Returns a string that contain the error message
 std::string Message::getJoinError(const Channel &ch, const Client &clt, short symbol)
 {
@@ -149,4 +69,44 @@ std::string Message::getJoinError(const Channel &ch, const Client &clt, short sy
     }
 
     return error;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/*                          Reply Messages Handlers                           */
+/* -------------------------------------------------------------------------- */
+
+/*
+    returns a string that has :
+        JOIN message
+        MODE message with the current channel’s modes
+        RPL_TOPIC and RPL_TOPICTIME numerics if the channel has a topic set (if the topic is not set, the user is sent no numerics).
+        one or more RPL_NAMREPLY
+*/
+std::string Message::newInChannelReply(const Channel &, const Client &, const std::string )
+{
+    // std::map<int, Client>       users;
+    // std::string                 clients;
+    // std::stringstream           ss;
+    
+    // // build up the message to sent
+    // ss << Message::RPL_NAMREPLY;
+    // std::string symbol = ss.str().c_str();
+
+    std::string reply;
+    //     commandReply()
+    // ); // "@" channel is public
+
+    return (reply);
+}
+
+std::string  Message::rplAwayMsg(Client &clt,std :: string str)
+{
+    std :: string msg;
+
+    msg = static_cast<std::string>(":") + SERVER_PREFIX + "301 ";
+    msg.append(clt.username + static_cast<std::string>(" "));
+    msg.append(str);
+
+    return(msg);
 }

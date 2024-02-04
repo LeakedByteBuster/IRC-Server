@@ -7,7 +7,7 @@
 // Sets the map in Message class to the specified static error message
 void    Message::setErrorsDatabase()
 {
-    Message::MessageErrorNumber    errorNumbers[ERRORS_SIZE] = {
+    Message::error_t    errorNumbers[ERRORS_SIZE] = {
         Message::ERR_INCORRECT_PASS,    // 1
         Message::ERR_NONICKNAMEGIVEN,   // 2
         Message::ERR_ERRONEUSNICKNAME,  // 3

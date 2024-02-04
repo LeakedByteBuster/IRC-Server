@@ -8,6 +8,7 @@ Registration :
     - parse with and without ":"
     - check number of spaces in user, NICK, and PASS
     - user is not deleted correctly when is disconnected 
+    - Refactor postRegistration() function
 
 NICK :
     NICK dasdasdasd // errors :No nickname given not returned to check why
