@@ -9,13 +9,20 @@ Registration :
     - check number of spaces in user, NICK, and PASS
     - user is not deleted correctly when is disconnected 
 
-NICK dasdasdasd // errors :No nickname given not returned to check why
-NICK dasdasdasd
-NICK dasdasdasd
-NICK
-:ircCamel.localhost 431 dasdasdas :No nickname given
-NICK aa
-NICK aa
+NICK :
+    NICK dasdasdasd // errors :No nickname given not returned to check why
+    NICK dasdasdasd
+    NICK dasdasdasd
+    NICK
+    :ircCamel.localhost 431 dasdasdas :No nickname given
+    NICK aa
+    NICK aa
+
+    maybe remove this [just be sure to have >= 2 strings]
+        if (tokens.size() != 2) {
+        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NONICKNAMEGIVEN));
+        throw std::invalid_argument("");
+    }
 
 LimeChat :
     - Error sendMsg(): Socket operation on non-socket
