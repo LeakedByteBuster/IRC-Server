@@ -21,7 +21,7 @@ NICK :
 
     maybe remove this [just be sure to have >= 2 strings]
         if (tokens.size() != 2) {
-        Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NONICKNAMEGIVEN));
+        Server::sendMsg(clt, _ERR(clt.nickname, ERR_NONICKNAMEGIVEN));
         throw std::invalid_argument("");
     }
 
@@ -35,11 +35,11 @@ LimeChat :
 
 Server :
     - MSG_NOSIGNAL (SIGPIPE)
-
+`
 PASS 3
 NICK Doug00754
 USER hoba 0 * loba hoba douga
-
+`
 AFTER REGISTRATION :
     send 5 welcoming messages in userRegistration()
 

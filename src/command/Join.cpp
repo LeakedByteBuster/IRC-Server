@@ -28,16 +28,16 @@ std::vector<std::pair<std::string, std::string> >
     splited = splitByValue(commandList[0], ',');
     if (splited.empty()) {
         Server::sendMsg( clt,
-            Message::getJoinError( Channel(commandList[0]), clt, Message::ERR_BADCHANMASK));
+            JOIN_ERR( Channel(commandList[0]), clt, ERR_BADCHANMASK));
         return (tokens);
     }
     
     for (size_t i = 0; i < splited.size(); i++) {
-        if (!isChannelNameCorrect(splited[i])) {
+        if (!isChannelNameCorrect(splited[i]) || splited[i].size() > MAX_CHANNEL_NAME_LEN + 1) {
             if (i != 0)
                 error.append("\r\n");
             error.append(
-                Message::getJoinError( Channel(splited[i]), clt, Message::ERR_BADCHANMASK)
+                JOIN_ERR( Channel(splited[i]), clt, ERR_BADCHANMASK)
             );
             continue ;
         }
@@ -56,7 +56,6 @@ std::vector<std::pair<std::string, std::string> >
     }
     return (tokens);
 }
-
 
 /*
 While a user is joined to a channel, they receive all status messages 
@@ -77,14 +76,14 @@ void    join(Client &clt, std::vector<std::string> &command)
     command.erase(command.begin());
     if (command.empty()) {
         Server::sendMsg( clt,
-            Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
+            _ERR(clt.nickname, ERR_NEEDMOREPARAMS));
         return ;
     }
 
     if ((tmpChannels = parseJoinCommand(command, clt)).empty()) {
         return ;
     }
-    
+
     std::string id(tmpChannels[0].first);
     Server::ChannelsInServer.insert( std::make_pair ( id, Channel() ) );
     Server::ChannelsInServer[id].clientsInChannel[clt.fd] = clt;
@@ -93,14 +92,22 @@ void    join(Client &clt, std::vector<std::string> &command)
     //     std::cout << "tmpChan: " << tmpChannels[i].first << " " << tmpChannels[i].second << std::endl;
     // }
     // std::cerr << "{ " << Message::joinPostReply( Channel( id, ""), clt, "MODE" ) << " }" << std::endl;
-    
-    // Loop through vector to set varianles of each channel
-    // for (size_t i = 0; i < tmpChannels.size(); i++) {
-        // check if channel existed
-            // store channel
-            // store channel key
-            // send messages
-    // }
-
+    /*
+        for (size_t i = 0; i < tmpChannels.size(); i++) {
+            // if (channel exist) {
+                create channel
+                set ChannelsInServer
+                send Replies
+            } else if (channel not exist) {
+                if (isExisted)
+                    send Error
+                if (isInvite == 0 && isKey == 0)
+                    add client to channel
+                
+                send Replies to new client
+                Brodcast JOIN message to channel
+            }
+        }
+    */
     return ;
 }

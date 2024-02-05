@@ -102,7 +102,7 @@ std::string   Bot::botExecuter(std::string buff, const Client &)
                 //     break ;
 
                 // default:
-                //     ret = Message::getError(clt.nickname, Message::ERR_UNKNOWNCOMMAND);
+                //     ret = _ERR(clt.nickname, ERR_UNKNOWNCOMMAND);
                 //     break ;
                 }
             }

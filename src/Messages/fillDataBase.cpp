@@ -7,26 +7,26 @@
 // Sets the map in Message class to the specified static error message
 void    Message::setErrorsDatabase()
 {
-    Message::error_t    errorNumbers[ERRORS_SIZE] = {
-        Message::ERR_INCORRECT_PASS,    // 1
-        Message::ERR_NONICKNAMEGIVEN,   // 2
-        Message::ERR_ERRONEUSNICKNAME,  // 3
-        Message::ERR_ERRONEUSUSERNAME,  // 4
-        Message::ERR_NICKNAMEINUSE,     // 5
-        Message::ERR_NEEDMOREPARAMS,    // 6
-        Message::ERR_ALREADYREGISTRED,  // 7
-        Message::ERR_UNKNOWNCOMMAND,    // 8
-        Message::ERR_NOSUCHFILE,        // 9
-        Message::ERR_NOSUCHNICK,        // 10
-        Message::ERR_NOSUCHFILENAME,    // 11
-        Message::ERR_NOFILEFROMSENDER,  // 12
-        Message::ERR_NOTEXTTOSEND,      // 13
-        Message::ERR_NOSUCHCHANNEL,     // 14
-        Message::ERR_TOOMANYCHANNELS,   // 15
-        Message::ERR_CHANNELISFULL,     // 16
-        Message::ERR_INVITEONLYCHAN,    // 17
-        Message::ERR_BADCHANMASK        // 18
-        /* NOTICE: Change ERRORS_SIZE macro in Messages.hpp to the current size */
+    Message::error_t    errorNumbers[ERRORS_ENUM_SIZE] = {
+        ERR_INCORRECT_PASS,    // 1
+        ERR_NONICKNAMEGIVEN,   // 2
+        ERR_ERRONEUSNICKNAME,  // 3
+        ERR_ERRONEUSUSERNAME,  // 4
+        ERR_NICKNAMEINUSE,     // 5
+        ERR_NEEDMOREPARAMS,    // 6
+        ERR_ALREADYREGISTRED,  // 7
+        ERR_UNKNOWNCOMMAND,    // 8
+        ERR_NOSUCHFILE,        // 9
+        ERR_NOSUCHNICK,        // 10
+        ERR_NOSUCHFILENAME,    // 11
+        ERR_NOFILEFROMSENDER,  // 12
+        ERR_NOTEXTTOSEND,      // 13
+        ERR_NOSUCHCHANNEL,     // 14
+        ERR_TOOMANYCHANNELS,   // 15
+        ERR_CHANNELISFULL,     // 16
+        ERR_INVITEONLYCHAN,    // 17
+        ERR_BADCHANMASK        // 18
+        /* NOTICE: Change ERRORS_ENUM_SIZE macro in Messages.hpp to the current size */
     };
 
     const char * staticErrorsString[] = {
@@ -48,10 +48,10 @@ void    Message::setErrorsDatabase()
         , ":Cannot join channel (+l)"           // 16
         , ":Cannot join channel (+i)"           // 17
         , ":Invalid channel name"               // 18
-        /* NOTICE: Change ERRORS_SIZE macro in Messages.hpp to the current size */
+        /* NOTICE: Change ERRORS_ENUM_SIZE macro in Messages.hpp to the current size */
     };
     
-    for (int i = 0; i < ERRORS_SIZE; i++) {
+    for (int i = 0; i < ERRORS_ENUM_SIZE; i++) {
         ErrorsDatabase[errorNumbers[i]] = staticErrorsString[i];
     }
 

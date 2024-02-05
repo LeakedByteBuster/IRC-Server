@@ -1,7 +1,5 @@
-#include "Command.hpp"
 #include "Server.hpp"
 #include "Bot.hpp"
-#include "utils.hpp"
 #include "registrationCommands.hpp"
 #include "FTP.hpp"
 
@@ -39,7 +37,7 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
             break;
 
         case PASS_USER:
-            Server::sendMsg(clients[id], Message::getError(clients[id].nickname, Message::ERR_ALREADYREGISTRED));
+            Server::sendMsg(clients[id], _ERR(clients[id].nickname, ERR_ALREADYREGISTRED));
             break;
 
         case PRVMSG:
@@ -59,7 +57,7 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
             break;
 
         default:
-            Server::sendMsg(clients[id], Message::getError(clients[id].nickname, Message::ERR_UNKNOWNCOMMAND));
+            Server::sendMsg(clients[id], _ERR(clients[id].nickname, ERR_UNKNOWNCOMMAND));
             break;
         }
     }

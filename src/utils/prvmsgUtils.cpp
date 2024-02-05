@@ -17,14 +17,14 @@
 //                 }
 //                 else
 //                 {
-//                     Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_CANNOTSENDTOCHAN));
+//                     Server::sendMsg(clt, _ERR(clt.nickname, Message::ERR_CANNOTSENDTOCHAN));
 //                     return 0;
 //                 }
 //             }
 //         }
 //         if(it == channels.end())
 //         {
-//             Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NOSUCHNICK));
+//             Server::sendMsg(clt, _ERR(clt.nickname, ERR_NOSUCHNICK));
 //                 return 0;
 //         }
 //     }

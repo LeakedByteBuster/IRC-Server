@@ -21,7 +21,7 @@ const char *    Message::getStaticErrorMsg(const short type) {
 
 //  Returns a string that contain the error message :
 // :ircCamel.localhost <Error Number> <Client Nickname> :<error message>
-std::string Message::getError(const std::string &nick, short type)
+std::string _ERR(const std::string &nick, short type)
 {
     std::string error;
 
@@ -47,7 +47,7 @@ std::string Message::getError(const std::string &nick, short type)
 }
 
 //  Returns a string that contain the error message
-std::string Message::getJoinError(const Channel &ch, const Client &clt, short symbol)
+std::string JOIN_ERR(const Channel &ch, const Client &clt, short symbol)
 {
     std::string error;
 
