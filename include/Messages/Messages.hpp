@@ -3,7 +3,7 @@
 
 /*
     error number in ERR_NONICKNAMEGIVEN and ERR_ERRONEUSNICKNAME
-    should stay hard coded because of switch case in getError()
+    should stay hard coded because for switch case in getError()
 */
 #define FOR_LIST_OF_ERRORS(BUILD_ERROR) \
     BUILD_ERROR(Message::ERR_NOSUCHNICK,       133, \

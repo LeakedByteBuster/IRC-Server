@@ -7,9 +7,8 @@
 #include "Operator.hpp"
 
 struct	channelLimits {
-	// Max users that can connect to the channel
-	int	maxUsers;
-	int	nameLen;
+	int	usersLimit;
+	int	nameLimit; // max characters in channel name
 } ;
 
 class Channel : public ChannelModes, public channelLimits {
@@ -30,7 +29,7 @@ public:
 	
 	Channel();
 	Channel(const std::string name);
-	Channel(const std::string name, const std::string key, std::string topic, int maxUsers);
+	Channel(const std::string name, const std::string key, std::string topic, int usersLimit);
 	~Channel();
 
 	std::string getClientsInString();

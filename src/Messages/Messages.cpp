@@ -65,7 +65,7 @@ std::string Message::getJoinError(const Channel &ch, const Client &clt, short sy
         #undef BUILD_JOIN_ERROR
 
     default:
-        std::cerr << "Warning getError(): Unknown type: " << symbol << std::endl;
+        std::cerr << "Warning getJoinError(): Unknown type: " << symbol << std::endl;
     }
 
     return error;
