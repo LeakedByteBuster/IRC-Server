@@ -41,7 +41,7 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
             break;
 
         case PRVMSG:
-            // prv_msg(channels, commands, clients[id],clients);
+            prv_msg(Server::ChannelsInServer, commands, clients[id],clients);
             break ;
 
         case PONG: // ignore PONG
