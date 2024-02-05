@@ -65,11 +65,12 @@ Server::Server(std::string portNum, std::string password) : password(password), 
                                      static_cast<std::string>(strerror(errno)));
         }
 
-#if defined(LOG)
-        std::cout << geTime() << std::endl;
-        std::cout << "Canonical name : " << res->ai_canonname << std::endl;
-        serverWelcomeMessage(*(reinterpret_cast<sockaddr_in *>(res->ai_addr)), sfd);
-#endif // LOG
+        #if defined(LOG)
+            std::cout << geTime() << std::endl;
+            std::cout << "Canonical name : " 
+                << res->ai_canonname << std::endl;
+            serverWelcomeMessage( *( (sockaddr_in *)res->ai_addr ), sfd );
+        #endif // LOG
 
         check = 0;
         break;
@@ -77,7 +78,7 @@ Server::Server(std::string portNum, std::string password) : password(password), 
 
     freeaddrinfo(res0);
     if (check)
-        throw std::runtime_error("Error getaddrinfo");
+        throw std::runtime_error("Error getaddrinfo()");
     
     serverCreationDate = geTime();
     Message::setErrorsDatabase();
@@ -151,17 +152,9 @@ void Server::addNewPollfd(int fd, std::vector<struct pollfd> &fds, nfds_t &nfds)
 int Server::isPollReady(std::vector<struct pollfd> &fds, nfds_t &nfds)
 {
     int ret = 0;
-    if ((ret = poll(fds.data(), nfds, POLL_TIMEOUT)) == -1)
-    {
-        throw std::runtime_error("Error poll() : " +
-                                 static_cast<std::string>(strerror(errno)));
-    }
-    else if (ret > OPEN_MAX)
-    {
-        std::cerr
-            << "Warning poll() : max open files per process is reached"
-            << std::endl;
-        return (0);
+    if ((ret = poll(fds.data(), nfds, POLL_TIMEOUT)) == -1) {
+        throw std::runtime_error("Error poll() : "
+            + static_cast<std::string>(strerror(errno)));
     }
     return (ret);
 }
