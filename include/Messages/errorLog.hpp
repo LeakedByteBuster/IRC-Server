@@ -26,6 +26,7 @@
 #define ERR_INVITEONLYCHAN      Message::INVITEONLYCHAN
 #define ERR_BANNEDFROMCHAN      Message::BANNEDFROMCHAN
 #define ERR_BADCHANNELKEY       Message::BADCHANNELKEY
+// #define rplAwayMsg and call _ERR()
 
 /*
     error number in ERR_NONICKNAMEGIVEN and ERR_ERRONEUSNICKNAME

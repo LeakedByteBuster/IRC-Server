@@ -39,7 +39,7 @@ Channel::~Channel()
 }
 
 //  returns a string that contains all clients in the given channel
-std::string Channel::getClientsInString()
+std::string   Channel::getClientsInString() const 
 {
     std::string                   clients;
     std::string                   tmp;

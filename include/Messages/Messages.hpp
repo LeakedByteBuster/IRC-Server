@@ -19,8 +19,8 @@ class   Message;
 class   Channel;
 
 enum    s_types {
-    TYPE_USER, // used in newInChannelReply()
-    TYPE_SERVER, // used in newInChannelReply()
+    TYPE_USER, // used in getJoinReply()
+    TYPE_SERVER, // used in getJoinReply()
 };
 
 class   Message :  public ErrorTypesAndNumbers, public RepliesTypesAndNumbers {
@@ -41,8 +41,7 @@ public :
     
     static std::string  rplAwayMsg(Client &clt, std::string str);
     // sends replies  366, 353, JOIN reply and MODE reply
-    static std::string  newInChannelReply( const Channel &ch,
-        const Client &clt, const std::string command );
+    static std::string  getJoinReply( const Channel &ch, const Client &clt);
 
     // Sets the map in Message class to the specified static error message
     static void         setErrorsDatabase();
@@ -60,10 +59,10 @@ public :
 std::string  errorPrefix(const Client &clt, const std::string errNum);
 // <nick!~user><@><hostname>
 std::string  userPrefix(const Client &clt);
-//  <nick!~user><@><hostname>
-std::string  replyCommandPrefix(const Channel &ch, const Client &clt, const std::string command, int user_or_server);
 // <':'>< ircCamel.localhost / <nick!~user><@><hostname> > <command> <channel name>
 // prefix types : TYPE_SERVER, TYPE_USER
 std::string commandReply(const Channel &ch, const Client &clt, std::string command, int prefixType);
+// <':'><ircCamel.localhost> <symbol> <client Nickname> <channel name>
+std::string replyPrefix(const Channel &ch, const Client &clt, const std::string symbol);
 
 #endif // ERRORS_HPP

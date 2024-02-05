@@ -83,20 +83,14 @@ std::string JOIN_ERR(const Channel &ch, const Client &clt, short symbol)
         RPL_TOPIC and RPL_TOPICTIME numerics if the channel has a topic set (if the topic is not set, the user is sent no numerics).
         one or more RPL_NAMREPLY
 */
-std::string Message::newInChannelReply(const Channel &, const Client &, const std::string )
+std::string Message::getJoinReply(const Channel &ch, const Client &clt)
 {
-    // std::map<int, Client>       users;
-    // std::string                 clients;
-    // std::stringstream           ss;
-    
-    // // build up the message to sent
-    // ss << Message::RPL_NAMREPLY;
-    // std::string symbol = ss.str().c_str();
-
-    std::string reply;
-    //     commandReply()
-    // ); // "@" channel is public
-
+    std::string reply(
+        commandReply(ch, clt, "JOIN", TYPE_USER) + "\r\n"
+        + commandReply(ch, clt, "MODE", TYPE_SERVER) + " +Cnst" + "\r\n"
+        + ":" + SERVER_PREFIX + "353 " + clt.nickname + " @ " + ch.name + " :" + ch.getClientsInString() +"\r\n"
+        + replyPrefix(ch, clt, "366") + " :End of /NAMES list."
+    );
     return (reply);
 }
 

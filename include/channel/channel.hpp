@@ -32,7 +32,7 @@ public:
 	Channel(const std::string name, const std::string key, std::string topic, int usersLimit);
 	~Channel();
 
-	std::string getClientsInString();
+	std::string getClientsInString() const;
 };
 
 #endif // CHANNEL_HPP

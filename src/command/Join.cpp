@@ -79,15 +79,18 @@ void    join(Client &clt, std::vector<std::string> &command)
             _ERR(clt.nickname, ERR_NEEDMOREPARAMS));
         return ;
     }
+    if ((tmpChannels = parseJoinCommand(command, clt)).empty()) { return ; }
 
-    if ((tmpChannels = parseJoinCommand(command, clt)).empty()) {
-        return ;
-    }
-
+    clt.isOperator = 1;
     std::string id(tmpChannels[0].first);
-    Server::ChannelsInServer.insert( std::make_pair ( id, Channel() ) );
+    Server::ChannelsInServer.insert( std::make_pair ( id, Channel(command[0]) ) );
     Server::ChannelsInServer[id].clientsInChannel[clt.fd] = clt;
 
+    Server::sendMsg(clt, Message::getJoinReply(Server::ChannelsInServer[id], clt));
+    
+    std::cerr << Message::getJoinReply(Server::ChannelsInServer[id], clt);
+    std::cerr.flush();
+    
     // for (size_t i = 0; i < tmpChannels.size(); i++) {
     //     std::cout << "tmpChan: " << tmpChannels[i].first << " " << tmpChannels[i].second << std::endl;
     // }
