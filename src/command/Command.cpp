@@ -562,21 +562,9 @@ void creat_file(Client clt, std ::string sender, std ::string filename)
     clt.Files.clear();
 }
 
-int search_msg(std::vector<std::string> command)
-{
-    int i = 0;
-    std::vector<std::string>::iterator it = command.begin();
-    for(; it != command.end();it++)
-    {
-        if(it->find(":") != std::string::npos)
-        {
-            return(i);
-        }
-        i++;
-    }
-    return(0);
-}
 
+
+// search two points in last argument 
 int check_text_msg(std ::string msg)
 {
     int two_point = std::count(msg.begin(),msg.end(),':');
@@ -600,6 +588,8 @@ void prv_msg(std::map<std::string,channel> &channels, std::vector<std ::string> 
     check_targets(channels,command,client_and_channels,clt,clients);
 }
 
+
+// append all msg argument on command in single string
 std :: string compile_msg(std::vector<std::string> commands,int position)
 {
     std :: string first = commands[position];
@@ -621,6 +611,8 @@ std :: string compile_msg(std::vector<std::string> commands,int position)
     }
     return(msg);
 }
+
+// parse the second argument of command (split channel and client)
 std::vector<std::string> parse_such(std::string str)
 {
     std::stringstream virgule(str);
@@ -640,27 +632,30 @@ void check_targets(std::map<std::string,channel> channelsinserver, std::vector<s
     std :: string msg = compile_msg(command,2);
     for(size_t i = 0; i < params.size();i++)
     {
+        // case of channel
         if(params[i].find('#') == 0)
         {
+            // check channel if it's on server 
             int id = check_channel(channelsinserver,params[i],clt);
+            //channel not found 
             if(!id)
             {
                 Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NOSUCHNICK));
                 return;
             }
-            else if(id == 2)
+            else if(id == 2) // channel found and the sender is a member on it
             {
                 std::map<std::string,channel>::iterator it = channelsinserver.find(params[i]);
                 sendMsg_to_channel(it->first,channelsinserver,msg,clt);
                 return;
             }
-            else
+            else // the channel found but the sender is not member on it
             {
                 Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_CANNOTSENDTOCHAN));
                 return;
             }
         }
-        else
+        else // case is an other client
         {
             int id = search_a_client(clients,params[i]);
             if(id)
@@ -708,17 +703,24 @@ const char *getDownMsg()
 
 //":" + senderNick + "!~" + senderUsername + "@" + senderHostname + " PRIVMSG " + receiver + " :" + message + "\r\n"
 void sendPrvmsg(Client sender,std::string str,Client recv)
-{
+{ 
+    // append user prefix for limechat 
     std::string msg = getId(sender);
     msg.append(" PRIVMSG " + recv.nickname + " " + str);
+
     Server::sendMsg(recv, msg);
+
+    // send rply to client 
     Server::sendMsg(sender, Message::rplAwayMsg(sender, msg));
 }
 
 int check_channel(std::map<std::string,channel> channles_server,std::string channel_name,Client clt)
 {
+
+    // check the channel if it's on server
     if (check_existed_channel(channles_server,channel_name))
     {
+        // check the sender (client) is a membre on channe; 
        if(is_client_in_channel(channel_name,channles_server,clt.nickname))
        {
             return(2);
