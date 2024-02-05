@@ -2,11 +2,12 @@
 
 bool    isChannelNameCorrect(std::string name)
 {
-    std::string specials = " ,\a\r\n\0";
     // disables leaving all channels : (name.compare("0") == 0)
-    if (name[0] != '#' || name.compare("0") == 0) {
+    if (name.empty() || name[0] != '#' || name.compare("0") == 0) {
         return (0);
     }
+    
+    std::string specials = " ,\a\r\n\0";
     for (size_t i = 0; i < specials.size(); i++) {
         if (name.find(specials[i]) != std::string::npos) {
             return (0);
@@ -15,38 +16,44 @@ bool    isChannelNameCorrect(std::string name)
     return (1);
 }
 
+#define UUUID 656
 std::vector<std::pair<std::string, std::string> >
-    parseJoinCommand(std::vector<std::string> &strList, const Client &clt)
+    parseJoinCommand(std::vector<std::string> &commandList, const Client &clt)
 {
     // pair<channel name, channel password>
     std::vector<std::pair<std::string, std::string> >   tokens;
     std::vector<std::string>                            splited;
+    std::string                                         error;
 
-    // skip first argument "join"
-    strList.erase(strList.begin());
-
-    if (strList.size() >= 1) {
-        
-        splited = splitByValue(strList[0], ',');
-        for (size_t i = 0; i < splited.size(); i++) {
-            if (!isChannelNameCorrect(splited[i])) {
-                Server::sendMsg( clt,
-                    Message::getJoinError( Channel(splited[i]), clt,
-                        Message::ERR_BADCHANMASK));
-                continue ;
-            }
-            tokens.push_back(std::make_pair(splited[i], ""));
+    splited = splitByValue(commandList[0], ',');
+    if (splited.empty()) {
+        Server::sendMsg( clt,
+            Message::getJoinError( Channel(commandList[0]), clt, Message::ERR_BADCHANMASK));
+        return (tokens);
+    }
+    
+    for (size_t i = 0; i < splited.size(); i++) {
+        if (!isChannelNameCorrect(splited[i])) {
+            if (i != 0)
+                error.append("\r\n");
+            error.append(
+                Message::getJoinError( Channel(splited[i]), clt, Message::ERR_BADCHANMASK)
+            );
+            continue ;
         }
+        tokens.push_back(std::make_pair(splited[i], ""));
+    }
 
-        if (strList.size() >= 2) {
-            std::vector<std::string>    passwords = splitByValue(strList[1], ',');
-            for (size_t i = 0; (i < passwords.size()) && (i < tokens.size()); i++) {
-                tokens[i].second = passwords[i];
-            }
+    if (commandList.size() >= 2) {
+        std::vector<std::string>    passwords = splitByValue(commandList[1], ',');
+        for (size_t i = 0; (i < passwords.size()) && (i < tokens.size()); i++) {
+            tokens[i].second = passwords[i];
         }
     }
-    if (strList.empty()) // string given is empty
-        tokens.push_back(std::make_pair("#", ""));
+
+    if (!error.empty()) {
+        Server::sendMsg( clt, error );
+    }
     return (tokens);
 }
 
@@ -66,22 +73,25 @@ void    join(Client &clt, std::vector<std::string> &command)
 {
     // pair<channel name, channel key>
     std::vector<std::pair<std::string, std::string> >   tmpChannels;
-
-
-    std::cout << "here 1 " << std::endl;
-    tmpChannels = parseJoinCommand(command, clt);
-    if (tmpChannels.empty())
+    // skip first argument "join"
+    command.erase(command.begin());
+    if (command.empty()) {
+        Server::sendMsg( clt,
+            Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
         return ;
-    for (size_t i = 0; i < tmpChannels.size(); i++) {
-        std::cout << "tmpChan: " << tmpChannels[i].first << " " << tmpChannels[i].second << std::endl;
     }
+
+    if ((tmpChannels = parseJoinCommand(command, clt)).empty()) {
+        return ;
+    }
+    
     std::string id(tmpChannels[0].first);
-
     Server::ChannelsInServer.insert( std::make_pair ( id, Channel() ) );
-
     Server::ChannelsInServer[id].clientsInChannel[clt.fd] = clt;
-    std::cout << "PP:" <<  Server::ChannelsInServer[id].getClientsInString() << std::endl;
 
+    // for (size_t i = 0; i < tmpChannels.size(); i++) {
+    //     std::cout << "tmpChan: " << tmpChannels[i].first << " " << tmpChannels[i].second << std::endl;
+    // }
     // std::cerr << "{ " << Message::joinPostReply( Channel( id, ""), clt, "MODE" ) << " }" << std::endl;
     
     // Loop through vector to set varianles of each channel
