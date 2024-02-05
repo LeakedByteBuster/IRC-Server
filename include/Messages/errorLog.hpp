@@ -1,6 +1,17 @@
 #if !defined(ERRORLOG_HPP)
 #define ERRORLOG_HPP
 
+/*
+    TO SET NO STATIC PART OF YOUR MESSAGE : <SERVER_PRIFIX> <symbol from ErrorTypesAndNumbers> .... <static error>:
+        1 - Add an error number to the enum struct "ErrorTypesAndNumbers"
+        2 - Define it like this below : "#define ERR_BADCHANMASK         Message::BADCHANMASK"
+        3 - Add it to the macro FOR_LIST_OF_ERRORS [Don't forget to add '\', but not for last line]
+        4 - Add static error message to  "void    Message::setErrorsDatabase()", i.e
+            [add symbol to errorNumbers, static string, and set macro ERRORS_ENUM_SIZE]
+
+*/
+
+
 // shortcut for using Message::getError() method
 #define _ERR        Message::getError
 // shortcut for using Message::getJoinError() method
