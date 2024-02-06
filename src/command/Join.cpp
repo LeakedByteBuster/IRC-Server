@@ -7,7 +7,7 @@ bool    isChannelNameCorrect(std::string name)
         return (0);
     }
     
-    std::string specials = " ,\a\r\n\0";
+    std::string specials = " \a\r\n\0";
     for (size_t i = 0; i < specials.size(); i++) {
         if (name.find(specials[i]) != std::string::npos) {
             return (0);
@@ -53,11 +53,11 @@ std::vector<std::pair<std::string, std::string> >
     return (tokens);
 }
 
-bool    tryInsert(std::map<std::string, Channel> &map, const std::string &name, const std::string key)
+bool    tryInsert(const std::string &name, const std::string key)
 {
     std::pair<std::map<std::string, Channel>::iterator, bool>    it;
     
-    it = map.insert(std::make_pair(name, Channel(name, key, "", 25)));
+    it = Server::ChannelsInServer.insert(std::make_pair(name, Channel(name, key, "", USERS_CHANNEL_LIMIT)));
     return ((it.second == 1) ? 1 : 0);
 }
 
@@ -85,19 +85,15 @@ void    join(Client &clt, std::vector<std::string> &command)
     for (size_t i = 0; i < input.size(); i++) {
         std::string name = input[i].first;
         std::string key = input[i].second;
-        // should return an error in tryInsert
-        if ( tryInsert(Server::ChannelsInServer, name, key) ) {
+
+        if ( tryInsert(name, key) ) {
 
             Channel &ch = Server::ChannelsInServer[name];
+            
             if ( !key.empty() ) { ch.isKey = 1; }
-            // set key of the channel
-            // set Channel modes
-
             clt.isOperator = 1; // set clt as an operator
             //  insert clt in channel's client map
             ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
-
-            // send reply
             Server::sendMsg(clt, Message::getJoinReply(ch, clt));
             continue ;
         }
@@ -107,21 +103,24 @@ void    join(Client &clt, std::vector<std::string> &command)
         if (ch.isKey && (ch.getKey().compare(key) != 0)) { Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_BADCHANNELKEY)); continue ; }
         if (ch.isInviteOnly) { Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_INVITEONLYCHAN)); continue ; }
 
+        clt.isOperator = 0; // reInitialize it to zero
         ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
         Server::sendMsg(clt, Message::getJoinReply(ch, clt));
-
-        std::cout <<  "clients: " << ch.getClientsInString() << std::endl; // ....
+        /* BroadCast message */
+        Server::sendMsg(ch, clt, ":" + userPrefix(clt) + " JOIN :" + ch.name); //S <-   :alice!a@localhost JOIN :#irctoast
+        
+        // std::cout <<  "clients: " << ch.getClientsInString() << std::endl; // ....
 
 }
     
     
-    for (size_t i = 0; i< input.size(); i++) {
-        std::cout << input[i].first << " | " << input[i].second << std::endl;
-    }
+    // for (size_t i = 0; i< input.size(); i++) {
+    //     std::cout << input[i].first << " | " << input[i].second << std::endl;
+    // }
 
-    std::__1::map<std::__1::string, Channel>::iterator it = Server::ChannelsInServer.begin();
-    for (; it != Server::ChannelsInServer.end(); it++)
-        std::cout << "key: " << it->first << " || ch: " << it->second.name << " - ch.key: " << it->second.getKey() << std::endl;
+    // std::__1::map<std::__1::string, Channel>::iterator it = Server::ChannelsInServer.begin();
+    // for (; it != Server::ChannelsInServer.end(); it++)
+    //     std::cout << "key: " << it->first << " || ch: " << it->second.name << " - ch.key: " << it->second.getKey() << std::endl;
 
     return ;
 }

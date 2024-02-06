@@ -1,41 +1,23 @@
 #include "channel.hpp"
 
-Channel::Channel()
-    : key(""), topic(""), name("")
+Channel::Channel() : ChannelModes(USERS_CHANNEL_LIMIT, 0)
+    , key(""), topic(""), name("")
 {
-    usersLimit = 25;
-
-    isInviteOnly = 0;
-    isUsersLimit = 0;
-    isTopic = 0;
-    isKey = 0;
 }
 
-Channel::Channel(const std::string name)
-    : key(""), topic(""), name(name)
+Channel::Channel(const std::string name) : ChannelModes(USERS_CHANNEL_LIMIT, 0)
+    , key(""), topic(""), name(name)
 {
-    usersLimit = 25;
-
-    isInviteOnly = 0;
-    isUsersLimit = 0;
-    isTopic = 0;
-    isKey = 0;
 }
 
 Channel::Channel(const std::string name, const std::string key, std::string topic, int usersLimit)
-    : key(key), topic(topic), name(name)
+    : ChannelModes( usersLimit, !key.empty() ? 1 : 0 ), key(key), topic(topic), name(name)
 {
     this->usersLimit = usersLimit;
-
-    isInviteOnly = 0;
-    isUsersLimit = 0;
-    isTopic = 0;
-    isKey = ( !key.empty() ? 1 : 0);
 }
 
 Channel::~Channel()
 {
-
 }
 
 const std::string	& Channel::getKey() const {

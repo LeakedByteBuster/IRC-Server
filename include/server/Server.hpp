@@ -59,9 +59,11 @@ public :
     //      parse NICK, USER, PASS and, Registers the new client
     void    userRegistration(int fd, std::vector<std::string> string);
     //      Sends a message to a specific client
-    static void    sendMsg(const Client &target, std::string msg);
+    static void    sendMsg(const Client &clt, std::string msg);
     //      Sends a message to a specific channel
-    static void    sendMsg(const Channel &target, std::string msg);
+    static void    sendMsg(const Channel &ch, std::string msg);
+    //      Sends a message to a specific channel
+    static void    sendMsg(const Channel &ch, const Client &except, std::string msg);
     //          Sends 001, 002, 003, 004 messages
     std::string postRegistration(const Client &clt);
 

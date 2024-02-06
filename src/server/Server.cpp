@@ -311,3 +311,14 @@ void    Server::sendMsg(const Channel &ch, std::string msg)
         Server::sendMsg(it->second, msg);
     }
 }
+
+void    Server::sendMsg(const Channel &ch, const Client &except, std::string msg)
+{
+    const std::map<int, Client> &clts = ch.clientsInChannel;
+    std::map<int, Client>::const_iterator it = clts.begin();
+
+    for (; it != clts.end(); it++) {
+        if (it->second.fd != except.fd)
+            Server::sendMsg(it->second, msg);
+    }
+}
