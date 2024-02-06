@@ -46,6 +46,8 @@ public :
     // Returns the error string stored at index 'type' in ErrorsDatabase map
     static const char   *getStaticErrorMsg(const short type);
 
+
+
 } ;
 
 /* -------------------------------------------------------------------------- */
@@ -62,5 +64,8 @@ std::string  userPrefix(const Client &clt);
 std::string commandReply(const Channel &ch, const Client &clt, std::string command, int prefixType);
 // <':'><ircCamel.localhost> <symbol> <client Nickname> <channel name>
 std::string replyPrefix(const Channel &ch, const Client &clt, const std::string symbol);
+// std::string commandReply2( <sender> , <reciever> , <message>) 
+// it's same of replyPrefix but change channle with reciever
+std::string privmsgReply(const Client &sender , const Client &recv ,  const std::string &msg);
 
 #endif // ERRORS_HPP

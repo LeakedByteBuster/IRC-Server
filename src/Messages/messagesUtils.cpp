@@ -42,6 +42,8 @@ std::string commandReply(const Channel &ch, const Client &clt, std::string comma
     return (rpl);
 }
 
+
+
 /* -------------------------------------------------------------------------- */
 /*                       Static Error Messages Database                       */
 /* -------------------------------------------------------------------------- */
@@ -73,7 +75,8 @@ void    Message::setErrorsDatabase()
         // ERR_CHANOPRIVSNEEDED,   // 19
         // ERR_USERNOTINCHANNEL,   // 20
         // ERR_NOTONCHANNEL        // 21
-        ERR_BADCHANNELKEY       // 22
+        ERR_CANNOTSENDTOCHAN,    // 22
+        ERR_BADCHANNELKEY       // 23
 
         /* NOTICE: Change ERRORS_ENUM_SIZE macro in Messages.hpp to the current size */
     };
@@ -100,9 +103,8 @@ void    Message::setErrorsDatabase()
         // , ":You're not channel operator"     // 19 
         // , ":They aren't on that channel"     // 20
         // , ":You're not on that channel"      // 21
-        , ":Cannot join channel (+k) - bad key" // 22
-
-
+        , ":Cannot send to channel"             // 22
+        , ":Cannot join channel (+k) - bad key" // 23
         /* NOTICE: Change ERRORS_ENUM_SIZE macro in Messages.hpp to the current size */
     };
     
