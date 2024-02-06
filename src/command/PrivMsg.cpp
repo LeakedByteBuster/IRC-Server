@@ -32,12 +32,9 @@ void check_targets(std::vector<std::string> command , std::vector<std::string> p
         {
             //check if name of channle come with operator prefix
             Operator = params[i].find("@") == 0 ? true : false;
-            if(Operator)
-                Chnl_name = params[i].substr(1,params[i].size());
-            
+            Chnl_name = Operator ? params[i].substr(1,params[i].size()) : params[i];
             // check channel if it's on server
             int id = check_channel(Server::ChannelsInServer , Chnl_name,clt);
-
 
             if(!id) // Channel Not found
             {
@@ -51,7 +48,6 @@ void check_targets(std::vector<std::string> command , std::vector<std::string> p
                 if(it != Server::ChannelsInServer.end()){
 
                     msg = commandReply(it->second , clt , msg , TYPE_USER);
-
                     Detrm_Dest_Msg(it->second , msg , Operator);
                 }
                 else{
@@ -71,6 +67,8 @@ void check_targets(std::vector<std::string> command , std::vector<std::string> p
             int id = search_a_client(clients,params[i]);
             if(id)
             {
+                std :: cout << "Client :"<<id<<std::endl;
+                
                 std::map<int,Client>::iterator it = clients.find(id);
                 sendPrvmsg(clt , msg , it->second);
                 // send Massege to client;
@@ -100,10 +98,7 @@ void Detrm_Dest_Msg(Channel ChnlDest , std::string Msg,bool Operator)
     }
     else
     {
-        for(; it != ChnlDest.clientsInChannel.end(); it++)
-        {
-                Server::sendMsg(it->second,Msg);
-        }
+      Server::sendMsg(ChnlDest,Msg);
     }
 }
 
