@@ -67,7 +67,11 @@ void    Message::setErrorsDatabase()
         ERR_TOOMANYCHANNELS,   // 15
         ERR_CHANNELISFULL,     // 16
         ERR_INVITEONLYCHAN,    // 17
-        ERR_BADCHANMASK        // 18
+        ERR_BADCHANMASK,       // 18
+        ERR_CHANOPRIVSNEEDED,  // 19
+        ERR_USERNOTINCHANNEL,  // 20
+        ERR_NOTONCHANNEL    // 21
+
         /* NOTICE: Change ERRORS_ENUM_SIZE macro in Messages.hpp to the current size */
     };
 
@@ -90,6 +94,14 @@ void    Message::setErrorsDatabase()
         , ":Cannot join channel (+l)"           // 16
         , ":Cannot join channel (+i)"           // 17
         , ":Invalid channel name"               // 18
+        , ":You're not channel operator"        // 19 
+        , ":They aren't on that channel"          // 20
+        , ":You're not on that channel"         // 21
+
+
+
+
+
         /* NOTICE: Change ERRORS_ENUM_SIZE macro in Messages.hpp to the current size */
     };
     

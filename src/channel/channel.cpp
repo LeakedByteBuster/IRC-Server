@@ -58,3 +58,17 @@ std::string   Channel::getClientsInString() const
 
     return (clients);
 }
+
+//  returns a string that contains all clients in the given channel
+std::string   Channel::getUsersInString() const 
+{
+    std::string                   clients;
+    std::map<int, Client>::const_iterator it = clientsInChannel.begin();
+
+    for (; it != clientsInChannel.end(); it++) {
+        clients.append(it->second.nickname + " ");
+    }
+
+    return (clients);
+}
+

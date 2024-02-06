@@ -4,7 +4,7 @@
 #define SERVER_PREFIX           "ircCamel.localhost "
 #define SERVER_VERSION          "ircCamel 1.0"
 
-#define ERRORS_ENUM_SIZE             18 // used in fillDataBase()
+#define ERRORS_ENUM_SIZE            21 // used in fillDataBase()
 
 #define MAX_CHANNEL_NAME_LEN    200
 #define MAX_CHANNELS_PER_USER   10

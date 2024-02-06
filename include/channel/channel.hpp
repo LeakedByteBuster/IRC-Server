@@ -32,6 +32,7 @@ public:
 	Channel(const std::string name, const std::string key, std::string topic, int usersLimit);
 	~Channel();
 
+	std::string getUsersInString() const ;
 	std::string getClientsInString() const;
 };
 

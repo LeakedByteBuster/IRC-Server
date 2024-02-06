@@ -37,6 +37,9 @@
 #define ERR_INVITEONLYCHAN      Message::INVITEONLYCHAN
 #define ERR_BANNEDFROMCHAN      Message::BANNEDFROMCHAN
 #define ERR_BADCHANNELKEY       Message::BADCHANNELKEY
+#define ERR_CHANOPRIVSNEEDED    Message::CHANOPRIVSNEEDED
+#define ERR_USERNOTINCHANNEL    Message::USERNOTINCHANNEL 
+#define ERR_NOTONCHANNEL        Message::NOTONCHANNEL
 // #define rplAwayMsg and call _ERR()
 
 /*
@@ -56,12 +59,18 @@
         getStaticErrorMsg(ERR_ERRONEUSNICKNAME)) \
     BUILD_ERROR(ERR_NICKNAMEINUSE,    433, \
         getStaticErrorMsg(ERR_NICKNAMEINUSE)) \
+    BUILD_ERROR(ERR_USERNOTINCHANNEL,   441, \
+        getStaticErrorMsg(ERR_USERNOTINCHANNEL))\
+    BUILD_ERROR(ERR_NOTONCHANNEL,   442, \
+        getStaticErrorMsg(ERR_NOTONCHANNEL))\
     BUILD_ERROR(ERR_NEEDMOREPARAMS,   461, \
         getStaticErrorMsg(ERR_NEEDMOREPARAMS)) \
     BUILD_ERROR(ERR_ALREADYREGISTRED, 462, \
         getStaticErrorMsg(ERR_ALREADYREGISTRED)) \
     BUILD_ERROR(ERR_INCORRECT_PASS,   464, \
         getStaticErrorMsg(ERR_INCORRECT_PASS)) \
+    BUILD_ERROR(ERR_CHANOPRIVSNEEDED,   482, \
+        getStaticErrorMsg(ERR_CHANOPRIVSNEEDED))\
     BUILD_ERROR(ERR_NOFILEFROMSENDER, 1335, \
         getStaticErrorMsg(ERR_NOFILEFROMSENDER)) \
     BUILD_ERROR(ERR_NOSUCHFILE,       1336, \
@@ -120,7 +129,15 @@ struct  ErrorTypesAndNumbers {
         BANNEDFROMCHAN = 474,   // "<client> <channel> :Cannot join channel (+b)"
         BADCHANNELKEY = 475,    // "<client> <channel> :Cannot join channel (+k)"
         BADCHANMASK = 476,      // "<client> <channel> :Invalid channel name"
-
+    /* -------------------------------------------------------------------------- */
+    /*                                Kick Errors                                 */
+    /* -------------------------------------------------------------------------- */
+        CHANOPRIVSNEEDED = 482, //"<client> <channel> :You're not channel operator"
+        USERNOTINCHANNEL = 441, //  "<client> <nick> <channel> :They aren't on that channel"
+        NOTONCHANNEL     = 442  // "<client> <channel> :You're not on that channel"
+    
+    
+    
         // ERR_ERR_TOOMANYTARGETS = 407,
         // ERR_ERR_UNAVAILRESOURCE = 15
 

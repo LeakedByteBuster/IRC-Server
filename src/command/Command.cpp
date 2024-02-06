@@ -40,9 +40,7 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
             Server::sendMsg(clients[id], _ERR(clients[id].nickname, ERR_ALREADYREGISTRED));
             break;
 
-        case PRVMSG:
-            prv_msg(Server::ChannelsInServer, commands, clients[id],clients);
-            break ;
+        // case PRVMSG:K
 
         case PONG: // ignore PONG
             break;
@@ -50,7 +48,10 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
         case JOIN: // join Command
             join(clients[id], commands);
             break;
-        
+
+        case KICK: // kick command
+            Operator::kick(clients[id], commands);    
+            break;
         case IRCBOT : // bot (time)
             // needs privmsg to be refractored after
             // Server::sendMsg(clients[id], Bot::botExecuter(commands[0], clients[id]));

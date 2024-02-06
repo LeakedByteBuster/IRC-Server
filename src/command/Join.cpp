@@ -50,7 +50,6 @@ std::vector<std::pair<std::string, std::string> >
             tokens[i].second = passwords[i];
         }
     }
-
     if (!error.empty()) {
         Server::sendMsg( clt, error );
     }

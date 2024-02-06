@@ -161,7 +161,10 @@ int whichCommand(const std::string &first_argument)
             + (first_argument.compare("/WHOAMI") == 0)  * WHOAMI \
             
             + (first_argument.compare("join") == 0 ||
-                first_argument.compare("JOIN") == 0)  * JOIN;
+                first_argument.compare("JOIN") == 0)  * JOIN 
+
+            + (first_argument.compare("kick") == 0 ||
+                first_argument.compare("KICK") == 0)  * KICK;
     return (ret);
 }
 
