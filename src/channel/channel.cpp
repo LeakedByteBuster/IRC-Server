@@ -30,7 +30,7 @@ Channel::Channel(const std::string name, const std::string key, std::string topi
     isInviteOnly = 0;
     isUsersLimit = 0;
     isTopic = 0;
-    isKey = 0;
+    isKey = ( !key.empty() ? 1 : 0);
 }
 
 Channel::~Channel()
@@ -38,6 +38,9 @@ Channel::~Channel()
 
 }
 
+const std::string	& Channel::getKey() const {
+    return (this->key);
+}
 //  returns a string that contains all clients in the given channel
 std::string   Channel::getClientsInString() const 
 {

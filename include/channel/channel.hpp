@@ -33,6 +33,7 @@ public:
 	~Channel();
 
 	std::string getClientsInString() const;
+	const std::string	&getKey() const ;
 };
 
 #endif // CHANNEL_HPP

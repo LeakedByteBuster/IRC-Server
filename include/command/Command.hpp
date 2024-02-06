@@ -40,7 +40,7 @@ const char *                getDownMsg(void);
 void                        join(Client &clt, std::vector<std::string> &command);
 
 // PRVMSG 
-void                        prv_msg(std::map<std::string,Channel> &channels,std::vector<std :: string>command,Client clt,std::map<int,Client> Clients);
+// void                        prv_msg(std::map<std::string,Channel> &channels,std::vector<std :: string>command,Client clt,std::map<int,Client> Clients);
 // void                        check_targets(std::map<int,channel> channels,std::vector<std::string>commmand,Client clt,size_t position,std::map<int,Client> clients);
 // int                        search_in_channels(std::map<int,channel> channels,std::string name,Client clt);
 // int                        search_client_inChannel(Client clt,channel channel);

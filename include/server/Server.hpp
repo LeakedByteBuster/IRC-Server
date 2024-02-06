@@ -33,10 +33,10 @@
 class   Server {
 
 public :
+    static std::map<std::string, Channel>   ChannelsInServer; // all channels
     //  list of clients connected to the server || Nickname, Client class
-    std::map<int, Client>           clients; 
-    std::string                     serverCreationDate;
-    static std::map<std::string, Channel>  ChannelsInServer; // all channels
+    std::map<int, Client>                   clients; 
+    std::string                             serverCreationDate;
 
     //	creates a TCP, IPv4, Passive socket
     Server(std::string portNum, std::string password);
@@ -77,5 +77,18 @@ private :
     // make class command a friend to server class to get client id from class command
     friend class command;
 };
+
+// template<typename T, typename Key>
+// class Finder {
+
+// public :
+//     typedef typename T::iterator iterator;
+
+//     static bool  &findIn(T c, Key k) {
+//         iterator it = c.find(k);
+//         return ((it != c.end()) ? 1 : 0);
+//     }
+
+// };
 
 #endif // SERVER_HPP
