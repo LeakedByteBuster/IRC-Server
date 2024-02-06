@@ -2,23 +2,6 @@
 #include "FTP.hpp"
 #include "Messages.hpp"
 
-// search for a client by his nickname
-int search_a_client(std::map<int,Client> clients, std ::string NickName)
-{
-    if(clients.empty())
-    {
-        return(0);
-    }
-        std::map<int, Client>::iterator it = clients.begin();
-        for (; it != clients.end(); it++)
-        {
-            if (it->second.nickname.compare(NickName) == 0)
-            {
-                return (it->second.fd);
-            }
-        }
-    return (0);
-}
 
 int search_a_file(Client clt, std ::string sender)
 {

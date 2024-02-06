@@ -42,9 +42,13 @@ std::string commandReply(const Channel &ch, const Client &clt, std::string comma
     return (rpl);
 }
 
+
+
 /* -------------------------------------------------------------------------- */
 /*                       Static Error Messages Database                       */
 /* -------------------------------------------------------------------------- */
+
+#define ERRORS_ENUM_SIZE             19 // used in fillDataBase()
 
 // Sets the map in Message class to the specified static error message
 void    Message::setErrorsDatabase()
@@ -67,7 +71,8 @@ void    Message::setErrorsDatabase()
         ERR_TOOMANYCHANNELS,   // 15
         ERR_CHANNELISFULL,     // 16
         ERR_INVITEONLYCHAN,    // 17
-        ERR_BADCHANMASK        // 18
+        ERR_BADCHANMASK,        // 18
+        ERR_CANNOTSENDTOCHAN   // 19
         /* NOTICE: Change ERRORS_ENUM_SIZE macro in Messages.hpp to the current size */
     };
 
@@ -90,6 +95,7 @@ void    Message::setErrorsDatabase()
         , ":Cannot join channel (+l)"           // 16
         , ":Cannot join channel (+i)"           // 17
         , ":Invalid channel name"               // 18
+        , ":Cannot send to channel"             // 19
         /* NOTICE: Change ERRORS_ENUM_SIZE macro in Messages.hpp to the current size */
     };
     

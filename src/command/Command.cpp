@@ -41,7 +41,7 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
             break;
 
         case PRVMSG:
-            prv_msg(Server::ChannelsInServer, commands, clients[id],clients);
+            prv_msg(commands, clients[id],clients);
             break ;
 
         case PONG: // ignore PONG
@@ -89,12 +89,4 @@ const char *getDownMsg()
         "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣤⣤⣀⣀⣀⣀⠀⠀⠀⠀⣿⣿⣿⣿\n"
         "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n";
     return (Down);
-}
-
-void sendPrvmsg(Client sender,std::string str,Client recv)
-{
-    std::string msg = sender.nickname + " PRVMSG " + recv.nickname;
-    msg.append(" " + str);
-    Server::sendMsg(recv,msg);
-    Message::rplAwayMsg(sender,msg); 
 }
