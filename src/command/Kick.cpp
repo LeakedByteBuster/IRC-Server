@@ -22,17 +22,22 @@ bool clientIsOnChannel (std::string channelName,int fd)
     return (0);
 }
 
+Channel  getChannnel (std::string name)
+{
+     std::map<std::string, Channel>  :: iterator it = Server::ChannelsInServer.find(name);
+    if (it == Server::ChannelsInServer.end ())
+        return (it->second);
+    return Channel ();
+}
+
 bool UserInChannel(std::string name,std::string channelName)
 {
-    if (channelFound (channelName))
+    std::map<std::string, Channel> ::iterator iter = Server::ChannelsInServer.find(channelName);
+    if (iter!= Server::ChannelsInServer.end ())
     {
-        std::string str  = Server::ChannelsInServer[channelName].getClientsInString();
-        std::cout << "str >>>> " << str << " ";
-        std::vector<std::string> tokens = splitByValue(str, ' ');
-        for (size_t i=0 ; i < tokens.size () ; i ++)
-        {
-        std::cout << "vector  >>> " << tokens[i]  << " ";
-        }
+        std::string str  = iter->second.getUsersInString();
+        std::cout << "str --->" << str << std::endl ;
+        std::vector<std::string> tokens = splitBySpace(str);
         std::vector<std::string> ::iterator it;
         it  = std::find(tokens.begin () ,tokens.end(),name);
         if (it != tokens.end())
@@ -44,6 +49,8 @@ bool UserInChannel(std::string name,std::string channelName)
 void    Operator::kick(Client &clt, std::vector<std::string> &command)
 {
      // skip first argument "kick"
+    std::vector<std::string>   splited = splitBySpace(command[0]);
+
     command.erase(command.begin());
     if (command.empty()) 
     {
@@ -56,6 +63,12 @@ void    Operator::kick(Client &clt, std::vector<std::string> &command)
          Server::sendMsg( clt, JOIN_ERR(command[0],clt, ERR_BADCHANMASK));
         return ;
     }
+    // //check if user is on channel
+    if (!clientIsOnChannel(command[0],clt.fd))
+    {
+         Server::sendMsg( clt,_ERR(clt.nickname,ERR_NOTONCHANNEL));
+        return ;
+    }
     // check if it is operator
     if (!clt.isOperator)
     {
@@ -65,28 +78,20 @@ void    Operator::kick(Client &clt, std::vector<std::string> &command)
     // check if target is on channel 
     if (!UserInChannel(command[1],command[0]))
     {
-          Server::sendMsg( clt,_ERR(clt.nickname,ERR_USERNOTINCHANNEL));
+        Server::sendMsg( clt,_ERR(clt.nickname,ERR_USERNOTINCHANNEL));
         return ;
     }
-    // //check if user is on channel
-    if (!clientIsOnChannel(command[1],clt.fd))
-    {
-         Server::sendMsg( clt,_ERR(clt.nickname,ERR_NOTONCHANNEL));
-        return ;
-    }
-    // if the last one of the channel kicks the channel disapeared or operator left 
-    // if (channel.)
-    // {
-        
-    // }
     //send Reply
     //sendmsg ()
-
-    //
+    // if (command[3])
+    // {
+    //     std::string reason = 
+        std::cout  << " KICKED successfly " << std::endl ;
     //kick.isOperator ;
     //kick client ;
+   Server::sendMsg(clt, Message::getKickReply(Server::ChannelsInServer[command[0]], clt , command[2] , command[1]));
+   Server::ChannelsInServer[command[0]].clientsInChannel.erase(clt.fd);
 }
-   
    
    
    

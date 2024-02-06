@@ -104,3 +104,18 @@ std::string  Message::rplAwayMsg(Client &clt,std :: string str)
 
     return(msg);
 }
+
+std::string Message::getKickReply(const Channel &ch, const Client &clt, std::string reason, std::string target)
+{
+    if (reason.empty())
+        reason = clt.nickname;
+     std::string reply(
+        commandReply(ch, clt, "KICK", TYPE_USER)
+        + " " 
+        + target
+        + " :"
+        + reason
+        + "\r\n"
+        );
+    return  (reply);
+}

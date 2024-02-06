@@ -43,6 +43,8 @@ public :
     // sends replies  366, 353, JOIN reply and MODE reply
     static std::string  getJoinReply( const Channel &ch, const Client &clt);
 
+    // sends KICK reply
+    static std::string getKickReply(const Channel &ch, const Client & clt, std::string reason, std::string target);
     // Sets the map in Message class to the specified static error message
     static void         setErrorsDatabase();
     // Returns the error string stored at index 'type' in ErrorsDatabase map

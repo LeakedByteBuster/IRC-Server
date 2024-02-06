@@ -51,9 +51,17 @@ MODE #alk001 +o pao001
 
 
 PASS 0000
-NICK Doug
+NICK Aa
+USER a 0 *  a a a a
+
+PASS 0000
+NICK Dou
 USER hoba 0 * loba hoba douga
-`
+
+PASS 0000
+NICK Bb
+USER Bb 0 * b b b 
+
 +i :  Set Invite-Only Channel Mode .
 -i :  Remove Invite-Only Channel Mode .
 +t :  Set the restrictions of the TOPIC command to channel operators .

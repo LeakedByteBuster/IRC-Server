@@ -134,7 +134,8 @@ struct  ErrorTypesAndNumbers {
     /* -------------------------------------------------------------------------- */
         CHANOPRIVSNEEDED = 482, //"<client> <channel> :You're not channel operator"
         USERNOTINCHANNEL = 441, //  "<client> <nick> <channel> :They aren't on that channel"
-        NOTONCHANNEL     = 442  // "<client> <channel> :You're not on that channel"
+        NOTONCHANNEL     = 442, // "<client> <channel> :You're not on that channel"
+            
     
     
     
