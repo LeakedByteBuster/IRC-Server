@@ -47,6 +47,7 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
         case PONG: // ignore PONG
             break;
         
+        
         case JOIN: // join Command
             join(clients[id], commands);
             break;
@@ -54,6 +55,12 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
         case KICK: // kick command
             Operator::kick(clients[id], commands);    
             break;
+
+
+        case TOPIC: // TOPIC command
+            Operator::topic(clients[id], commands);    
+            break;
+        
         case IRCBOT : // bot (time)
             // needs privmsg to be refractored after
             // Server::sendMsg(clients[id], Bot::botExecuter(commands[0], clients[id]));

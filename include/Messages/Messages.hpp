@@ -45,6 +45,8 @@ public :
     static std::string getKickReply(const Channel &ch, const Client & clt, std::string reason, std::string target);
     // send KICKED reply
     static std::string getKickedReply(const Channel &ch, const Client &clt, std::string target);
+    // send NO TOPIC reply
+    static std::string getTopicReply(const Channel &ch, const Client & clt, std::string topic , std::string command);
     // Sets the map in Message class to the specified static error message
     static void         setErrorsDatabase();
     // Returns the error string stored at index 'type' in ErrorsDatabase map
@@ -67,6 +69,9 @@ std::string  userPrefix(const Client &clt);
 // prefix types : TYPE_SERVER, TYPE_USER
 std::string commandReply(const Channel &ch, const Client &clt, std::string command, int prefixType);
 // <':'><ircCamel.localhost> <symbol> <client Nickname> <channel name>
+
+std::string commandReply2(const Channel &ch, const Client &clt, std::string num, std::string  msg);
+
 std::string replyPrefix(const Channel &ch, const Client &clt, const std::string symbol);
 // std::string commandReply2( <sender> , <reciever> , <message>) 
 // it's same of replyPrefix but change channle with reciever

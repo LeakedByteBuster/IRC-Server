@@ -55,7 +55,7 @@ std::string reasonArg (std::vector<std::string> &command,size_t positionStart)
         }
     }
     else
-        reason = " NO reason .";
+        reason = "NO reason .";
     return (reason);
 }
 
@@ -63,17 +63,18 @@ void    Operator::kick(Client &clt, std::vector<std::string> &command)
 {
      // skip first argument "kick"
     std::vector<std::string>   splited = splitBySpace(command[0]);
-    std::string reason =reasonArg(command , 3);
     command.erase(command.begin());
     if (command.empty()) 
     {
         Server::sendMsg( clt, _ERR(clt.nickname, ERR_NEEDMOREPARAMS));
         return ;
     }
+    std::string reason =reasonArg(command , 3);
     // check if channel existed
+    std::cout << "channel --->" << channelFound(command[0]) << std::endl; 
     if (!channelFound(command[0]))
     {
-         Server::sendMsg( clt, JOIN_ERR(command[0],clt, ERR_BADCHANMASK));
+        Server::sendMsg( clt, JOIN_ERR(command[0],clt, ERR_BADCHANMASK));
         return ;
     }
     // //check if user is on channel

@@ -128,3 +128,16 @@ std::string Message::getKickedReply(const Channel &ch, const Client &clt, std::s
         );
     return  (reply);
 }
+std::string Message::getTopicReply(const Channel &ch, const Client & clt, std::string num , std::string topic)
+{
+     std::string reply(
+        commandReply2(ch, clt, num, topic)
+        );
+    return  (reply);
+}
+
+// _ERR(..) + ch.name  + ch.topic;
+// _ERR(..) + ch.name + time()
+void    foo(){
+    return ;   
+}

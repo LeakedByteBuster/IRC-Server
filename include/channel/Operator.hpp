@@ -9,9 +9,13 @@ public :
     /* invite a client to a channel */
     static void    invite(){}
     /* Change or view the channel topic */
-    static void    topic(){}
+    static void    topic(Client &clt, std::vector<std::string> &command);
     /* Change the channel’s mode */
     static void    mode(/* int mode */){}
 };
+
+std::string reasonArg (std::vector<std::string> &command,size_t positionStart);
+int         channelFound (std::string name);
+bool        clientIsOnChannel (std::string channelName,int fd);
 
 #endif // OPERATOR_HPP

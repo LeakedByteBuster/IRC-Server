@@ -41,7 +41,10 @@
 #define ERR_USERNOTINCHANNEL    Message::USERNOTINCHANNEL 
 #define ERR_NOTONCHANNEL        Message::NOTONCHANNEL
 #define ERR_CANNOTSENDTOCHAN    Message::CANNOTSENDTOCHAN
+
 // #define rplAwayMsg and call _ERR()
+
+// shortcut for using Message::get_REPLY() method
 
 /*
     error number in ERR_NONICKNAMEGIVEN and ERR_ERRONEUSNICKNAME
@@ -79,7 +82,8 @@
     BUILD_ERROR(ERR_NOSUCHFILENAME,   1336, \
         getStaticErrorMsg(ERR_NOSUCHFILENAME)) \
     BUILD_ERROR(ERR_CANNOTSENDTOCHAN,    404, \
-        getStaticErrorMsg(ERR_CANNOTSENDTOCHAN))
+        getStaticErrorMsg(ERR_CANNOTSENDTOCHAN))\
+
 
 #define FOR_LIST_OF_JOIN_ERRORS(BUILD_JOIN_ERROR) \
     BUILD_JOIN_ERROR(ERR_NOSUCHCHANNEL,    403, \
@@ -139,12 +143,10 @@ struct  ErrorTypesAndNumbers {
     /* -------------------------------------------------------------------------- */
     /*                                Kick Errors                                 */
     /* -------------------------------------------------------------------------- */
-        CHANOPRIVSNEEDED = 482, //"<client> <channel> :You're not channel operator"
+        CHANOPRIVSNEEDED = 482, //  "<client> <channel> :You're not channel operator"
         USERNOTINCHANNEL = 441, //  "<client> <nick> <channel> :They aren't on that channel"
-        NOTONCHANNEL     = 442, // "<client> <channel> :You're not on that channel"
+        NOTONCHANNEL     = 442, //  "<client> <channel> :You're not on that channel"
             
-    
-    
     
         // ERR_ERR_TOOMANYTARGETS = 407,
         // ERR_ERR_UNAVAILRESOURCE = 15

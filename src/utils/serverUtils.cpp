@@ -164,7 +164,10 @@ int whichCommand(const std::string &first_argument)
                 first_argument.compare("JOIN") == 0)  * JOIN 
 
             + (first_argument.compare("kick") == 0 ||
-                first_argument.compare("KICK") == 0)  * KICK;
+                first_argument.compare("KICK") == 0)  * KICK
+
+            + (first_argument.compare("TOPIC") == 0 ||
+                first_argument.compare("topic") == 0)  * TOPIC;    
     return (ret);
 }
 

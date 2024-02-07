@@ -42,7 +42,16 @@ std::string commandReply(const Channel &ch, const Client &clt, std::string comma
     return (rpl);
 }
 
+// SERVER_PREFIX num clt.nickname ch.name :Coolest topic
+std::string commandReply2(const Channel &ch, const Client &clt, std::string num, std::string  msg)
+{
+    std::string rpl(":"); 
+    rpl.append(SERVER_PREFIX + num);
+    rpl.append(+ " " + clt.nickname + " " + ch.name);
+    rpl.append( + " " + msg );
 
+    return (rpl);
+}
 
 /* -------------------------------------------------------------------------- */
 /*                       Static Error Messages Database                       */
@@ -105,6 +114,8 @@ void    Message::setErrorsDatabase()
         , ":You're not on that channel"         // 21
         , ":Cannot send to channel"             // 22
         , ":Cannot join channel (+k) - bad key" // 23
+        // , ":Cannot join channel (+k) - bad key" // 23
+
         /* NOTICE: Change ERRORS_ENUM_SIZE macro in Messages.hpp to the current size */
     };
     

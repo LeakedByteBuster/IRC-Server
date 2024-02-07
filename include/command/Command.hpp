@@ -26,7 +26,8 @@ enum    Commands {
     JOKE,
     WHOAMI,
     JOIN,
-    KICK
+    KICK,
+    TOPIC
 };
 
 // compare first string in vector too see if is a valid command
