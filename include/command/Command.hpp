@@ -11,6 +11,10 @@
 #include "channel.hpp"
 #include <utility>
 
+
+#define MSG_MAX 512
+
+
 class Server;
 
 enum    Commands {

@@ -25,8 +25,14 @@ void check_targets(std::vector<std::string> command , std::vector<std::string> p
     std :: string Chnl_name;
 
     std :: string msg = compile_msg(command,2);
+    if(msg.size() > MSG_MAX)
+    {
+        Server::sendMsg(clt, _ERR(clt.nickname ,ERR_INPUTTOOLONG));
+        return;
+    }
     for(size_t i = 0; i < params.size();i++)
     {
+        std::string final_msg;
         // case of channel
         if(params[i].find('#') == 0 || (params[i].find('@') == 0 && params[i].find('#') == 1))
         {
@@ -41,7 +47,7 @@ void check_targets(std::vector<std::string> command , std::vector<std::string> p
             if(!id) // Channel Not found
             {
                 Server::sendMsg(clt, _ERR(clt.nickname , ERR_NOSUCHNICK));
-                return;
+                continue;
             }
             else if(id == 2) // channel found and the sender is a member on it
             {
@@ -49,19 +55,19 @@ void check_targets(std::vector<std::string> command , std::vector<std::string> p
 
                 if(it != Server::ChannelsInServer.end()){
 
-                    msg = ChnlReply(clt,it->second.name,msg);
-                    Detrm_Dest_Msg(it->second , clt , msg , Operator);
+                    final_msg = ChnlReply(clt,it->second.name,msg);
+                    Detrm_Dest_Msg(it->second , clt , final_msg , Operator);
                 }
                 else{
 
                     Server::sendMsg(clt, _ERR(clt.nickname , ERR_NOSUCHNICK));
                 }
-                return;
+                continue;
             }
             else // the channel found but the sender is not member on it
             {
                 Server::sendMsg(clt, _ERR(clt.nickname, ERR_CANNOTSENDTOCHAN));
-                return;
+                continue;
             }
         }
         else // case is an other client

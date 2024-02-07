@@ -38,6 +38,7 @@
 #define ERR_BANNEDFROMCHAN      Message::BANNEDFROMCHAN
 #define ERR_BADCHANNELKEY       Message::BADCHANNELKEY
 #define ERR_CANNOTSENDTOCHAN    Message::CANNOTSENDTOCHAN
+#define ERR_INPUTTOOLONG        Message::MSGTOOLONG
 // #define rplAwayMsg and call _ERR()
 
 /*
@@ -70,7 +71,9 @@
     BUILD_ERROR(ERR_NOSUCHFILENAME,   1336, \
         getStaticErrorMsg(ERR_NOSUCHFILENAME)) \
     BUILD_ERROR(ERR_CANNOTSENDTOCHAN,    404, \
-        getStaticErrorMsg(ERR_CANNOTSENDTOCHAN))
+        getStaticErrorMsg(ERR_CANNOTSENDTOCHAN)) \
+    BUILD_ERROR(ERR_INPUTTOOLONG,    417, \
+        getStaticErrorMsg(ERR_INPUTTOOLONG))
 
 #define FOR_LIST_OF_JOIN_ERRORS(BUILD_JOIN_ERROR) \
     BUILD_JOIN_ERROR(ERR_NOSUCHCHANNEL,    403, \
@@ -117,6 +120,7 @@ struct  ErrorTypesAndNumbers {
         CANNOTSENDTOCHAN = 404,
         NOSUCHNICK = 401,
         NOTEXTTOSEND = 412,
+        MSGTOOLONG = 417,
     /* -------------------------------------------------------------------------- */
     /*                                 Join Errors                                */
     /* -------------------------------------------------------------------------- */
