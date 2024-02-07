@@ -257,7 +257,6 @@ void            Server::handleIncomingConnections()
                             buff = ptr;
                             std::pair<std::string, bool>    str = parseInput(buff, map, pollFds, i);
                             if (str.second == 1) { // '\n' is in the message
-                                std::cout << "Input: " << str.first;
                                 std::cout.flush();
                                 std::vector<std::string> commandStrings = splitByLines(str.first);
                                 if (commandStrings.size() > 0) {
@@ -309,5 +308,16 @@ void    Server::sendMsg(const Channel &ch, std::string msg)
 
     for (; it != clts.end(); it++) {
         Server::sendMsg(it->second, msg);
+    }
+}
+
+void    Server::sendMsg(const Channel &ch, const Client &except, std::string msg)
+{
+    const std::map<int, Client> &clts = ch.clientsInChannel;
+    std::map<int, Client>::const_iterator it = clts.begin();
+
+    for (; it != clts.end(); it++) {
+        if (it->second.fd != except.fd)
+            Server::sendMsg(it->second, msg);
     }
 }

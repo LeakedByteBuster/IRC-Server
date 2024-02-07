@@ -42,35 +42,41 @@ std::string commandReply(const Channel &ch, const Client &clt, std::string comma
     return (rpl);
 }
 
+
+
 /* -------------------------------------------------------------------------- */
 /*                       Static Error Messages Database                       */
 /* -------------------------------------------------------------------------- */
+
+#define ERRORS_ENUM_SIZE             23 // used in setErrorsDatabase()
 
 // Sets the map in Message class to the specified static error message
 void    Message::setErrorsDatabase()
 {
     Message::error_t    errorNumbers[ERRORS_ENUM_SIZE] = {
-        ERR_INCORRECT_PASS,    // 1
-        ERR_NONICKNAMEGIVEN,   // 2
-        ERR_ERRONEUSNICKNAME,  // 3
-        ERR_ERRONEUSUSERNAME,  // 4
-        ERR_NICKNAMEINUSE,     // 5
-        ERR_NEEDMOREPARAMS,    // 6
-        ERR_ALREADYREGISTRED,  // 7
-        ERR_UNKNOWNCOMMAND,    // 8
-        ERR_NOSUCHFILE,        // 9
-        ERR_NOSUCHNICK,        // 10
-        ERR_NOSUCHFILENAME,    // 11
-        ERR_NOFILEFROMSENDER,  // 12
-        ERR_NOTEXTTOSEND,      // 13
-        ERR_NOSUCHCHANNEL,     // 14
-        ERR_TOOMANYCHANNELS,   // 15
-        ERR_CHANNELISFULL,     // 16
-        ERR_INVITEONLYCHAN,    // 17
-        ERR_BADCHANMASK,       // 18
-        ERR_CHANOPRIVSNEEDED,  // 19
-        ERR_USERNOTINCHANNEL,  // 20
-        ERR_NOTONCHANNEL    // 21
+        ERR_INCORRECT_PASS,     // 1
+        ERR_NONICKNAMEGIVEN,    // 2
+        ERR_ERRONEUSNICKNAME,   // 3
+        ERR_ERRONEUSUSERNAME,   // 4
+        ERR_NICKNAMEINUSE,      // 5
+        ERR_NEEDMOREPARAMS,     // 6
+        ERR_ALREADYREGISTRED,   // 7
+        ERR_UNKNOWNCOMMAND,     // 8
+        ERR_NOSUCHFILE,         // 9
+        ERR_NOSUCHNICK,         // 10
+        ERR_NOSUCHFILENAME,     // 11
+        ERR_NOFILEFROMSENDER,   // 12
+        ERR_NOTEXTTOSEND,       // 13
+        ERR_NOSUCHCHANNEL,      // 14
+        ERR_TOOMANYCHANNELS,    // 15
+        ERR_CHANNELISFULL,      // 16
+        ERR_INVITEONLYCHAN,     // 17
+        ERR_BADCHANMASK,        // 18
+        ERR_CHANOPRIVSNEEDED,   // 19
+        ERR_USERNOTINCHANNEL,   // 20
+        ERR_NOTONCHANNEL,        // 21
+        ERR_CANNOTSENDTOCHAN,    // 22
+        ERR_BADCHANNELKEY       // 23
 
         /* NOTICE: Change ERRORS_ENUM_SIZE macro in Messages.hpp to the current size */
     };
@@ -95,13 +101,10 @@ void    Message::setErrorsDatabase()
         , ":Cannot join channel (+i)"           // 17
         , ":Invalid channel name"               // 18
         , ":You're not channel operator"        // 19 
-        , ":They aren't on that channel"          // 20
+        , ":They aren't on that channel"        // 20
         , ":You're not on that channel"         // 21
-
-
-
-
-
+        , ":Cannot send to channel"             // 22
+        , ":Cannot join channel (+k) - bad key" // 23
         /* NOTICE: Change ERRORS_ENUM_SIZE macro in Messages.hpp to the current size */
     };
     

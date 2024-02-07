@@ -41,8 +41,16 @@ const char *                getDownMsg(void);
 void                        join(Client &clt, std::vector<std::string> &command);
 
 // PRVMSG 
-void                        prv_msg(std::map<std::string,Channel> &channels,std::vector<std :: string>command,Client clt,std::map<int,Client> Clients);
-// void                        check_targets(std::map<int,channel> channels,std::vector<std::string>commmand,Client clt,size_t position,std::map<int,Client> clients);
-// int                        search_in_channels(std::map<int,channel> channels,std::string name,Client clt);
-// int                        search_client_inChannel(Client clt,channel channel);
-// void                       sendPrvmsg(Client sender,std::string msg,Client recv);
+void                       prv_msg(std::vector<std :: string>command,Client clt,std::map<int,Client> Clients);
+void                       check_targets(std::vector<std::string>commmand,std::vector<std::string> client_and_channels,Client clt,std::map<int,Client> clients);
+void                       sendPrvmsg(Client sender,std::string msg,Client recv);
+int                        check_text_msg(std ::string msg);
+std::vector<std::string>   parse_such(std::string str);
+std :: string              compile_msg(std::vector<std::string> commands,int position);
+int                        check_channel(std::map<std::string,Channel> channles_server,std::string channel_name,Client clt);
+int                        search_a_client(std::map<int,Client> clients, std ::string NickName);
+int                        is_client_in_channel (std::string & name,std::map<std::string,Channel> &channelsInServer,std::string cltname);
+int                        check_existed_channel (std::map<std::string,Channel> &channelsInServer , std::string name);
+void                       Detrm_Dest_Msg(Channel ChnlDest , std::string Msg,bool Operator);
+
+

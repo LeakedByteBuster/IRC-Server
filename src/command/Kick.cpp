@@ -36,7 +36,6 @@ bool UserInChannel(std::string name,std::string channelName)
     if (iter!= Server::ChannelsInServer.end ())
     {
         std::string str  = iter->second.getUsersInString();
-        std::cout << "str --->" << str << std::endl ;
         std::vector<std::string> tokens = splitBySpace(str);
         std::vector<std::string> ::iterator it;
         it  = std::find(tokens.begin () ,tokens.end(),name);
@@ -45,12 +44,26 @@ bool UserInChannel(std::string name,std::string channelName)
     }
     return 0;
 }
+std::string reasonArg (std::vector<std::string> &command,size_t positionStart)
+{
+    std::string reason; 
+    if (command.size() > positionStart )
+    {
+        for (size_t i = positionStart ; i < command.size () ; ++i)
+        {
+            reason = reason+" "+command[i];
+        }
+    }
+    else
+        reason = " NO reason .";
+    return (reason);
+}
 
 void    Operator::kick(Client &clt, std::vector<std::string> &command)
 {
      // skip first argument "kick"
     std::vector<std::string>   splited = splitBySpace(command[0]);
-
+    std::string reason =reasonArg(command , 3);
     command.erase(command.begin());
     if (command.empty()) 
     {
@@ -82,53 +95,8 @@ void    Operator::kick(Client &clt, std::vector<std::string> &command)
         return ;
     }
     //send Reply
-    //sendmsg ()
-    // if (command[3])
-    // {
-    //     std::string reason = 
-        std::cout  << " KICKED successfly " << std::endl ;
-    //kick.isOperator ;
-    //kick client ;
-   Server::sendMsg(clt, Message::getKickReply(Server::ChannelsInServer[command[0]], clt , command[2] , command[1]));
+   Server::sendMsg(clt, Message::getKickReply(Server::ChannelsInServer[command[0]], clt , reason , command[1]));
+//    Server::sendMsg(clt, Message::getKickReply(Server::ChannelsInServer[command[0]], clt , reason , command[1]));
+   Server::sendMsg(Server::ChannelsInServer[command[0]], Message::getKickedReply(Server::ChannelsInServer[command[0]], clt, command[1]));
    Server::ChannelsInServer[command[0]].clientsInChannel.erase(clt.fd);
 }
-   
-   
-   
-   
-   
-   
-    // if (commands.size() == 3 || commands.size() == 4)
-    // {   
-    //         // std::cout << "commands--->" << commands[0] << std::endl ;
-    //         // std::cout << "commands--->" << commands[1] << std::endl ;
-    //         // std::cout << "commands--->" << commands[2] << std::endl ;
-    //         // std::cout << "commands--->" << commands[3] << std::endl ;
-    //             std::cout << "clt.isOperator  >>>> " << clt.isOperator << std::endl;
-    //     if (parse_channel_name_token (commands[1]) && check_existed_channel(channelsInServer,commands[1]))
-    //     {
-    //         if (is_client_in_channel(commands[1] ,channelsInServer,clt.nickname) && is_client_in_channel (commands[1],channelsInServer, commands[2]))
-    //         {
-    //                     if (clt.isOperator == 1)
-    //                     {
-    //                         clt.inChannel.erase(std::remove(clt.inChannel.begin (),clt.inChannel.end (),commands[1]),clt.inChannel.end());
-    //                         Server::sendMsg (clt, ":" + clt.nickname + "!" + clt.username + "@" + host_name() + " KICK " + commands[1] + " " + commands[2] + " :" + clt.nickname);
-    //                         channelsInServer.erase(commands[1]);
-    //                         sendMsg_to_channel(commands[1],channelsInServer, ":" + clt.nickname + "!" + clt.username + "@" + host_name() + " KICK " + commands[1] + " " + commands[2] + " :" + clt.nickname , clt );
-    //                         // Server::sendMsg (, ":" + clt.nickname + "!" + clt.username + "@" + host_name() + " KICK " + commands[1] + " " + commands[2] + " :" + clt.nickname);
-                           
-    //                         // std::cout << "deleted clt n : " << clt.fd << std::endl;
-    //                     }
-    //                     else
-    //                    Server::sendMsg(clt ,Message::getError (clt.nickname, Message ::ERR_CHANOPRIVSNEEDED));
-    //         }
-    //         else
-    //             Server::sendMsg(clt ,Message::getError (clt.nickname, Message ::ERR_USERNOTINCHANNEL));
-    //             /// 401 here no such nick /channel 
-    //     }
-    //     else
-    //         Server::sendMsg(clt ,Message::getError (clt.nickname, Message ::ERR_NOSUCHCHANNEL));
-    // }
-    // else
-    //     Server::sendMsg(clt, Message::getError(clt.nickname, Message::ERR_NEEDMOREPARAMS));
-// }

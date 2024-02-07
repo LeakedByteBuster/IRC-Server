@@ -33,10 +33,10 @@
 class   Server {
 
 public :
+    static std::map<std::string, Channel>   ChannelsInServer; // all channels
     //  list of clients connected to the server || Nickname, Client class
-    std::map<int, Client>           clients; 
-    std::string                     serverCreationDate;
-    static std::map<std::string, Channel>  ChannelsInServer; // all channels
+    std::map<int, Client>                   clients; 
+    std::string                             serverCreationDate;
 
     //	creates a TCP, IPv4, Passive socket
     Server(std::string portNum, std::string password);
@@ -59,9 +59,11 @@ public :
     //      parse NICK, USER, PASS and, Registers the new client
     void    userRegistration(int fd, std::vector<std::string> string);
     //      Sends a message to a specific client
-    static void    sendMsg(const Client &target, std::string msg);
+    static void    sendMsg(const Client &clt, std::string msg);
     //      Sends a message to a specific channel
-    static void    sendMsg(const Channel &target, std::string msg);
+    static void    sendMsg(const Channel &ch, std::string msg);
+    //      Sends a message to a specific channel
+    static void    sendMsg(const Channel &ch, const Client &except, std::string msg);
     //          Sends 001, 002, 003, 004 messages
     std::string postRegistration(const Client &clt);
 
@@ -77,5 +79,18 @@ private :
     // make class command a friend to server class to get client id from class command
     friend class command;
 };
+
+// template<typename T, typename Key>
+// class Finder {
+
+// public :
+//     typedef typename T::iterator iterator;
+
+//     static bool  &findIn(T c, Key k) {
+//         iterator it = c.find(k);
+//         return ((it != c.end()) ? 1 : 0);
+//     }
+
+// };
 
 #endif // SERVER_HPP

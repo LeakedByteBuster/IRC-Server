@@ -6,8 +6,10 @@
 #include "Modes.hpp"
 #include "Operator.hpp"
 
+#define USERS_CHANNEL_LIMIT	25
+
 struct	channelLimits {
-	int	usersLimit;
+	int	usersLimit; // max users in channel
 	int	nameLimit; // max characters in channel name
 } ;
 
@@ -17,16 +19,10 @@ private:
 	const std::string	key;
 
 public:
-							// std::map< Client's fd, Client >
-	std::map<int, Client>	clientsInChannel;
-							//	Topic of the channel
-	std::string				topic;
-							// The channel name
-	const std::string		name;
+	std::map<int, Client>	clientsInChannel; // std::map< Client's fd, Client >
+	std::string				topic; // Topic of the channel
+	const std::string		name; // The channel name
 
-							// Operators of the channel
-	// std::vector<int>		ClientsOperators;
-	
 	Channel();
 	Channel(const std::string name);
 	Channel(const std::string name, const std::string key, std::string topic, int usersLimit);
@@ -34,6 +30,8 @@ public:
 
 	std::string getUsersInString() const ;
 	std::string getClientsInString() const;
+	const std::string	&getKey() const ;
+
 };
 
 #endif // CHANNEL_HPP

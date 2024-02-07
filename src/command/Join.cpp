@@ -7,7 +7,7 @@ bool    isChannelNameCorrect(std::string name)
         return (0);
     }
     
-    std::string specials = " ,\a\r\n\0";
+    std::string specials = " \a\r\n\0";
     for (size_t i = 0; i < specials.size(); i++) {
         if (name.find(specials[i]) != std::string::npos) {
             return (0);
@@ -16,9 +16,8 @@ bool    isChannelNameCorrect(std::string name)
     return (1);
 }
 
-#define UUUID 656
 std::vector<std::pair<std::string, std::string> >
-    parseJoinCommand(std::vector<std::string> &commandList, const Client &clt)
+    parseJoin(std::vector<std::string> &commandList, const Client &clt)
 {
     // pair<channel name, channel password>
     std::vector<std::pair<std::string, std::string> >   tokens;
@@ -27,8 +26,7 @@ std::vector<std::pair<std::string, std::string> >
 
     splited = splitByValue(commandList[0], ',');
     if (splited.empty()) {
-        Server::sendMsg( clt,
-            JOIN_ERR( Channel(commandList[0]), clt, ERR_BADCHANMASK));
+        Server::sendMsg(clt, JOIN_ERR(Channel(commandList[0]), clt, ERR_BADCHANMASK));
         return (tokens);
     }
     
@@ -36,9 +34,7 @@ std::vector<std::pair<std::string, std::string> >
         if (!isChannelNameCorrect(splited[i]) || splited[i].size() > MAX_CHANNEL_NAME_LEN + 1) {
             if (i != 0)
                 error.append("\r\n");
-            error.append(
-                JOIN_ERR( Channel(splited[i]), clt, ERR_BADCHANMASK)
-            );
+            error.append(JOIN_ERR( Channel(splited[i]), clt, ERR_BADCHANMASK));
             continue ;
         }
         tokens.push_back(std::make_pair(splited[i], ""));
@@ -56,6 +52,14 @@ std::vector<std::pair<std::string, std::string> >
     return (tokens);
 }
 
+bool    tryInsert(const std::string &name, const std::string key)
+{
+    std::pair<std::map<std::string, Channel>::iterator, bool>    it;
+    
+    it = Server::ChannelsInServer.insert(std::make_pair(name, Channel(name, key, "", USERS_CHANNEL_LIMIT)));
+    return ((it.second == 1) ? 1 : 0);
+}
+
 /*
 While a user is joined to a channel, they receive all status messages 
 related to that channel including new JOIN, PART, KICK, and MODE messages.
@@ -67,49 +71,55 @@ May send a MODE message with the current channel’s modes.
 Sends them RPL_TOPIC and RPL_TOPICTIME numerics if the channel has a topic set (if the topic is not set, the user is sent no numerics).
 Sends them one or more RPL_NAMREPLY numerics (which also contain the name of the user that’s joining).
 */
+
 void    join(Client &clt, std::vector<std::string> &command)
 {
+    command.erase(command.begin()); // skip first argument "JOIN"
+    if (command.empty()) { return (Server::sendMsg( clt, _ERR(clt.nickname, ERR_NEEDMOREPARAMS)), (void)0); }
+
     // pair<channel name, channel key>
-    std::vector<std::pair<std::string, std::string> >   tmpChannels;
-    // skip first argument "join"
-    command.erase(command.begin());
-    if (command.empty()) {
-        Server::sendMsg( clt,
-            _ERR(clt.nickname, ERR_NEEDMOREPARAMS));
-        return ;
-    }
-    if ((tmpChannels = parseJoinCommand(command, clt)).empty()) { return ; }
+    std::vector<std::pair<std::string, std::string> >   input;
+    if ((input = parseJoin(command, clt)).empty()) { return ; }
 
-    clt.isOperator = 1;
-    std::string id(tmpChannels[0].first);
-    Server::ChannelsInServer.insert( std::make_pair ( id, Channel(command[0]) ) );
-    Server::ChannelsInServer[id].clientsInChannel[clt.fd] = clt;
+    for (size_t i = 0; i < input.size(); i++) {
+        std::string name = input[i].first;
+        std::string key = input[i].second;
 
-    Server::sendMsg(clt, Message::getJoinReply(Server::ChannelsInServer[id], clt));
-    
-    std::cerr << Message::getJoinReply(Server::ChannelsInServer[id], clt);
-    std::cerr.flush();
-    
-    // for (size_t i = 0; i < tmpChannels.size(); i++) {
-    //     std::cout << "tmpChan: " << tmpChannels[i].first << " " << tmpChannels[i].second << std::endl;
-    // }
-    // std::cerr << "{ " << Message::joinPostReply( Channel( id, ""), clt, "MODE" ) << " }" << std::endl;
-    /*
-        for (size_t i = 0; i < tmpChannels.size(); i++) {
-            // if (channel exist) {
-                create channel
-                set ChannelsInServer
-                send Replies
-            } else if (channel not exist) {
-                if (isExisted)
-                    send Error
-                if (isInvite == 0 && isKey == 0)
-                    add client to channel
-                
-                send Replies to new client
-                Brodcast JOIN message to channel
-            }
+        if ( tryInsert(name, key) ) {
+
+            Channel &ch = Server::ChannelsInServer[name];
+            
+            if ( !key.empty() ) { ch.isKey = 1; }
+            clt.isOperator = 1; // set clt as an operator
+            //  insert clt in channel's client map
+            ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
+            Server::sendMsg(clt, Message::getJoinReply(ch, clt));
+            continue ;
         }
-    */
+        
+        Channel &ch = Server::ChannelsInServer[name];
+
+        if (ch.isKey && (ch.getKey().compare(key) != 0)) { Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_BADCHANNELKEY)); continue ; }
+        if (ch.isInviteOnly) { Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_INVITEONLYCHAN)); continue ; }
+
+        clt.isOperator = 0; // reInitialize it to zero
+        ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
+        Server::sendMsg(clt, Message::getJoinReply(ch, clt));
+        /* BroadCast message */
+        Server::sendMsg(ch, clt, ":" + userPrefix(clt) + " JOIN :" + ch.name); //S <-   :alice!a@localhost JOIN :#irctoast
+        
+        // std::cout <<  "clients: " << ch.getClientsInString() << std::endl; // ....
+
+}
+    
+    
+    // for (size_t i = 0; i< input.size(); i++) {
+    //     std::cout << input[i].first << " | " << input[i].second << std::endl;
+    // }
+
+    // std::__1::map<std::__1::string, Channel>::iterator it = Server::ChannelsInServer.begin();
+    // for (; it != Server::ChannelsInServer.end(); it++)
+    //     std::cout << "key: " << it->first << " || ch: " << it->second.name << " - ch.key: " << it->second.getKey() << std::endl;
+
     return ;
 }

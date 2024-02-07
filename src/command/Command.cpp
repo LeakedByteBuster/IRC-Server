@@ -40,7 +40,9 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
             Server::sendMsg(clients[id], _ERR(clients[id].nickname, ERR_ALREADYREGISTRED));
             break;
 
-        // case PRVMSG:K
+        case PRVMSG:
+            prv_msg(commands, clients[id],clients);
+            break ;
 
         case PONG: // ignore PONG
             break;
@@ -90,12 +92,4 @@ const char *getDownMsg()
         "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣤⣤⣀⣀⣀⣀⠀⠀⠀⠀⣿⣿⣿⣿\n"
         "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n";
     return (Down);
-}
-
-void sendPrvmsg(Client sender,std::string str,Client recv)
-{
-    std::string msg = sender.nickname + " PRVMSG " + recv.nickname;
-    msg.append(" " + str);
-    Server::sendMsg(recv,msg);
-    Message::rplAwayMsg(sender,msg); 
 }

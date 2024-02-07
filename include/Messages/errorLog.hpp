@@ -40,6 +40,7 @@
 #define ERR_CHANOPRIVSNEEDED    Message::CHANOPRIVSNEEDED
 #define ERR_USERNOTINCHANNEL    Message::USERNOTINCHANNEL 
 #define ERR_NOTONCHANNEL        Message::NOTONCHANNEL
+#define ERR_CANNOTSENDTOCHAN    Message::CANNOTSENDTOCHAN
 // #define rplAwayMsg and call _ERR()
 
 /*
@@ -76,7 +77,9 @@
     BUILD_ERROR(ERR_NOSUCHFILE,       1336, \
         getStaticErrorMsg(ERR_NOSUCHFILE)) \
     BUILD_ERROR(ERR_NOSUCHFILENAME,   1336, \
-        getStaticErrorMsg(ERR_NOSUCHFILENAME))
+        getStaticErrorMsg(ERR_NOSUCHFILENAME)) \
+    BUILD_ERROR(ERR_CANNOTSENDTOCHAN,    404, \
+        getStaticErrorMsg(ERR_CANNOTSENDTOCHAN))
 
 #define FOR_LIST_OF_JOIN_ERRORS(BUILD_JOIN_ERROR) \
     BUILD_JOIN_ERROR(ERR_NOSUCHCHANNEL,    403, \
@@ -114,11 +117,15 @@ struct  ErrorTypesAndNumbers {
     /* -------------------------------------------------------------------------- */
     /*                            FileTransfert Errors                            */
     /* -------------------------------------------------------------------------- */
-        NOSUCHNICK = 401,
-        NOTEXTTOSEND = 412,
         NOSUCHFILE = 8,
         NOSUCHFILENAME = 10,
         NOFILEFROMSENDER = 11,
+    /* -------------------------------------------------------------------------- */
+    /*                           PRIVMSG Errors                            */
+    /* -------------------------------------------------------------------------- */
+        CANNOTSENDTOCHAN = 404,
+        NOSUCHNICK = 401,
+        NOTEXTTOSEND = 412,
     /* -------------------------------------------------------------------------- */
     /*                                 Join Errors                                */
     /* -------------------------------------------------------------------------- */
