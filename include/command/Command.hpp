@@ -50,6 +50,7 @@ int                        check_channel(std::map<std::string,Channel> channles_
 int                        search_a_client(std::map<int,Client> clients, std ::string NickName);
 int                        is_client_in_channel (std::string & name,std::map<std::string,Channel> &channelsInServer,std::string cltname);
 int                        check_existed_channel (std::map<std::string,Channel> &channelsInServer , std::string name);
-void                       Detrm_Dest_Msg(Channel ChnlDest , std::string Msg,bool Operator);
+void                       Detrm_Dest_Msg(Channel ChnlDest , Client & except , std::string Msg , bool Operator);
+std::string                ChnlReply(const Client &sender , const Channel &recv ,  const std::string &msg);
 
 

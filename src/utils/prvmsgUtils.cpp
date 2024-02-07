@@ -118,3 +118,21 @@ int search_a_client(std::map<int,Client> clients, std ::string NickName)
         }
     return (0);
 }
+
+// <':'><nick!~user><@><hostname> <nickname> <message>
+std::string privmsgReply(const Client &sender , const Client &recv ,  const std::string &msg)
+{
+    std::string rpl(":"); 
+    rpl.append( userPrefix(sender) + " " + "PRIVMSG" + " " + recv.nickname +" "+ msg);
+
+    return (rpl);
+}
+
+// <':'><nick!~user><@><hostname>  <channelname> <message>
+std::string ChnlReply(const Client &sender , const Channel &recv ,  const std::string &msg)
+{
+    std::string rpl(":"); 
+    rpl.append( userPrefix(sender) + " " + "PRIVMSG" + " " + recv.name +" "+ msg);
+
+    return (rpl);
+}

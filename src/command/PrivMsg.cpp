@@ -33,6 +33,8 @@ void check_targets(std::vector<std::string> command , std::vector<std::string> p
             //check if name of channle come with operator prefix
             Operator = params[i].find("@") == 0 ? true : false;
             Chnl_name = Operator ? params[i].substr(1,params[i].size()) : params[i];
+
+
             // check channel if it's on server
             int id = check_channel(Server::ChannelsInServer , Chnl_name,clt);
 
@@ -47,8 +49,8 @@ void check_targets(std::vector<std::string> command , std::vector<std::string> p
 
                 if(it != Server::ChannelsInServer.end()){
 
-                    msg = commandReply(it->second , clt , msg , TYPE_USER);
-                    Detrm_Dest_Msg(it->second , msg , Operator);
+                    msg = ChnlReply(clt,it->second.name,msg);
+                    Detrm_Dest_Msg(it->second , clt , msg , Operator);
                 }
                 else{
 
@@ -67,7 +69,6 @@ void check_targets(std::vector<std::string> command , std::vector<std::string> p
             int id = search_a_client(clients,params[i]);
             if(id)
             {
-                std :: cout << "Client :"<<id<<std::endl;
                 
                 std::map<int,Client>::iterator it = clients.find(id);
                 sendPrvmsg(clt , msg , it->second);
@@ -83,14 +84,14 @@ void check_targets(std::vector<std::string> command , std::vector<std::string> p
 
 
 // Determine the destination of the message is just Operator or all client
-void Detrm_Dest_Msg(Channel ChnlDest , std::string Msg,bool Operator)
+void Detrm_Dest_Msg(Channel ChnlDest , Client & except , std::string Msg , bool Operator)
 {
     std::map<int,Client>::iterator it = ChnlDest.clientsInChannel.begin();
     if(Operator)
     {
         for(; it != ChnlDest.clientsInChannel.end(); it++)
         {
-            if(it->second.isOperator)
+            if(it->second.isOperator && it->second.nickname != except.nickname)
             {
                 Server::sendMsg(it->second,Msg);
             }
@@ -98,21 +99,12 @@ void Detrm_Dest_Msg(Channel ChnlDest , std::string Msg,bool Operator)
     }
     else
     {
-      Server::sendMsg(ChnlDest,Msg);
+      Server::sendMsg(ChnlDest,except,Msg);
     }
 }
 
 
 
-
-// <':'><nick!~user><@><hostname> <command> <nickname>
-std::string privmsgReply(const Client &sender , const Client &recv ,  const std::string &msg)
-{
-    std::string rpl(":"); 
-    rpl.append( userPrefix(sender) + " " + "PRIVMSG" + " " + recv.nickname +" "+ msg);
-
-    return (rpl);
-}
 
 
 //":" + senderNick + "!~" + senderUsername + "@" + senderHostname + " PRIVMSG " + receiver + " :" + message + "\r\n"
@@ -122,8 +114,6 @@ void sendPrvmsg(Client sender , std::string str , Client recv)
     std::string Final_Msg = privmsgReply(sender , recv , str);
     Server::sendMsg(recv , Final_Msg);
 
-    // send rply to client
-    Server::sendMsg(sender, Message::rplAwayMsg(sender, recv.nickname));
 }
 
 
