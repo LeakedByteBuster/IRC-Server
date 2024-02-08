@@ -73,7 +73,7 @@ std::pair<std::string, bool>    parseInput(std::string buff, std::map<int, std::
                             const std::vector<struct pollfd>  &fds, unsigned long &i)
 {
     //  if buff doesn't have '\n' at the end
-    if (buff.rfind('\n') == std::string::npos) {
+    if (buff.rfind("\r\n") == std::string::npos) {
         std::pair<std::map<int, std::string>::iterator,bool> itRet;
         itRet = map.insert(std::pair<int, std::string>(fds[i].fd, buff));
         if (itRet.second == false) {
@@ -82,16 +82,11 @@ std::pair<std::string, bool>    parseInput(std::string buff, std::map<int, std::
         return (make_pair(static_cast<std::string>(""), 0));
     } 
     // if client sent a '\n' but he has already a buff stored in map
-    if ( !map.empty() && (buff.find('\n') != std::string::npos)
+    if ( !map.empty() && (buff.find("\r\n") != std::string::npos)
                 && !map[fds[i].fd].empty() ) {
         buff = map[fds[i].fd].append(buff);
         map.erase(fds[i].fd);
     }
-
-    #if defined(LOG)
-        std::cout << "buff in parseInput() : " << buff;
-        std::cout.flush();
-    #endif // LOG
 
     return (make_pair(buff, 1));
 }

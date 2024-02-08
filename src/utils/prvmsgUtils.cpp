@@ -4,29 +4,27 @@
 
 
 // append all msg argument on command in single string
-std :: string compile_msg(std::vector<std::string> commands,int position)
+std :: string compile_msg(std::vector<std::string> commands, int position)
 {
-    std :: string first = commands[position];
-    size_t i = position;
-
-    if(first.front() == ':' && first.at(1) == ':')
-    {
-        first = first.substr(1,first.size());
-        commands[position] = first;
-    }
     std :: string msg;
-    for(; i < commands.size();i++)
-    {
-        if(i != commands.size() - 1)
-            msg = msg.append(commands[i] + " ");
-        else
-            msg = msg.append(commands[i]);
+
+    for(size_t i = position; i < commands.size();i++)
+    {   
+        if(i != commands.size() - 1) {
+            msg.append(commands[i] + " ");
+            continue ;
+        }
+        msg.append(commands[i]);
     }
-    return(msg);
+    if(commands.size() > 3)
+        msg.erase(msg.begin());
+    return (msg);
 }
 
 
-int check_channel(std::map<std::string,Channel> channles_server,std::string channel_name,Client clt)
+
+
+int check_channel(std::map<std::string,Channel> channles_server,std::string channel_name,const Client &clt)
 {
     // check the channel if it's on server
     if (check_existed_channel(channles_server,channel_name))
@@ -123,7 +121,7 @@ int search_a_client(std::map<int,Client> clients, std ::string NickName)
 std::string privmsgReply(const Client &sender , const Client &recv ,  const std::string &msg)
 {
     std::string rpl(":"); 
-    rpl.append( userPrefix(sender) + " " + "PRIVMSG" + " " + recv.nickname +" "+ msg);
+    rpl.append( userPrefix(sender) + " " + "PRIVMSG" + " " + recv.nickname +" :"+ msg);
 
     return (rpl);
 }
@@ -132,7 +130,7 @@ std::string privmsgReply(const Client &sender , const Client &recv ,  const std:
 std::string ChnlReply(const Client &sender , const Channel &recv ,  const std::string &msg)
 {
     std::string rpl(":"); 
-    rpl.append( userPrefix(sender) + " " + "PRIVMSG" + " " + recv.name +" "+ msg);
+    rpl.append( userPrefix(sender) + " " + "PRIVMSG" + " " + recv.name +" :"+ msg);
 
     return (rpl);
 }

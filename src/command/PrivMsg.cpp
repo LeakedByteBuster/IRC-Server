@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-void prv_msg(std::vector<std ::string> command , Client clt, std::map<int,Client> clients)
+void prv_msg(std::vector<std ::string> command , const Client &clt, std::map<int,Client> clients)
 {
     if (command.size() < 3)
     {
@@ -18,7 +18,7 @@ void prv_msg(std::vector<std ::string> command , Client clt, std::map<int,Client
 
 
 
-void check_targets(std::vector<std::string> command , std::vector<std::string> params , Client clt , std::map<int,Client> clients)
+void check_targets(std::vector<std::string> command , std::vector<std::string> params, const Client &clt, std::map<int,Client> clients)
 {
 
     bool Operator = false;
@@ -52,11 +52,10 @@ void check_targets(std::vector<std::string> command , std::vector<std::string> p
             else if(id == 2) // channel found and the sender is a member on it
             {
                 std::map<std::string,Channel>::iterator it = Server::ChannelsInServer.find(Chnl_name);
-
                 if(it != Server::ChannelsInServer.end()){
 
                     final_msg = ChnlReply(clt,it->second.name,msg);
-                    Detrm_Dest_Msg(it->second , clt , final_msg , Operator);
+                    Detrm_Dest_Msg(it->second ,  clt , final_msg , Operator);
                 }
                 else{
 
@@ -90,7 +89,7 @@ void check_targets(std::vector<std::string> command , std::vector<std::string> p
 
 
 // Determine the destination of the message is just Operator or all client
-void Detrm_Dest_Msg(Channel ChnlDest , Client & except , std::string Msg , bool Operator)
+void Detrm_Dest_Msg(Channel ChnlDest , const Client & except , std::string Msg , bool Operator)
 {
     std::map<int,Client>::iterator it = ChnlDest.clientsInChannel.begin();
     if(Operator)
@@ -114,7 +113,7 @@ void Detrm_Dest_Msg(Channel ChnlDest , Client & except , std::string Msg , bool 
 
 
 //":" + senderNick + "!~" + senderUsername + "@" + senderHostname + " PRIVMSG " + receiver + " :" + message + "\r\n"
-void sendPrvmsg(Client sender , std::string str , Client recv)
+void sendPrvmsg(const Client &sender , std::string str , Client recv)
 {
     //add privmsg command reply to messages
     std::string Final_Msg = privmsgReply(sender , recv , str);
