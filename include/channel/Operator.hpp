@@ -7,11 +7,12 @@ public :
     /* Eject a client from the channel */
     static void     kick(Client &clt, std::vector<std::string> &command);
     /* invite a client to a channel */
-    static void    invite(){}
+    static void     invite (Client &clt, std::vector<std::string> &command);
+
     /* Change or view the channel topic */
-    static void    topic(Client &clt, std::vector<std::string> &command);
+    static void     topic(Client &clt, std::vector<std::string> &command);
     /* Change the channel’s mode */
-    static void    mode(/* int mode */){}
+    static void     mode(/* int mode */){}
 };
 
 std::string reasonArg (std::vector<std::string> &command,size_t positionStart);
