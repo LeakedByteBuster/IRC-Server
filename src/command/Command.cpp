@@ -51,9 +51,13 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
             join(clients[id], commands);
             break;
         
+        case MODE: // join Command
+            Operator::mode(clients[id], commands);
+            break;
+        
         case IRCBOT : // bot (time)
             // needs privmsg to be refractored after
-            // Server::sendMsg(clients[id], Bot::botExecuter(commands[0], clients[id]));
+            Server::sendMsg(clients[id], Bot::botExecuter(commands[0], clients[id]));
             break;
 
         default:

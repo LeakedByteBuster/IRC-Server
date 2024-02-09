@@ -16,7 +16,7 @@ struct ChannelModes {
 
 	bool	isInviteOnly; // if enabled channel is invite only
 	bool	isUsersLimit; // if enabled channel has a user limit
-	bool	isTopic; //  if enabled only operator can change topic
+	bool	isTopic; //  if enabled channel has mode topic enabled
 	bool	isKey;  // if enabled password is required to join channel
 } ;
 

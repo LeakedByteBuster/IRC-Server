@@ -51,6 +51,10 @@ MODE #1997 +k 0
 MODE #4989 -k dsajkdhasjdhasjkdhasjdhasdkahsd
     :apo98s!~apo@197.230.30.146 MODE #4989 -k *
 
+-------------  't' MODE
+mode #77 +t hello every one [ignores it silently, if already set]
+
+
 ---------------------------------------------------------
 OTHERS :
 --------
@@ -71,6 +75,9 @@ MODE #1997 -oi+k 0 Doug007
 
  ------ERRORS--------ERRORS---------ERRORS------------ 
 
+mode
+    :zirconium.libera.chat 461 apo9 MODE :Not enough parameters
+
 MODE #1997 -i
     :lead.libera.chat 482 Alfredo #1997 :You're not a channel operator
 
@@ -82,10 +89,51 @@ MODE #1997 -Cn+io* Doug007
 
 MODE #1996
     :tantalum.libera.chat 403 Doug007 #1996 :No such channel
+
+mode #77 -ok jkhfdskjfds 
+    :zirconium.libera.chat 401 apo9 jkhfdskjfds :No such nick/channel
 */
 
 
-// void    MODE(std::vector<std::string> args, std::map<>)
-// {
-//     return ;
-// }
+// expect arg: +o, +l, +k
+// expect no arg: -l, -k, -i, -t, +t
+
+// MODE #1997    
+//     :tantalum.libera.chat 324 Jack #1997 +Cinst
+//     :tantalum.libera.chat 329 Jack #1997 1707369961
+static void    listChannelModes(const Channel &ch, Client clt)
+{
+    std::string msg = replyPrefix(ch, clt, "324");
+    if (ch.isKey)
+        msg.append();
+
+    Server::sendMsg(clt, msg);
+}
+
+typedef std::pair<Message::error_t, bool>   error_pair;
+
+void    Operator::mode(Client clt, std::vector<std::string> args)
+{
+    try {
+        if (args.size() <= 1) 
+            throw error_pair(ERR_NEEDMOREPARAMS, 1);
+        
+        std::__1::map<std::__1::string, Channel>::iterator it;
+        it = Server::ChannelsInServer.find(args[1]);
+        if (it == Server::ChannelsInServer.end())
+            throw error_pair(ERR_NOSUCHCHANNEL, 0);
+
+        if (args.size() == 2) {
+            listChannelModes(it->second, clt);
+        }
+
+
+    } catch (error_pair errorNum) {
+        if (errorNum.second == 1)
+            Server::sendMsg(clt, _ERR(clt.nickname, errorNum.first));
+        else
+            Server::sendMsg(clt, JOIN_ERR(Channel(args[1]), clt, errorNum.first));
+    }
+
+    return ;
+}

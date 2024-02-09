@@ -47,7 +47,7 @@ std::string _ERR(const std::string &nick, short type)
 }
 
 //  Returns a string that contain the error message
-std::string JOIN_ERR(const Channel &ch, const Client &clt, short symbol)
+std::string Message::getJoinError(const Channel &ch, const Client &clt, short symbol)
 {
     std::string error;
 

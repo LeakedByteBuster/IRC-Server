@@ -266,6 +266,7 @@ void            Server::handleIncomingConnections()
                                         continue;
                                     }
                                     for (size_t n = 0; n < commandStrings.size(); n++) {
+                                        std::cout << "in --> " << commandStrings[n] << std::endl;
                                         std::vector<std::string> commands = splitBySpace(commandStrings[n]);
                                         execute_commmand(clients, commands, pollFds[i].fd);
                                     }
@@ -284,6 +285,7 @@ void            Server::handleIncomingConnections()
 
 void    Server::sendMsg(const Client &target, std::string msg)
 {
+    std::cout << "rpl --> " << msg << std::endl;
     if (msg.size() > 0) {
         char    buff[BYTES_TO_READ];
         ssize_t bytes;

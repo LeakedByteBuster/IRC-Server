@@ -28,7 +28,8 @@ enum    Commands {
     DATE,
     JOKE,
     WHOAMI,
-    JOIN
+    JOIN,
+    MODE
 };
 
 // compare first string in vector too see if is a valid command

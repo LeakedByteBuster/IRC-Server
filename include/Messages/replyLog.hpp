@@ -17,7 +17,10 @@ struct  RepliesTypesAndNumbers {
         // || S <-   :irc.example.com 333 alice #test dan!~d@localhost 1547691506
         RPL_TOPICWHOTIME = 333, // "<client> <channel> <nick> <setat>"      
         // || S <-   :irc.example.com 353 alice @ #test :alice @dan
-        RPL_NAMREPLY = 353      // "<client> <symbol> <channel> :[prefix]<nick>{ [prefix]<nick>}" 
+        RPL_NAMREPLY = 353,      // "<client> <symbol> <channel> :[prefix]<nick>{ [prefix]<nick>}" 
+
+        RPL_CHANNELMODEIS = 324,   // "<client> <channel> <modestring> <mode arguments>..."
+        RPL_CREATIONTIME = 329
 
     } reply_t;
 };
