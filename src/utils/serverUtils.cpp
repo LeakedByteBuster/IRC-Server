@@ -73,7 +73,7 @@ std::pair<std::string, bool>    parseInput(std::string buff, std::map<int, std::
                             const std::vector<struct pollfd>  &fds, unsigned long &i)
 {
     //  if buff doesn't have '\n' at the end
-    if (buff.rfind("\r\n") == std::string::npos) {
+    if (buff.rfind("\n") == std::string::npos) {
         std::pair<std::map<int, std::string>::iterator,bool> itRet;
         itRet = map.insert(std::pair<int, std::string>(fds[i].fd, buff));
         if (itRet.second == false) {
@@ -82,7 +82,7 @@ std::pair<std::string, bool>    parseInput(std::string buff, std::map<int, std::
         return (make_pair(static_cast<std::string>(""), 0));
     } 
     // if client sent a '\n' but he has already a buff stored in map
-    if ( !map.empty() && (buff.find("\r\n") != std::string::npos)
+    if ( !map.empty() && (buff.find("\n") != std::string::npos)
                 && !map[fds[i].fd].empty() ) {
         buff = map[fds[i].fd].append(buff);
         map.erase(fds[i].fd);
@@ -143,11 +143,15 @@ int whichCommand(const std::string &first_argument)
             + (first_argument.compare("user") == 0)     * PASS_USER \
 
             + (first_argument.compare("PRIVMSG") == 0)   * PRVMSG \
+            + (first_argument.compare("privmsg") == 0)   * PRVMSG \
 
             + (first_argument.compare("PONG") == 0)     * PONG \
 
             + (first_argument.compare("/DATE") == 0)    * DATE \
             + (first_argument.compare("/date") == 0)    * DATE \
+
+            + (first_argument.compare("BOT") == 0)    * IRCBOT \
+            + (first_argument.compare("bot") == 0)    * IRCBOT \
 
             + (first_argument.compare("/JOKE") == 0)    * JOKE \
             + (first_argument.compare("/joke") == 0)    * JOKE \

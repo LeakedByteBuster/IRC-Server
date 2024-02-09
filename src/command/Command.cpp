@@ -1,5 +1,5 @@
 #include "Server.hpp"
-#include "Bot.hpp"
+// #include "Bot.hpp"
 #include "registrationCommands.hpp"
 #include "FTP.hpp"
 
@@ -7,11 +7,9 @@
 void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &commands, int id)
 {
     int res = 0;
-
     if (!commands.empty())
     {
         res =  whichCommand(commands[0]);
-
         switch (res)
         {
         case SENDFILE:
@@ -52,8 +50,8 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
             break;
         
         case IRCBOT : // bot (time)
-            // needs privmsg to be refractored after
-            // Server::sendMsg(clients[id], Bot::botExecuter(commands[0], clients[id]));
+            //needs privmsg to be refractored after
+            // Server::sendMsg(clients[id], Bot::botExecuter(commands[1], clients[id]));
             break;
 
         default:

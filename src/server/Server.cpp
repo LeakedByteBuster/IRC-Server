@@ -106,12 +106,12 @@ Server::~Server()
         std::cerr << "Error close() : " << strerror(errno) << std::endl;
     }
     //  Close all clients fd
-    std::map<int, Client>::iterator it = clients.begin();
-    for (; it != clients.end(); it++)
-    {
-        if (close(it->second.fd) == -1)
-            std::cerr << "Error close() : " << strerror(errno) << std::endl;
-    }
+    // std::map<int, Client>::iterator it = clients.begin();
+    // for (; it != clients.end(); it++)
+    // {
+    //     if (close(it->second.fd) == -1)
+    //         std::cerr << "Error close() : " << strerror(errno) << std::endl;
+    // }
 }
 
 /* -------------------------------------------------------------------------- */
