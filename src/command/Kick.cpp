@@ -22,9 +22,23 @@ bool clientIsOnChannel (std::string channelName,int fd)
     return (0);
 }
 
+
+int  getFdByNick(std::string nick)
+{
+    // if (nick.empty ())
+    //     return 0;
+    std::map < int ,Client > ::iterator it = Server::clients.begin();
+    for (; it!= Server::clients.end(); ++it)
+    {
+        if (it->second.nickname == nick)
+            return it->first ;
+    }
+    return  -1;
+}
+
 Channel  getChannnel (std::string name)
 {
-     std::map<std::string, Channel>  :: iterator it = Server::ChannelsInServer.find(name);
+    std::map<std::string, Channel>  :: iterator it = Server::ChannelsInServer.find(name);
     if (it == Server::ChannelsInServer.end ())
         return (it->second);
     return Channel ();
@@ -59,45 +73,63 @@ std::string reasonArg (std::vector<std::string> &command,size_t positionStart)
     return (reason);
 }
 
+
 void    Operator::kick(Client &clt, std::vector<std::string> &command)
 {
-     // skip first argument "kick"
-    std::vector<std::string>   splited = splitBySpace(command[0]);
+    // have to add command name in errors .
+    // fix reason .
+
+/*
+KICK #aa user :okokkookok   :
+
+*/
+    std::string reason;
+
     command.erase(command.begin());
+
+    reason = reasonArg(command , 2);
+    if (reason[0] == ':')
+        reason.erase(0);
+    std::cout << "res --> " << reason << std::endl;
+    // command.erase(command.begin());
+    if (command.back() == ":")
+        command.pop_back ();
     if (command.empty()) 
     {
         Server::sendMsg( clt, _ERR(clt.nickname, ERR_NEEDMOREPARAMS));
         return ;
     }
-    std::string reason =reasonArg(command , 3);
     // check if channel existed
-    std::cout << "channel --->" << channelFound(command[0]) << std::endl; 
     if (!channelFound(command[0]))
     {
-        Server::sendMsg( clt, JOIN_ERR(command[0],clt, ERR_BADCHANMASK));
+        Server::sendMsg(clt, JOIN_ERR(command[0],clt, ERR_NOSUCHCHANNEL));
         return ;
     }
     // //check if user is on channel
     if (!clientIsOnChannel(command[0],clt.fd))
     {
-         Server::sendMsg( clt,_ERR(clt.nickname,ERR_NOTONCHANNEL));
+        Server::sendMsg( clt,_ERR(clt.nickname, ERR_NOTONCHANNEL));
         return ;
     }
-    // check if it is operator
+    // check if target is on channel 
+    int targetfd = getFdByNick (command[1]);
+    if (targetfd == -1 ||  !clientIsOnChannel(command[0],targetfd))
+    {
+        Server::sendMsg( clt,_ERR(clt.nickname,ERR_USERNOTINCHANNEL));
+        return ;
+    } 
+    // check if user is operator
     if (!clt.isOperator)
     {
         Server::sendMsg( clt,_ERR(clt.nickname,ERR_CHANOPRIVSNEEDED));
         return ;
     }
-    // check if target is on channel 
-    if (!UserInChannel(command[1],command[0]))
-    {
-        Server::sendMsg( clt,_ERR(clt.nickname,ERR_USERNOTINCHANNEL));
-        return ;
-    }
-    //send Reply
-   Server::sendMsg(clt, Message::getKickReply(Server::ChannelsInServer[command[0]], clt , reason , command[1]));
-//    Server::sendMsg(clt, Message::getKickReply(Server::ChannelsInServer[command[0]], clt , reason , command[1]));
-   Server::sendMsg(Server::ChannelsInServer[command[0]], Message::getKickedReply(Server::ChannelsInServer[command[0]], clt, command[1]));
-   Server::ChannelsInServer[command[0]].clientsInChannel.erase(clt.fd);
+    //send Reply to kicker
+//    Server::sendMsg(clt, Message::getKickReply(Server::ChannelsInServer[command[0]], clt , reason, command[1]));
+    //send Reply to channel 
+   Server::sendMsg(Server::ChannelsInServer[command[0]], Message::getKickReply(Server::ChannelsInServer[command[0]], clt , reason, command[1]));
+    //Erase client from channel vector 
+   Server::ChannelsInServer[command[0]].clientsInChannel.erase(targetfd);
+    if (Server::ChannelsInServer[command[0]].clientsInChannel.size() == 0)
+        Server::ChannelsInServer.erase(command[0]);
 }

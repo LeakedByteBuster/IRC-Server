@@ -46,32 +46,6 @@ std::string _ERR(const std::string &nick, short type)
     return error;
 }
 
-
-
-// std::string _ERR2(const std::string &nick, short type,std::string cmd)
-// {
-//     std::string error;
-
-//     switch (type)
-//     {
-//         #define BUILD_ERROR(errorType, errorNum, errorMsg) \
-//             case Message::errorType: \
-//                 error = static_cast<std::string>(":") \
-//                         + SERVER_PREFIX \
-//                         + #errorNum \
-//                         + " " + nick + " " \
-//                         + errorMsg; \
-//                 break;
-
-//             FOR_LIST_OF_ERRORS(BUILD_ERROR)
-//         #undef BUILD_ERROR
-
-//     default:
-//         std::cerr << "Warning getError(): Unknown type: " << type << std::endl;
-//     }
-
-//     return error;
-// }
 //  Returns a string that contain the error message
 std::string JOIN_ERR(const Channel &ch, const Client &clt, short symbol)
 {
@@ -137,7 +111,6 @@ std::string Message::getKickReply(const Channel &ch, const Client &clt, std::str
         commandReply(ch, clt, "KICK", TYPE_USER)
         + " " 
         + target
-        + " :"
         + reason
         );
     return  (reply);

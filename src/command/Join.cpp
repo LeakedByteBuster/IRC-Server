@@ -96,30 +96,16 @@ void    join(Client &clt, std::vector<std::string> &command)
             Server::sendMsg(clt, Message::getJoinReply(ch, clt));
             continue ;
         }
-        
-        Channel &ch = Server::ChannelsInServer[name];
 
+        Channel &ch = Server::ChannelsInServer[name];
         if (ch.isKey && (ch.getKey().compare(key) != 0)) { Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_BADCHANNELKEY)); continue ; }
         if (ch.isInviteOnly) { Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_INVITEONLYCHAN)); continue ; }
-
         clt.isOperator = 0; // reInitialize it to zero
         ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
         Server::sendMsg(clt, Message::getJoinReply(ch, clt));
         /* BroadCast message */
         Server::sendMsg(ch, clt, ":" + userPrefix(clt) + " JOIN :" + ch.name); //S <-   :alice!a@localhost JOIN :#irctoast
-        
-        // std::cout <<  "clients: " << ch.getClientsInString() << std::endl; // ....
 
 }
-    
-    
-    // for (size_t i = 0; i< input.size(); i++) {
-    //     std::cout << input[i].first << " | " << input[i].second << std::endl;
-    // }
-
-    // std::__1::map<std::__1::string, Channel>::iterator it = Server::ChannelsInServer.begin();
-    // for (; it != Server::ChannelsInServer.end(); it++)
-    //     std::cout << "key: " << it->first << " || ch: " << it->second.name << " - ch.key: " << it->second.getKey() << std::endl;
-
     return ;
 }

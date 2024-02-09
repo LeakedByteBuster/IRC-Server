@@ -4,7 +4,8 @@
 
 //  holds all the channels created in the server : map<channel name, channel class>
 std::map<std::string, Channel>  Server::ChannelsInServer; // all channels
-
+ //  list of clients connected to the server || Nickname, Client class
+std::map<int, Client>                   Server::clients; //all clients
 /* -------------------------------------------------------------------------- */
 /*                            Server constructors                             */
 /* -------------------------------------------------------------------------- */
@@ -266,6 +267,8 @@ void            Server::handleIncomingConnections()
                                         continue;
                                     }
                                     for (size_t n = 0; n < commandStrings.size(); n++) {
+                                        std::cout<<"com --> " << commandStrings[n] << std::endl;
+                                        // std::cout<<"com   >" << commandStrings.size ()<<"<" << std::endl;
                                         std::vector<std::string> commands = splitBySpace(commandStrings[n]);
                                         execute_commmand(clients, commands, pollFds[i].fd);
                                     }
@@ -284,6 +287,7 @@ void            Server::handleIncomingConnections()
 
 void    Server::sendMsg(const Client &target, std::string msg)
 {
+    std::cout << "MSG --> " << msg << std::endl; 
     if (msg.size() > 0) {
         char    buff[BYTES_TO_READ];
         ssize_t bytes;

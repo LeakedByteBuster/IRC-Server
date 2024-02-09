@@ -98,7 +98,7 @@ void    Message::setErrorsDatabase()
         , ":Erroneous nickname"                 // 3
         , ":Erroneous username"                 // 4
         , ":Nickname is already in use"         // 4
-        , ":Not enough parameters"              // 6
+        , ":Not enough parameters."              // 6
         , ":You may not reregister"             // 7
         , ":Unknown command"                    // 8
         , ":No such a file in /DIR"             // 9

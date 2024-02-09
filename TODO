@@ -56,7 +56,7 @@ USER a 0 *  a a a a
 
 PASS 0000
 NICK Dou
-USER hoba 0 * loba hoba douga
+USER hoba 0 * loba hoba douga 
 
 PASS 0000
 NICK B22
@@ -162,8 +162,8 @@ applying channel modes, and set other users to operator (or lower) status.
 -----------------------------------------------------------------------------------------------------------------------
     Set the user limit to channel. -------> isUsersLimit = 1 ; with param how much Users channelLimits.usersLimit
 
-PASS 3
-NICK apo
+PASS 0000
+NICK ap
 USER apo 0 * apo
 
 `

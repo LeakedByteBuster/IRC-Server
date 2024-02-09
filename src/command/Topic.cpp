@@ -17,7 +17,13 @@ std::string holdTopic(const std::vector<std::string>& command)
 
 void Operator::topic (Client &clt, std::vector<std::string> &command)
 {
-    // std::vector<std::string>   splited = splitBySpace(command[0]);
+    if (command.back() == ":")
+        command.pop_back ();
+    for (size_t i = 0 ; i < command.size () ; ++i)
+    {
+        std::cout << "command in topic :" << command[i] << " ";
+    }
+        std::cout <<std::endl ;
     command.erase(command.begin());
     if (command.empty()) 
     {
@@ -25,13 +31,13 @@ void Operator::topic (Client &clt, std::vector<std::string> &command)
         return ;
     }
     std::string topic  =holdTopic(command);
-    Channel &ch = Server::ChannelsInServer[command[0]];
     // check if channel existed
     if (!channelFound(command[0]))
     {
         Server::sendMsg( clt, JOIN_ERR(command[0],clt, ERR_NOSUCHCHANNEL));
         return ;
     }
+    Channel &ch = Server::ChannelsInServer[command[0]];
       // //check if user is on channel
     if (!clientIsOnChannel(command[0],clt.fd))
     {
@@ -53,6 +59,7 @@ void Operator::topic (Client &clt, std::vector<std::string> &command)
             Server::sendMsg(clt  ,commandReply2(ch, clt, "331", ":No topic is set."));
         else // view topic 
         {
+            std::cout << "reply >>" << commandReply2(ch, clt, "332", topic) << std::endl;
             Server::sendMsg (clt,commandReply2(ch, clt, "332", topic)) ;
             std::cout << "REPLY : " << commandReply2(ch, clt, "332", topic) << std::endl ;
             std::stringstream    ss;

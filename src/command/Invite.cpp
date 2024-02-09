@@ -4,6 +4,13 @@
 
 void Operator::invite (Client &clt, std::vector<std::string> &command)
 {
+    // if (command.back() == ":")
+    //     command.pop_back ();
+    for (size_t i = 0 ; i < command.size () ; ++i)
+    {
+       std::cout << "command in invite :" << command[i] << " ";
+    }
+        std::cout <<std::endl ;
     command.erase (command.begin ());
     if (command.empty()) 
     {
