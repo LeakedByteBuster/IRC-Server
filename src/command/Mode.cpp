@@ -69,10 +69,18 @@ MODE #1997
 MODE #986
     :mercury.libera.chat 324 apo98s #986 +lk 11 apo98
     :mercury.libera.chat 329 apo98s #986 1707441174
+/*
+
+---------------------------------------------------------
+MODE #1997    
+    :tantalum.libera.chat 324 Jack #1997 +Cinst
+    :tantalum.libera.chat 329 Jack #1997 1707369961
 
 MODE #1997 -i+o Alfredo fdsfsd dfsfs
     :Jack!~hoba@197.230.30.146 MODE #1997 +o Alfredo
 
+MODE #1997 +i
+    :Jack!~hoba@197.230.30.146 MODE #1997 +i 
 
 MODE #1997 -oi+k 0 Doug007
     :Doug007!~hoba@197.230.30.146 MODE #1997 +k Doug007
@@ -81,9 +89,21 @@ MODE #1997 -oi+k 0 Doug007
 
 mode
     :zirconium.libera.chat 461 apo9 MODE :Not enough parameters
+MODE #1997 +k
+
+MODE #1997 +k 0
+    :Doug007!~hoba@197.230.30.146 MODE #1997 +k 0
+
+---------------------------------------------------------
+
+MODE #1997 *9
+    :tantalum.libera.chat 472 Jack * :is an unknown mode char to me
 
 MODE #1997 -i
     :lead.libera.chat 482 Alfredo #1997 :You're not a channel operator
+
+MODE #1997 -o 
+    :tantalum.libera.chat 461 Jack MODE :Not enough parameters
 
 MODE #1997 -Cn+io*
     :tantalum.libera.chat 461 Doug007 MODE :Not enough parameters

@@ -36,6 +36,7 @@ enum    Commands {
 
 // compare first string in vector too see if is a valid command
 void                        execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> &commands, int id);
+void                        join(Client &clt, std::vector<std::string> &command);
 
 //  FTP
 void                        send_file(std::map<int,Client> &clients,std :: vector<std :: string> & commands,Client &cl);
@@ -43,7 +44,6 @@ void                        get_file(std::map<int,Client> &clients,std :: vector
 int                         search_a_file(Client clt,std :: string sender);
 void                        creat_file(Client clt,std :: string sender,std :: string filename);
 const char *                getDownMsg(void);
-void                        join(Client &clt, std::vector<std::string> &command);
 
 // PRVMSG 
 void                       prv_msg(std::vector<std :: string>command,const Client &clt ,std::map<int,Client> Clients);
