@@ -87,7 +87,7 @@ std::string Message::getJoinReply(const Channel &ch, const Client &clt)
 {
     std::string reply(
         commandReply(ch, clt, "JOIN", TYPE_USER) + "\r\n"
-        + commandReply(ch, clt, "MODE", TYPE_SERVER) + " +Cnst" + "\r\n"
+        + commandReply(ch, clt, "MODE", TYPE_SERVER) + " " + ch.getModeString() + "\r\n"
         + ":" + SERVER_PREFIX + "353 " + clt.nickname + " @ " + ch.name + " :" + ch.getClientsInString() +"\r\n"
         + replyPrefix(ch, clt, "366") + " :End of /NAMES list."
     );

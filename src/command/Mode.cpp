@@ -40,6 +40,8 @@ MODE #1997 -o
     :tantalum.libera.chat 461 Jack MODE :Not enough parameters
 MODE #1997 +o 
     :tantalum.libera.chat 461 Jack MODE :Not enough parameters
+MODE #joi0556 +o dsad
+    Error(401): dsad No such nick/channel
 
 -------------  'k' MODE
 
@@ -101,12 +103,16 @@ mode #77 -ok jkhfdskjfds
 // MODE #1997    
 //     :tantalum.libera.chat 324 Jack #1997 +Cinst
 //     :tantalum.libera.chat 329 Jack #1997 1707369961
+
 static void    listChannelModes(const Channel &ch, Client clt)
 {
-    std::string msg = replyPrefix(ch, clt, "324");
-    if (ch.isKey)
-        msg.append();
-
+    std::stringstream   ss;
+    std::string         token;
+    std::string         msg = replyPrefix(ch, clt, "324");
+    ss << time(NULL);
+    ss >> token;
+    msg.append(" " + ch.getModeString() + "\r\n");
+    msg.append(replyPrefix(ch, clt, "329") + " " + token);
     Server::sendMsg(clt, msg);
 }
 
@@ -125,8 +131,8 @@ void    Operator::mode(Client clt, std::vector<std::string> args)
 
         if (args.size() == 2) {
             listChannelModes(it->second, clt);
+            return ;
         }
-
 
     } catch (error_pair errorNum) {
         if (errorNum.second == 1)

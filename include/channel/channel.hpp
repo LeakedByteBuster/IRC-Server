@@ -21,6 +21,7 @@ private:
 public:
 	std::map<int, Client>	clientsInChannel; // std::map< Client's fd, Client >
 	std::string				topic; // Topic of the channel
+	std::string				modeString; // Topic of the channel
 	const std::string		name; // The channel name
 
 	Channel();
@@ -30,6 +31,7 @@ public:
 
 	std::string			getClientsInString() const ;
 	const std::string	&getKey() const ;
+	const std::string	getModeString() const ;
 };
 
 #endif // CHANNEL_HPP

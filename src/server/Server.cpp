@@ -4,7 +4,7 @@
 
 //  holds all the channels created in the server : map<channel name, channel class>
 std::map<std::string, Channel>  Server::ChannelsInServer; // all channels
-
+std::string                             Server::serverCreationDate;
 /* -------------------------------------------------------------------------- */
 /*                            Server constructors                             */
 /* -------------------------------------------------------------------------- */
@@ -80,7 +80,7 @@ Server::Server(std::string portNum, std::string password) : password(password), 
     if (check)
         throw std::runtime_error("Error getaddrinfo()");
     
-    serverCreationDate = geTime();
+    Server::serverCreationDate = geTime();
     Message::setErrorsDatabase();
 }
 

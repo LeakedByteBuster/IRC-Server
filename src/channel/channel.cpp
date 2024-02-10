@@ -20,6 +20,32 @@ Channel::~Channel()
 {
 }
 
+const std::string	Channel::getModeString() const {
+
+    std::string modeString("+");
+
+    if (isInviteOnly)
+        modeString.append("i");
+    if (isTopic)
+        modeString.append("t");
+    if (isUsersLimit)
+        modeString.append("l");
+    if (isKey)
+        modeString.append("k");
+    if (isUsersLimit) {
+        std::stringstream   ss;
+        std::string         token;
+        ss << usersLimit;
+        ss >> token;
+        modeString.append(" " + token);
+    }
+    if (isKey) {
+        modeString.append(" " + getKey());
+    }
+
+    return (modeString);
+}
+
 const std::string	& Channel::getKey() const {
     return (this->key);
 }

@@ -189,7 +189,7 @@ std::string Server::postRegistration(const Client &clt)
     // RPL_CREATED
     str = static_cast<std::string>(":") + SERVER_PREFIX + "003 " + clt.nickname;
     str.append(
-        " :This server was created on " + serverCreationDate
+        " :This server was created on " + Server::serverCreationDate
     );
     Server::sendMsg(clt, str);
     str.clear();
