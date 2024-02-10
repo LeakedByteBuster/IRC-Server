@@ -28,7 +28,9 @@ enum    Commands {
     DATE,
     JOKE,
     WHOAMI,
-    JOIN
+    JOIN,
+    MODE,
+    QUIT
 };
 
 

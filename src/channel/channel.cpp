@@ -1,4 +1,5 @@
 #include "channel.hpp"
+#include "Client.hpp"
 
 Channel::Channel() : ChannelModes(USERS_CHANNEL_LIMIT, 0)
     , key(""), topic(""), name("")
