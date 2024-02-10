@@ -6,26 +6,22 @@
 
 void    parsePass(Client &clt, std::string str, const std::string &pass)
 {    
-    #if defined(DEBUG)
-        std::cout << "parsePass(): " << str << std::endl;
-    #endif  // DEBUG
-
     std::vector<std::string>    tokens = splitBySpace(str);
     // Checks if pass command is already given
     if (clt.isRegistred == 1) {
-        Server::sendMsg(clt, _ERR(clt.nickname, ERR_ALREADYREGISTRED));
+        Server::sendMsg(clt, _ERR("*", ERR_ALREADYREGISTRED));
         throw std::invalid_argument("");
     }
     if (tokens.size() != 2) {
-        Server::sendMsg(clt, _ERR(clt.nickname, ERR_NEEDMOREPARAMS));
+        Server::sendMsg(clt, _ERR("*", ERR_NEEDMOREPARAMS));
         throw std::invalid_argument("");
     }
     if (tokens[0].compare("PASS") != 0) {
-        Server::sendMsg(clt, _ERR(clt.nickname, ERR_NEEDMOREPARAMS));
+        Server::sendMsg(clt, _ERR("*", ERR_NEEDMOREPARAMS));
         throw std::invalid_argument("");
     }
     if (tokens[1].compare(pass) != 0) {
-        Server::sendMsg(clt, _ERR(clt.nickname, ERR_INCORRECT_PASS));
+        Server::sendMsg(clt, _ERR("*", ERR_INCORRECT_PASS));
         throw std::invalid_argument("");
     }
 }
@@ -40,26 +36,22 @@ void    parseNick(std::map<int, Client> &clients, Client &clt, std::string str)
 {
     std::map<int, Client>::iterator it;
 
-    #if defined(DEBUG)
-        std::cout << "parseNick(): " << str << std::endl;
-    #endif  // DEBUG
-
     // checks number of parameters and command
     std::vector<std::string>    tokens = splitBySpace(str);
     if (tokens.size() != 2) {
-        Server::sendMsg(clt, _ERR(clt.nickname, ERR_NONICKNAMEGIVEN));
+        Server::sendMsg(clt, _ERR("*", ERR_NONICKNAMEGIVEN));
         throw std::invalid_argument("");
     }
     //  Assigning given nick to str
     str = tokens[1];
     //  check command
     if (tokens[0].compare("NICK") != 0) {
-        Server::sendMsg(clt, _ERR(clt.nickname, ERR_ERRONEUSNICKNAME));
+        Server::sendMsg(clt, _ERR(str, ERR_ERRONEUSNICKNAME));
         throw std::invalid_argument("");
     }
     //  checks if first character is a letter
     if (!isalpha(str[0])) {
-        Server::sendMsg(clt, _ERR(clt.nickname, ERR_ERRONEUSNICKNAME));
+        Server::sendMsg(clt, _ERR(str, ERR_ERRONEUSNICKNAME));
         throw std::invalid_argument("");
     }
     //  checks if rest of characters is valid
@@ -68,7 +60,7 @@ void    parseNick(std::map<int, Client> &clients, Client &clt, std::string str)
         if (isalnum(str[i])) {
             continue ;
         } else if (special.find(str[i]) == std::string::npos) {
-            Server::sendMsg(clt, _ERR(clt.nickname, ERR_ERRONEUSNICKNAME));
+            Server::sendMsg(clt, _ERR(str, ERR_ERRONEUSNICKNAME));
             throw std::invalid_argument("");
         }
     }
@@ -76,7 +68,7 @@ void    parseNick(std::map<int, Client> &clients, Client &clt, std::string str)
     it = clients.begin();
     for (; it != clients.end(); it++) {
         if (str.compare(it->second.nickname) == 0) {
-            Server::sendMsg(clt, _ERR(clt.nickname, ERR_NICKNAMEINUSE));
+            Server::sendMsg(clt, _ERR(str, ERR_NICKNAMEINUSE));
             throw std::invalid_argument("");
         }
     }
@@ -96,10 +88,6 @@ void    parseNick(std::map<int, Client> &clients, Client &clt, std::string str)
 */
 void    parseUser(Client &clt, std::string str)
 {
-    #if defined(DEBUG)
-        std::cout << "parseUser(): " << str << std::endl;
-    #endif  // DEBUG
-
     std::vector<std::string> tokens = splitBySpace(str);
     
     // checks if parameter number is > 5
