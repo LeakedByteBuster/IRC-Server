@@ -49,13 +49,19 @@ MODE #alk001 +o pao001
     :ioa002!~kj@197.230.30.146 MODE #alk001 +o pao001
 
 
+:nick!=user@hostname INVITE target :channelname
+:hostname 341 nick target channel name 
+INVITE :    
+:Do!~hoba@197.230.30.146 INVITE Dou :#ss //to target 
+
+:copper.libera.chat 341 Do Dou #ss //to client 
 
 PASS 6667
 NICK Aa
 USER a 0 *  a a a a
 
 PASS 0000
-NICK Dou
+NICK Do
 USER hoba 0 * loba hoba douga 
 
 PASS 0000

@@ -12,6 +12,8 @@ int  channelFound (std::string name)
 
 bool clientIsOnChannel (std::string channelName,int fd)
 {
+    std::cout << "name " << channelName << std::endl;
+    std::cout << "fd " << fd << std::endl;
     std::map<std::string, Channel>  :: iterator it = Server::ChannelsInServer.find(channelName);
     if (it != Server::ChannelsInServer.end ())
     {
@@ -23,12 +25,12 @@ bool clientIsOnChannel (std::string channelName,int fd)
 }
 
 
-int  getFdByNick(std::string nick)
+int  getFdByNick(std::string nick,std::map<int, Client> &clients)
 {
     // if (nick.empty ())
     //     return 0;
-    std::map < int ,Client > ::iterator it = Server::clients.begin();
-    for (; it!= Server::clients.end(); ++it)
+    std::map < int ,Client > ::iterator it = clients.begin();
+    for (; it!= clients.end(); ++it)
     {
         if (it->second.nickname == nick)
             return it->first ;
