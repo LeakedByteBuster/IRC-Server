@@ -21,6 +21,13 @@ struct  RepliesTypesAndNumbers {
 
         RPL_CHANNELMODEIS = 324,   // "<client> <channel> <modestring> <mode arguments>..."
         RPL_CREATIONTIME = 329
+    /* -------------------------------------------------------------------------- */
+    /*                                   TOPIC  REPLIES                           */
+    /* -------------------------------------------------------------------------- */
+        // RPL_NOTOPIC = 331 ,   // Sent to a client when joining a channel to inform them that the channel with the name <channel> does not have any topic set.
+        // RPL_TOPIC = 332,         // Sent to a client when joining the <channel> to inform them of the current topic of the channel.
+        // RPL_TOPICWHOTIME = 333  // Sent to a client to let them know who set the topic (<nick>) and when they set it (<setat> is a unix timestamp). Sent after RPL_TOPIC (332).
+
 
     } reply_t;
 };

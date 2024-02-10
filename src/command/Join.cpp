@@ -46,7 +46,6 @@ std::vector<std::pair<std::string, std::string> >
             tokens[i].second = passwords[i];
         }
     }
-
     if (!error.empty()) {
         Server::sendMsg( clt, error );
     }
@@ -99,10 +98,9 @@ void    join(Client &clt, std::vector<std::string> &command)
         }
 
         Channel &ch = Server::ChannelsInServer[name];
-
+    
         if (ch.isKey && (ch.getKey().compare(key) != 0)) { Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_BADCHANNELKEY)); continue ; }
         if (ch.isInviteOnly) { Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_INVITEONLYCHAN)); continue ; }
-
         clt.isOperator = 0; // reInitialize it to zero
         ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
         Server::sendMsg(clt, Message::getJoinReply(ch, clt));

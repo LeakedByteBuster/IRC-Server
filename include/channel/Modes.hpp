@@ -7,13 +7,12 @@ struct ClientOperator {
 
 struct ChannelModes {
 
-	ChannelModes (int userLimits, bool key) {
+	ChannelModes (int userLimits, bool key) {		
 		isInviteOnly = 0;
 		isUsersLimit = userLimits;
 		isTopic = 0;
 		isKey = key;
 	}
-
 	bool	isInviteOnly; // if enabled channel is invite only
 	bool	isUsersLimit; // if enabled channel has a user limit
 	bool	isTopic; //  if enabled channel has mode topic enabled

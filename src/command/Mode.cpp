@@ -1,5 +1,7 @@
 #include "Server.hpp"
 
+typedef std::pair<Message::error_t, bool>   error_pair;
+
 /*
 
 ------------ 'l' MODE
@@ -104,7 +106,7 @@ mode #77 -ok jkhfdskjfds
 //     :tantalum.libera.chat 324 Jack #1997 +Cinst
 //     :tantalum.libera.chat 329 Jack #1997 1707369961
 
-static void    listChannelModes(const Channel &ch, Client clt)
+static inline void    listChannelModes(const Channel &ch, Client clt)
 {
     std::stringstream   ss;
     std::string         token;
@@ -116,23 +118,26 @@ static void    listChannelModes(const Channel &ch, Client clt)
     Server::sendMsg(clt, msg);
 }
 
-typedef std::pair<Message::error_t, bool>   error_pair;
+static inline Channel  &findChannel(std::string name)
+{
+    std::__1::map<std::__1::string, Channel>::iterator it;
+    it = Server::ChannelsInServer.find(name);
+    if (it == Server::ChannelsInServer.end())
+        throw error_pair(ERR_NOSUCHCHANNEL, 0);
+    return (it->second);
+}
+
 
 void    Operator::mode(Client clt, std::vector<std::string> args)
 {
     try {
         if (args.size() <= 1) 
             throw error_pair(ERR_NEEDMOREPARAMS, 1);
-        
-        std::__1::map<std::__1::string, Channel>::iterator it;
-        it = Server::ChannelsInServer.find(args[1]);
-        if (it == Server::ChannelsInServer.end())
-            throw error_pair(ERR_NOSUCHCHANNEL, 0);
 
-        if (args.size() == 2) {
-            listChannelModes(it->second, clt);
-            return ;
-        }
+        Channel &ch = findChannel(args[1]);
+        if (args.size() == 2) { listChannelModes(ch, clt); return ; }
+
+
 
     } catch (error_pair errorNum) {
         if (errorNum.second == 1)

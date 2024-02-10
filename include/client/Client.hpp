@@ -24,6 +24,7 @@ public :
     Client(const Client &rhs);
     Client& operator=(const Client &rhs);
     virtual ~Client();
+    
 
 };
 

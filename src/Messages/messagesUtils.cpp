@@ -42,13 +42,31 @@ std::string commandReply(const Channel &ch, const Client &clt, std::string comma
     return (rpl);
 }
 
+// SERVER_PREFIX num clt.nickname ch.name :Coolest topic
+std::string commandReply2(const Channel &ch, const Client &clt, std::string num, std::string  msg)
+{
+    std::string rpl(":"); 
+    rpl.append(SERVER_PREFIX + num);
+    rpl.append(+ " " + clt.nickname + " " + ch.name);
+    rpl.append( + " :" + msg );
 
+    return (rpl);
+}
 
+std::string commandReply3(const Channel &ch, const Client &clt, std::string command, int prefixType,std::string topic)
+{
+    std::string rpl(":"); 
+    rpl.append( (prefixType == TYPE_SERVER) ? SERVER_PREFIX : userPrefix(clt) + " ");
+    rpl.append(command + " " + ch.name );
+    rpl.append(" :" + topic);
+    return (rpl);
+}
 /* -------------------------------------------------------------------------- */
 /*                       Static Error Messages Database                       */
 /* -------------------------------------------------------------------------- */
 
-#define ERRORS_ENUM_SIZE             21 // used in setErrorsDatabase()
+#define ERRORS_ENUM_SIZE             24 // used in setErrorsDatabase()
+
 
 // Sets the map in Message class to the specified static error message
 void    Message::setErrorsDatabase()
@@ -72,12 +90,12 @@ void    Message::setErrorsDatabase()
         ERR_CHANNELISFULL,      // 16
         ERR_INVITEONLYCHAN,     // 17
         ERR_BADCHANMASK,        // 18
-        // ERR_CHANOPRIVSNEEDED,   // 19
-        // ERR_USERNOTINCHANNEL,   // 20
-        // ERR_NOTONCHANNEL        // 21
-        ERR_CANNOTSENDTOCHAN,   // 22
-        ERR_BADCHANNELKEY,       // 23
-        ERR_INPUTTOOLONG,         // 24
+        ERR_CHANOPRIVSNEEDED,   // 19
+        ERR_USERNOTINCHANNEL,   // 20
+        ERR_NOTONCHANNEL,       // 21
+        ERR_CANNOTSENDTOCHAN,    // 22
+        ERR_BADCHANNELKEY,      // 23
+        ERR_INPUTTOOLONG,       // 24
 
         /* NOTICE: Change ERRORS_ENUM_SIZE macro in Messages.hpp to the current size */
     };
@@ -88,7 +106,7 @@ void    Message::setErrorsDatabase()
         , ":Erroneous nickname"                 // 3
         , ":Erroneous username"                 // 4
         , ":Nickname is already in use"         // 4
-        , ":Not enough parameters"              // 6
+        , ":Not enough parameters."              // 6
         , ":You may not reregister"             // 7
         , ":Unknown command"                    // 8
         , ":No such a file in /DIR"             // 9
@@ -101,9 +119,9 @@ void    Message::setErrorsDatabase()
         , ":Cannot join channel (+l)"           // 16
         , ":Cannot join channel (+i)"           // 17
         , ":Invalid channel name"               // 18
-        // , ":You're not channel operator"     // 19 
-        // , ":They aren't on that channel"     // 20
-        // , ":You're not on that channel"      // 21
+        , ":You're not channel operator"        // 19 
+        , ":They aren't on that channel"        // 20
+        , ":You're not on that channel"         // 21
         , ":Cannot send to channel"             // 22
         , ":Cannot join channel (+k) - bad key" // 23
         , ":Input line was too long"            // 24

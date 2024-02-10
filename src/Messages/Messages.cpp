@@ -20,7 +20,7 @@ const char *    Message::getStaticErrorMsg(const short type) {
 /* -------------------------------------------------------------------------- */
 
 //  Returns a string that contain the error message :
-// :ircCamel.localhost <Error Number> <Client Nickname> :<error message>
+// :ircCamel.localhost <Error Number> <Client Nickname> :<error message> /// missing command ...
 std::string _ERR(const std::string &nick, short type)
 {
     std::string error;
@@ -103,4 +103,40 @@ std::string  Message::rplAwayMsg(Client &clt,std :: string str)
     msg.append(str);
 
     return(msg);
+}
+
+std::string Message::getKickReply(const Channel &ch, const Client &clt, std::string reason, std::string target)
+{
+     std::string reply(
+        commandReply(ch, clt, "KICK", TYPE_USER)
+        + " " 
+        + target
+        + reason
+        );
+    return  (reply);
+}
+std::string Message::getKickedReply(const Channel &ch, const Client &clt, std::string target)
+{
+     std::string reply(
+        commandReply(ch, clt, "KICK", TYPE_USER)
+        + " " 
+        + target
+        + " :"
+        + "Kicked by "
+        +clt.nickname
+        );
+    return  (reply);
+}
+std::string Message::getTopicReply(const Channel &ch, const Client & clt, std::string num , std::string topic)
+{
+     std::string reply(
+        commandReply2(ch, clt, num, topic)
+        );
+    return  (reply);
+}
+
+// _ERR(..) + ch.name  + ch.topic;
+// _ERR(..) + ch.name + time()
+void    foo(){
+    return ;   
 }

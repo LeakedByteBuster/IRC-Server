@@ -80,7 +80,7 @@ std::pair<std::string, bool>    parseInput(std::string buff, std::map<int, std::
             map[fds[i].fd].append(buff); // join buff
         }
         return (make_pair(static_cast<std::string>(""), 0));
-    } 
+    }
     // if client sent a '\n' but he has already a buff stored in map
     if ( !map.empty() && (buff.find("\r\n") != std::string::npos)
                 && !map[fds[i].fd].empty() ) {
@@ -159,7 +159,13 @@ int whichCommand(const std::string &first_argument)
                 first_argument.compare("JOIN") == 0)  * JOIN \
             
             + (first_argument.compare("mode") == 0 ||
-                first_argument.compare("MODE") == 0)  * MODE;
+                first_argument.compare("MODE") == 0)  * MODE
+
+            + (first_argument.compare("kick") == 0 ||
+                first_argument.compare("KICK") == 0)  * KICK
+
+            + (first_argument.compare("TOPIC") == 0 ||
+                first_argument.compare("topic") == 0)  * TOPIC;    
     return (ret);
 }
 

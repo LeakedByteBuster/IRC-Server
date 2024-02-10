@@ -47,8 +47,18 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
         case PONG: // ignore PONG
             break;
         
+        
         case JOIN: // join Command
             join(clients[id], commands);
+            break;
+
+        case KICK: // kick command
+            Operator::kick(clients[id], commands);    
+            break;
+
+
+        case TOPIC: // TOPIC command
+            Operator::topic(clients[id], commands);    
             break;
         
         case MODE: // join Command

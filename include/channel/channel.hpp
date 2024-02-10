@@ -19,6 +19,7 @@ private:
 	const std::string	key;
 
 public:
+	std::vector <std::string> invitedUsers; // when  mode invite only enable add client nick to this vector
 	std::map<int, Client>	clientsInChannel; // std::map< Client's fd, Client >
 	std::string				topic; // Topic of the channel
 	std::string				modeString; // Topic of the channel
@@ -29,7 +30,8 @@ public:
 	Channel(const std::string name, const std::string key, std::string topic, int usersLimit);
 	~Channel();
 
-	std::string			getClientsInString() const ;
+	std::string getUsersInString() const ;
+	std::string getClientsInString() const;
 	const std::string	&getKey() const ;
 	const std::string	getModeString() const ;
 };

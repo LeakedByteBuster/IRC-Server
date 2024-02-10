@@ -4,7 +4,7 @@
 
 //  holds all the channels created in the server : map<channel name, channel class>
 std::map<std::string, Channel>  Server::ChannelsInServer; // all channels
-std::string                             Server::serverCreationDate;
+std::string                     Server::serverCreationDate;
 /* -------------------------------------------------------------------------- */
 /*                            Server constructors                             */
 /* -------------------------------------------------------------------------- */
@@ -266,7 +266,7 @@ void            Server::handleIncomingConnections()
                                         continue;
                                     }
                                     for (size_t n = 0; n < commandStrings.size(); n++) {
-                                        std::cout << "in --> " << commandStrings[n] << std::endl;
+                                        std::cout<<"--> " << commandStrings[n] << std::endl;
                                         std::vector<std::string> commands = splitBySpace(commandStrings[n]);
                                         execute_commmand(clients, commands, pollFds[i].fd);
                                     }
