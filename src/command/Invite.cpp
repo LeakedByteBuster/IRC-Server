@@ -9,11 +9,6 @@ void Operator::invite (Client &clt, std::vector<std::string> &command,std::map<i
         Server::sendMsg( clt, _ERR(clt.nickname, ERR_NEEDMOREPARAMS));
         return ;
     }
-    for (size_t i = 0 ; i < command.size () ; ++i)
-    {
-       std::cout << "command in invite :" << command[i] << " ";
-    }
-        std::cout <<std::endl ;
     command.erase (command.begin ());
     if (command.empty()) 
     {
@@ -37,7 +32,8 @@ void Operator::invite (Client &clt, std::vector<std::string> &command,std::map<i
         Server::sendMsg( clt,_ERR(clt.nickname,ERR_CHANOPRIVSNEEDED));
         return ;
     }
-    if (getFdByNick(command[0],clients)!= -1)
+    int targetfd =getFdByNick(command[0],clients);
+    if (targetfd != -1)
     {
         if (clientIsOnChannel(ch.name,getFdByNick(command[0],clients)))
         {
@@ -45,7 +41,12 @@ void Operator::invite (Client &clt, std::vector<std::string> &command,std::map<i
             return ;
         }
     }
-    std::cout << "-->" << commandReply (ch,clt,"INVITE",TYPE_USER) << std::endl;
-    Server::sendMsg(clt, commandReply (ch,clt,"INVITE",TYPE_USER));
-    
+    else 
+    {
+       Server::sendMsg(clt,_ERR(clt.nickname,ERR_NOSUCHNICK));
+            return ;
+    }
+    Server::sendMsg(targetfd, commandReply4 (ch,clt,"INVITE",TYPE_USER,command[0]));
+    Server::sendMsg(clt.fd, commandReply5 (ch,clt, TYPE_SERVER,command[0]));   
+    ch.invitedUsers.push_back (command[0]);
 }

@@ -57,11 +57,11 @@ INVITE :
 :copper.libera.chat 341 Do Dou #ss //to client 
 
 PASS 6667
-NICK Aa
+NICK A
 USER a 0 *  a a a a
 
 PASS 0000
-NICK Do
+NICK Do3
 USER hoba 0 * loba hoba douga 
 
 PASS 0000
