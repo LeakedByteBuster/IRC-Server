@@ -23,12 +23,12 @@ bool clientIsOnChannel (std::string channelName,int fd)
 }
 
 
-int  getFdByNick(std::string nick)
+int  getFdByNick(std::string nick,std::map<int, Client> &clients)
 {
     // if (nick.empty ())
     //     return 0;
-    std::map < int ,Client > ::iterator it = Server::clients.begin();
-    for (; it!= Server::clients.end(); ++it)
+    std::map < int ,Client > ::iterator it = clients.begin();
+    for (; it!= clients.end(); ++it)
     {
         if (it->second.nickname == nick)
             return it->first ;
@@ -74,7 +74,7 @@ std::string reasonArg (std::vector<std::string> &command,size_t positionStart)
 }
 
 
-void    Operator::kick(Client &clt, std::vector<std::string> &command)
+void    Operator::kick(Client &clt, std::vector<std::string> &command,std::map<int, Client> &clients)
 {
 
 /*
@@ -110,7 +110,7 @@ KICK #aa user :okokkookok   :
         return ;
     }
     // check if target is on channel 
-    int targetfd = getFdByNick (command[1]);
+    int targetfd = getFdByNick (command[1],clients);
     if (targetfd == -1 ||  !clientIsOnChannel(command[0],targetfd))
     {
         Server::sendMsg( clt,_ERR(clt.nickname,ERR_USERNOTINCHANNEL));

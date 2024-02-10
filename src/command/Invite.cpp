@@ -1,11 +1,12 @@
 #include "Server.hpp"
 
-
-
-void Operator::invite (Client &clt, std::vector<std::string> &command)
+void Operator::invite (Client &clt, std::vector<std::string> &command,std::map<int, Client> &clients)
 {
-    // if (command.back() == ":")
-    //     command.pop_back ();
+     if (command.size() < 3 || (command.size() == 2 && command[1].compare(":") == 0))
+    {
+        Server::sendMsg( clt, _ERR(clt.nickname, ERR_NEEDMOREPARAMS));
+        return ;
+    }
     for (size_t i = 0 ; i < command.size () ; ++i)
     {
        std::cout << "command in invite :" << command[i] << " ";
@@ -17,32 +18,32 @@ void Operator::invite (Client &clt, std::vector<std::string> &command)
         Server::sendMsg( clt, _ERR(clt.nickname, ERR_NEEDMOREPARAMS));
         return ;
     }
-    if (!channelFound(command[1]))
+    //  std::cout << "size-->" <<ch.clientsInChannel.size()  << std::endl ;
+    if (!channelFound(command[1]) || Server::ChannelsInServer[command[1]].clientsInChannel.size() < 1 )
     {
-        Server::sendMsg( clt, JOIN_ERR(command[0],clt, ERR_BADCHANMASK));
+        Server::sendMsg( clt, JOIN_ERR(command[1],clt, ERR_NOSUCHCHANNEL));
         return ;
     }
      Channel &ch = Server::ChannelsInServer[command[1]];
-    (void) ch;
     if (!clientIsOnChannel(command[1],clt.fd))
     {
-         Server::sendMsg( clt,_ERR(clt.nickname,ERR_NOTONCHANNEL));
+        Server::sendMsg(clt,_ERR(clt.nickname,ERR_NOTONCHANNEL));
         return ;
     }
-    // if (ch.isInviteOnly && !clt.isOperator)
-    // {
-    //     Server::sendMsg( clt,_ERR(clt.nickname,ERR_CHANOPRIVSNEEDED));
-    //     return ;
-    // }
-    // if (!UserInChannel(command[0],command[1]))
-    // {
-    //     Server::sendMsg( clt,_ERR(clt.nickname,ERR_USERNOTINCHANNEL));
-    //     return ;
-    // }
-    // if (OnInvitelist(command[0],command[1]))
-    // {
-    //      Server::sendMsg( clt,_ERR(clt.nickname,ERR_USERONCHANNEL));
-    //     return ;
-    // }
+    if (ch.isInviteOnly && !clt.isOperator)
+    {
+        Server::sendMsg( clt,_ERR(clt.nickname,ERR_CHANOPRIVSNEEDED));
+        return ;
+    }
+    if (getFdByNick(command[0],clients)!= -1)
+    {
+        if (clientIsOnChannel(ch.name,getFdByNick(command[0],clients)))
+        {
+            Server::sendMsg( clt,_ERR(clt.nickname,ERR_USERONCHANNEL));
+            return ;
+        }
+    }
+    std::cout << "-->" << commandReply (ch,clt,"INVITE",TYPE_USER) << std::endl;
+    Server::sendMsg(clt, commandReply (ch,clt,"INVITE",TYPE_USER));
     
 }

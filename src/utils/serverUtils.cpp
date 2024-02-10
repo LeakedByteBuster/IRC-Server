@@ -159,13 +159,16 @@ int whichCommand(const std::string &first_argument)
                 first_argument.compare("JOIN") == 0)  * JOIN \
             
             + (first_argument.compare("mode") == 0 ||
-                first_argument.compare("MODE") == 0)  * MODE
+                first_argument.compare("MODE") == 0)  * MODE \
 
             + (first_argument.compare("kick") == 0 ||
-                first_argument.compare("KICK") == 0)  * KICK
+                first_argument.compare("KICK") == 0)  * KICK \
 
             + (first_argument.compare("TOPIC") == 0 ||
-                first_argument.compare("topic") == 0)  * TOPIC;    
+                first_argument.compare("topic") == 0)  * TOPIC \
+
+            + (first_argument.compare("INVITE") == 0 ||
+                first_argument.compare("invite") == 0)  * INVITE;    
     return (ret);
 }
 

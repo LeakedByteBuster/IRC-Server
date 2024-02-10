@@ -31,7 +31,8 @@ enum    Commands {
     JOIN,
     MODE,
     KICK,
-    TOPIC
+    TOPIC,
+    INVITE
 };
 
 // compare first string in vector too see if is a valid command

@@ -69,7 +69,7 @@ MODE #1997
 MODE #986
     :mercury.libera.chat 324 apo98s #986 +lk 11 apo98
     :mercury.libera.chat 329 apo98s #986 1707441174
-/*
+
 
 ---------------------------------------------------------
 MODE #1997    

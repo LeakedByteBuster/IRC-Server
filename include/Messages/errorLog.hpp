@@ -42,6 +42,7 @@
 #define ERR_NOTONCHANNEL        Message::NOTONCHANNEL
 #define ERR_CANNOTSENDTOCHAN    Message::CANNOTSENDTOCHAN
 #define ERR_INPUTTOOLONG        Message::MSGTOOLONG
+#define ERR_USERONCHANNEL       Message::USERONCHANNEL
 // #define rplAwayMsg and call _ERR()
 
 // shortcut for using Message::get_REPLY() method
@@ -66,6 +67,8 @@
     BUILD_ERROR(ERR_USERNOTINCHANNEL,   441, \
         getStaticErrorMsg(ERR_USERNOTINCHANNEL))\
     BUILD_ERROR(ERR_NOTONCHANNEL,   442, \
+        getStaticErrorMsg(ERR_USERONCHANNEL))\
+    BUILD_ERROR(ERR_USERONCHANNEL,   443, \
         getStaticErrorMsg(ERR_NOTONCHANNEL))\
     BUILD_ERROR(ERR_NEEDMOREPARAMS,   461, \
         getStaticErrorMsg(ERR_NEEDMOREPARAMS)) \
@@ -148,7 +151,7 @@ struct  ErrorTypesAndNumbers {
         CHANOPRIVSNEEDED = 482, //  "<client> <channel> :You're not channel operator"
         USERNOTINCHANNEL = 441, //  "<client> <nick> <channel> :They aren't on that channel"
         NOTONCHANNEL     = 442, //  "<client> <channel> :You're not on that channel"
-            
+        USERONCHANNEL    = 443, //    "<client> <nick> <channel> :is already on channel"
     
         // ERR_ERR_TOOMANYTARGETS = 407,
         // ERR_ERR_UNAVAILRESOURCE = 15
