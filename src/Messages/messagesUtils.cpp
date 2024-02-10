@@ -65,7 +65,7 @@ std::string commandReply3(const Channel &ch, const Client &clt, std::string comm
 /*                       Static Error Messages Database                       */
 /* -------------------------------------------------------------------------- */
 
-#define ERRORS_ENUM_SIZE             25 // used in setErrorsDatabase()
+#define ERRORS_ENUM_SIZE             26 // used in setErrorsDatabase()
 
 
 // Sets the map in Message class to the specified static error message
@@ -97,6 +97,7 @@ void    Message::setErrorsDatabase()
         ERR_BADCHANNELKEY,      // 23
         ERR_INPUTTOOLONG,       // 24
         ERR_USERONCHANNEL,      //25
+        ERR_UNKNOWNMODE         // 26
 
         /* NOTICE: Change ERRORS_ENUM_SIZE macro in Messages.hpp to the current size */
     };
@@ -107,7 +108,7 @@ void    Message::setErrorsDatabase()
         , ":Erroneous nickname"                 // 3
         , ":Erroneous username"                 // 4
         , ":Nickname is already in use"         // 4
-        , ":Not enough parameters."              // 6
+        , ":Not enough parameters."             // 6
         , ":You may not reregister"             // 7
         , ":Unknown command"                    // 8
         , ":No such a file in /DIR"             // 9
@@ -126,7 +127,8 @@ void    Message::setErrorsDatabase()
         , ":Cannot send to channel"             // 22
         , ":Cannot join channel (+k) - bad key" // 23
         , ":Input line was too long"            // 24
-        , ":is already on channel"               // 25
+        , ":is already on channel"              // 25
+        , ":is unknown mode char to me"         // 26
         /* NOTICE: Change ERRORS_ENUM_SIZE macro in Messages.hpp to the current size */
     };
     

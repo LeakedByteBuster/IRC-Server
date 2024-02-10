@@ -157,7 +157,7 @@ int whichCommand(const std::string &first_argument)
             
             + (first_argument.compare("join") == 0 ||
                 first_argument.compare("JOIN") == 0)  * JOIN \
-            
+
             + (first_argument.compare("mode") == 0 ||
                 first_argument.compare("MODE") == 0)  * MODE \
 
@@ -259,10 +259,10 @@ void    clientWelcomeMessage(unsigned short cfd)
 
 void    printNewClientInfoOnServerSide(const struct sockaddr_in &cltAddr)
 {
-    std::cout   << geTime() << " |"
-                << " new connection ==> IP : " 
-                << inet_ntoa(cltAddr.sin_addr)
-                << " | port : "
-                << ntohs(cltAddr.sin_port)
+    std::cout   << HYEL
+                << "[ INFO ] New Connection : " << geTime() << " : "
+                << "IP : " << inet_ntoa(cltAddr.sin_addr)
+                << " - port : " << ntohs(cltAddr.sin_port)
+                << RESET
                 << std::endl;
 }

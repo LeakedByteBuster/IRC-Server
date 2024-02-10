@@ -24,6 +24,7 @@
 #include "Command.hpp"
 #include "channel.hpp"
 #include "utils.hpp"
+#include "Colors.hpp"
 
 #define SOCK_DOMAIN AF_INET
 #define BACKLOG SOMAXCONN

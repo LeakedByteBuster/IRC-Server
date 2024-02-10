@@ -43,6 +43,7 @@
 #define ERR_CANNOTSENDTOCHAN    Message::CANNOTSENDTOCHAN
 #define ERR_INPUTTOOLONG        Message::MSGTOOLONG
 #define ERR_USERONCHANNEL       Message::USERONCHANNEL
+#define ERR_UNKNOWNMODE         Message::UNKNOWNMODE
 // #define rplAwayMsg and call _ERR()
 
 // shortcut for using Message::get_REPLY() method
@@ -98,12 +99,14 @@
         getStaticErrorMsg(ERR_CHANNELISFULL)) \
     BUILD_JOIN_ERROR(ERR_INVITEONLYCHAN,   473, \
         getStaticErrorMsg(ERR_INVITEONLYCHAN)) \
-    BUILD_JOIN_ERROR(Message::ERR_BANNEDFROMCHAN,   474, \
-        getStaticErrorMsg(Message::ERR_BANNEDFROMCHAN)) \
+    BUILD_JOIN_ERROR(ERR_BANNEDFROMCHAN,   474, \
+        getStaticErrorMsg(ERR_BANNEDFROMCHAN)) \
     BUILD_JOIN_ERROR(ERR_BADCHANNELKEY,    475, \
         getStaticErrorMsg(ERR_BADCHANNELKEY)) \
-    BUILD_JOIN_ERROR(Message::ERR_BADCHANMASK,      476, \
-        getStaticErrorMsg(Message::ERR_BADCHANMASK))
+    BUILD_JOIN_ERROR(ERR_BADCHANMASK,      476, \
+        getStaticErrorMsg(ERR_BADCHANMASK)) \
+    BUILD_JOIN_ERROR(ERR_UNKNOWNMODE,        472, \
+        getStaticErrorMsg(ERR_UNKNOWNMODE))
 
 /* -------------------------------------------------------------------------- */
 /*                           Enum Struct Of Errors                            */
@@ -152,11 +155,15 @@ struct  ErrorTypesAndNumbers {
         USERNOTINCHANNEL = 441, //  "<client> <nick> <channel> :They aren't on that channel"
         NOTONCHANNEL     = 442, //  "<client> <channel> :You're not on that channel"
         USERONCHANNEL    = 443, //    "<client> <nick> <channel> :is already on channel"
-    
-        // ERR_ERR_TOOMANYTARGETS = 407,
-        // ERR_ERR_UNAVAILRESOURCE = 15
+    /* -------------------------------------------------------------------------- */
+    /*                                Mode Errors                                 */
+    /* -------------------------------------------------------------------------- */
+        UNKNOWNMODE = 472
 
     } error_t;
 } ;
+
+void    printLog(std::string str);
+void    printLog(std::vector<std::string> args);
 
 #endif // ERRORLOG_HPP

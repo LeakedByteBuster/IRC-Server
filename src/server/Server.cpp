@@ -185,8 +185,8 @@ bool Server::addNewClient(std::vector<struct pollfd> &fds, nfds_t *nfds, int &fd
     //  Add client fd to the poll of file descriptors
     Server::addNewPollfd(clientFd, fds, *nfds);
 
-    #if defined(LOG)
         printNewClientInfoOnServerSide(clt.hints);
+    #if defined(LOG)
         clientWelcomeMessage(clientFd);
     #endif // LOG
 
@@ -266,7 +266,7 @@ void            Server::handleIncomingConnections()
                                         continue;
                                     }
                                     for (size_t n = 0; n < commandStrings.size(); n++) {
-                                        std::cout<<"--> " << commandStrings[n] << std::endl;
+                                        std::cout << HMAG << "[ INPU ] " << commandStrings[n] << RESET << std::endl;
                                         std::vector<std::string> commands = splitBySpace(commandStrings[n]);
                                         execute_commmand(clients, commands, pollFds[i].fd);
                                     }
@@ -285,7 +285,7 @@ void            Server::handleIncomingConnections()
 
 void    Server::sendMsg(const Client &target, std::string msg)
 {
-    std::cout << "rpl --> " << msg << std::endl;
+    std::cout << HGRN << "[ SENT ] " << msg << RESET << std::endl;
     if (msg.size() > 0) {
         char    buff[BYTES_TO_READ];
         ssize_t bytes;

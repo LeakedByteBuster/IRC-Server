@@ -60,11 +60,14 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
         case TOPIC: // TOPIC command
             Operator::topic(clients[id], commands);    
             break;
-       
+
         case INVITE: // TOPIC command
             Operator::invite(clients[id], commands,clients);    
             break;
         
+        case MODE: // TOPIC command
+            Operator::mode(clients[id], commands);    
+            break;
         case IRCBOT : // bot (time)
             // needs privmsg to be refractored after
             Server::sendMsg(clients[id], Bot::botExecuter(commands[0], clients[id]));

@@ -1,6 +1,5 @@
 #include "Server.hpp"
 
-typedef std::pair<Message::error_t, bool>   error_pair;
 
 /*
 
@@ -126,11 +125,16 @@ mode #77 -ok jkhfdskjfds
 //     :tantalum.libera.chat 324 Jack #1997 +Cinst
 //     :tantalum.libera.chat 329 Jack #1997 1707369961
 
+typedef std::pair<Message::error_t, bool>           error_pair;
+typedef std::pair<Message::error_t, std::string>    logError;
+
 static inline void    listChannelModes(const Channel &ch, Client clt)
 {
     std::stringstream   ss;
     std::string         token;
-    std::string         msg = replyPrefix(ch, clt, "324");
+    std::string         msg;
+    
+    msg = replyPrefix(ch, clt, "324");
     ss << time(NULL);
     ss >> token;
     msg.append(" " + ch.getModeString() + "\r\n");
@@ -147,23 +151,64 @@ static inline Channel  &findChannel(std::string name)
     return (it->second);
 }
 
+static inline bool isValidChar(char c)
+{
+    static const   std::string modes = "ioklt+-";
+    return ( (modes.find(c) != std::string::npos) ? 1 : 0 );
+}
+
+static std::vector<std::string>    parseModeString(std::string ms)
+{
+    std::string                 err;
+    std::vector<std::string>    buff = splitByValue(ms, '+');
+    
+    printLog(buff);
+    for (size_t i = 0; i < buff.size() ; i++) {
+        for (size_t j = 0; j < buff[i].size(); j++){
+            if (! isValidChar(buff[i][j]) )
+                throw logError(ERR_UNKNOWNMODE, (err = buff[i][j]));
+        }
+    }
+
+    return (buff);
+}
+
+// static std::string  appendStrings(std::vector<std::string> vec) 
+// {
+//     std::string args;
+
+//     for (size_t i = 3; i < vec.size(); i++) {
+//         if (i != vec[i].size() - 1) {
+//             args.append(vec[i] + " ");
+//             continue ;
+//         }
+//         args.append(vec[i] + " ");
+//     }
+//     printLog(args);
+//     return (args);
+// }
 
 void    Operator::mode(Client clt, std::vector<std::string> args)
 {
-    try {
+
+    std::pair<std::string, std::string> modes;
+    try 
+    {
         if (args.size() <= 1) 
             throw error_pair(ERR_NEEDMOREPARAMS, 1);
-
         Channel &ch = findChannel(args[1]);
         if (args.size() == 2) { listChannelModes(ch, clt); return ; }
+        std::vector<std::string>    add = parseModeString(args[2]);
+        // if (args.size() > 3)
+        //     std::string  modeArgs = appendStrings(args);
 
-
-
-    } catch (error_pair errorNum) {
-        if (errorNum.second == 1)
-            Server::sendMsg(clt, _ERR(clt.nickname, errorNum.first));
+    } catch (error_pair error) {
+        if (error.second == 1)
+            Server::sendMsg(clt, _ERR(clt.nickname, error.first));
         else
-            Server::sendMsg(clt, JOIN_ERR(Channel(args[1]), clt, errorNum.first));
+            Server::sendMsg(clt, JOIN_ERR(Channel(args[1]), clt, error.first));
+    } catch (logError err) {
+        Server::sendMsg(clt, JOIN_ERR(Channel(err.second), clt, err.first));
     }
 
     return ;

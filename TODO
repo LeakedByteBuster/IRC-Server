@@ -30,7 +30,7 @@ LimeChat :
         (happens sometimes after send nick command)
     - Handle QUIT command sent by LimeChat when client disconnect from server
         Input: QUIT Leaving...
-        Input: QUIT Leaving...
+        Input: QUIT Leaving...`
         Error(421): Unknown command
 
 Server :

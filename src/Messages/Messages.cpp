@@ -143,6 +143,14 @@ std::string Message::getTopicReply(const Channel &ch, const Client & clt, std::s
 // }
 // _ERR(..) + ch.name  + ch.topic;
 // _ERR(..) + ch.name + time()
-void    foo(){
-    return ;   
+void    printLog(std::string str)
+{
+    std::cout << HRED << "[ DEBUG ] " << str << RESET <<  std::endl;
+}
+
+void    printLog(std::vector<std::string> args)
+{
+    for (size_t i = 0; i <  args.size(); i++) {
+        std::cout  << HRED << "[ DEBUG ] " << args[i] << RESET << std::endl;
+    }
 }

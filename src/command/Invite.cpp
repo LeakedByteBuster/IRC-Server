@@ -43,7 +43,7 @@ void Operator::invite (Client &clt, std::vector<std::string> &command,std::map<i
             return ;
         }
     }
-    std::cout << "-->" << commandReply (ch,clt,"INVITE",TYPE_USER) << std::endl;
+    // std::cout << "-->" << commandReply (ch,clt,"INVITE",TYPE_USER) << std::endl;
     Server::sendMsg(clt, commandReply (ch,clt,"INVITE",TYPE_USER));
     
 }
