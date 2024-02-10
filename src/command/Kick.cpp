@@ -69,15 +69,13 @@ std::string reasonArg (std::vector<std::string> &command,size_t positionStart)
         }
     }
     else
-        reason = "NO reason .";
+        reason = "";
     return (reason);
 }
 
 
 void    Operator::kick(Client &clt, std::vector<std::string> &command)
 {
-    // have to add command name in errors .
-    // fix reason .
 
 /*
 KICK #aa user :okokkookok   :
@@ -86,11 +84,11 @@ KICK #aa user :okokkookok   :
     std::string reason;
 
     command.erase(command.begin());
-
+    // if (command) 
     reason = reasonArg(command , 2);
     if (reason[0] == ':')
         reason.erase(0);
-    std::cout << "res --> " << reason << std::endl;
+    // std::cout << "res --> " << reason << std::endl;
     // command.erase(command.begin());
     if (command.back() == ":")
         command.pop_back ();

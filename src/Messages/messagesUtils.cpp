@@ -48,11 +48,19 @@ std::string commandReply2(const Channel &ch, const Client &clt, std::string num,
     std::string rpl(":"); 
     rpl.append(SERVER_PREFIX + num);
     rpl.append(+ " " + clt.nickname + " " + ch.name);
-    rpl.append( + " " + msg );
+    rpl.append( + " :" + msg );
 
     return (rpl);
 }
 
+std::string commandReply3(const Channel &ch, const Client &clt, std::string command, int prefixType,std::string topic)
+{
+    std::string rpl(":"); 
+    rpl.append( (prefixType == TYPE_SERVER) ? SERVER_PREFIX : userPrefix(clt) + " ");
+    rpl.append(command + " " + ch.name );
+    rpl.append(" :" + topic);
+    return (rpl);
+}
 /* -------------------------------------------------------------------------- */
 /*                       Static Error Messages Database                       */
 /* -------------------------------------------------------------------------- */
