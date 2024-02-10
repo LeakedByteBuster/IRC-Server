@@ -42,13 +42,13 @@ void Operator::topic (Client &clt, std::vector<std::string> &command)
         return ;
     }
        // check if it is operator
-    if (ch.isInviteOnly && !clt.isOperator)
+    if ((ch.isInviteOnly && !clt.isOperator )|| !clt.isOperator)
     {
         Server::sendMsg( clt,_ERR(clt.nickname,ERR_CHANOPRIVSNEEDED));
         return ;
     }
     // here if topic not set
-    if (command.size ()== 1)
+    if (command.size ()== 1 )
     {
         // no  topic set
         if (ch.topic.empty())
