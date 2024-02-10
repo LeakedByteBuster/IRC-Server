@@ -53,12 +53,16 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
             break;
 
         case KICK: // kick command
-            Operator::kick(clients[id], commands);    
+            Operator::kick(clients[id], commands,clients);    
             break;
 
 
         case TOPIC: // TOPIC command
             Operator::topic(clients[id], commands);    
+            break;
+       
+        case INVITE: // TOPIC command
+            Operator::invite(clients[id], commands,clients);    
             break;
         
         case IRCBOT : // bot (time)

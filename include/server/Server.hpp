@@ -35,7 +35,7 @@ class   Server {
 public :
     static std::map<std::string, Channel>   ChannelsInServer; // all channels
     //  list of clients connected to the server || Nickname, Client class
-    static std::map<int, Client>                   clients; 
+    std::map<int, Client>                   clients; 
     std::string                             serverCreationDate;
 
     //	creates a TCP, IPv4, Passive socket

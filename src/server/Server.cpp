@@ -4,8 +4,7 @@
 
 //  holds all the channels created in the server : map<channel name, channel class>
 std::map<std::string, Channel>  Server::ChannelsInServer; // all channels
- //  list of clients connected to the server || Nickname, Client class
-std::map<int, Client>                   Server::clients; //all clients
+
 /* -------------------------------------------------------------------------- */
 /*                            Server constructors                             */
 /* -------------------------------------------------------------------------- */

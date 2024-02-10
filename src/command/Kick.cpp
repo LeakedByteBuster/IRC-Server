@@ -74,7 +74,7 @@ std::string reasonArg (std::vector<std::string> &command,size_t positionStart)
 }
 
 
-void    Operator::kick(Client &clt, std::vector<std::string> &command)
+void    Operator::kick(Client &clt, std::vector<std::string> &command,std::map<int, Client> &clients)
 {
 
 /*
@@ -110,7 +110,7 @@ KICK #aa user :okokkookok   :
         return ;
     }
     // check if target is on channel 
-    int targetfd = getFdByNick (command[1]);
+    int targetfd = getFdByNick (command[1],clients);
     if (targetfd == -1 ||  !clientIsOnChannel(command[0],targetfd))
     {
         Server::sendMsg( clt,_ERR(clt.nickname,ERR_USERNOTINCHANNEL));

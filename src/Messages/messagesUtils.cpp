@@ -65,7 +65,7 @@ std::string commandReply3(const Channel &ch, const Client &clt, std::string comm
 /*                       Static Error Messages Database                       */
 /* -------------------------------------------------------------------------- */
 
-#define ERRORS_ENUM_SIZE             24 // used in setErrorsDatabase()
+#define ERRORS_ENUM_SIZE             25 // used in setErrorsDatabase()
 
 
 // Sets the map in Message class to the specified static error message
@@ -96,6 +96,7 @@ void    Message::setErrorsDatabase()
         ERR_CANNOTSENDTOCHAN,    // 22
         ERR_BADCHANNELKEY,      // 23
         ERR_INPUTTOOLONG,       // 24
+        ERR_USERONCHANNEL,      //25
 
         /* NOTICE: Change ERRORS_ENUM_SIZE macro in Messages.hpp to the current size */
     };
@@ -125,6 +126,7 @@ void    Message::setErrorsDatabase()
         , ":Cannot send to channel"             // 22
         , ":Cannot join channel (+k) - bad key" // 23
         , ":Input line was too long"            // 24
+        , ":is already on channel"               // 25
         /* NOTICE: Change ERRORS_ENUM_SIZE macro in Messages.hpp to the current size */
     };
     
