@@ -6,13 +6,14 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <poll.h> // for nfds_t
 
 #define BYTES_TO_READ   4096
 
-struct pollfd;
-struct sockaddr_in;
-class Client;
-typedef unsigned int nfds_t;
+struct  pollfd;
+struct  sockaddr_in;
+class   Client;
+
 
                             //  prints date, time, host, ip and port in STDOUT
 void                        serverWelcomeMessage(const struct sockaddr_in &srvSock, int sfd);
