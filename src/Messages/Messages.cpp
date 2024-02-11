@@ -154,4 +154,5 @@ void    printLog(std::vector<std::string> args)
     for (size_t i = 0; i <  args.size(); i++) {
         std::cout  << HRED << "[ DEBUG ] " << args[i] << RESET << std::endl;
     }
+    std::cout << std::endl;
 }
