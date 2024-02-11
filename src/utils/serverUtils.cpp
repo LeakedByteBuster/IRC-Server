@@ -161,6 +161,8 @@ int whichCommand(const std::string &first_argument)
 
             + (first_argument.compare("QUIT") == 0)  * QUIT \
             
+            + (first_argument.compare("PART") == 0)  * PART \
+
             + (first_argument.compare("join") == 0 ||
                 first_argument.compare("JOIN") == 0)  * JOIN;
     return (ret);

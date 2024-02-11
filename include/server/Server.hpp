@@ -26,6 +26,7 @@
 #include "utils.hpp"
 #include "PrivMsg.hpp"
 #include "Bot.hpp"
+#include "Part.hpp"
 
 #include "Quit.hpp"
 

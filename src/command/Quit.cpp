@@ -10,7 +10,7 @@
 void DeleteClt(Channel &Chnl,Client clt)
 {
     std::map<int,Client>::iterator it = Chnl.clientsInChannel.find(clt.fd);
-    if(it != Chnl.clientsInChannel.end())
+    if(it != Chnl.clientsInChannel.end() )
     {
         Chnl.clientsInChannel.erase(it);
     }

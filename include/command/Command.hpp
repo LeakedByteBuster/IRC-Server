@@ -30,7 +30,8 @@ enum    Commands {
     WHOAMI,
     JOIN,
     MODE,
-    QUIT
+    QUIT,
+    PART
 };
 
 

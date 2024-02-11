@@ -39,6 +39,7 @@
 #define ERR_BADCHANNELKEY       Message::BADCHANNELKEY
 #define ERR_CANNOTSENDTOCHAN    Message::CANNOTSENDTOCHAN
 #define ERR_INPUTTOOLONG        Message::MSGTOOLONG
+#define ERR_NOTONCHANNEL        Message::NOTONCHANNEL
 // #define rplAwayMsg and call _ERR()
 
 /*
@@ -73,7 +74,9 @@
     BUILD_ERROR(ERR_CANNOTSENDTOCHAN,    404, \
         getStaticErrorMsg(ERR_CANNOTSENDTOCHAN)) \
     BUILD_ERROR(ERR_INPUTTOOLONG,    417, \
-        getStaticErrorMsg(ERR_INPUTTOOLONG))
+        getStaticErrorMsg(ERR_INPUTTOOLONG))\
+    BUILD_ERROR(ERR_NOTONCHANNEL ,    442, \
+        getStaticErrorMsg(ERR_NOTONCHANNEL ))
 
 #define FOR_LIST_OF_JOIN_ERRORS(BUILD_JOIN_ERROR) \
     BUILD_JOIN_ERROR(ERR_NOSUCHCHANNEL,    403, \
@@ -130,7 +133,8 @@ struct  ErrorTypesAndNumbers {
         INVITEONLYCHAN = 473,   // "<client> <channel> :Cannot join channel (+i)"
         BANNEDFROMCHAN = 474,   // "<client> <channel> :Cannot join channel (+b)"
         BADCHANNELKEY = 475,    // "<client> <channel> :Cannot join channel (+k)"
-        BADCHANMASK = 476,      // "<client> <channel> :Invalid channel name"
+        BADCHANMASK = 476,
+        NOTONCHANNEL=442      
 
         // ERR_ERR_TOOMANYTARGETS = 407,
         // ERR_ERR_UNAVAILRESOURCE = 15
