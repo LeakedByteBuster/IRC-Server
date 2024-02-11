@@ -66,7 +66,7 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
             break;
         
         case MODE: // TOPIC command
-            Operator::mode(clients[id], commands);    
+            Operator::mode(clients, clients[id], commands);    
             break;
         case IRCBOT : // bot (time)
             // needs privmsg to be refractored after

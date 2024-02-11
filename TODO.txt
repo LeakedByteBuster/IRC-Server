@@ -42,7 +42,12 @@ AFTER REGISTRATION :
 JOIN :
     JOIN 0 succeeding or 
     JOIN 0 failing
+    join #98
+    :apo94!~apo@197.230.30.146 JOIN #98
+    :tungsten.libera.chat 353 apo94 @ #98 :apo94 @apo9
+    :tungsten.libera.chat 366 apo94 #98 :End of /NAMES list.
 
+    join #98
 :pao001!~kj@197.230.30.146 QUIT :Ping timeout: 260 seconds
     :pao001!~kj@197.230.30.146 QUIT :Ping timeout: 260 seconds
 MODE #alk001 +o pao001
@@ -51,7 +56,7 @@ MODE #alk001 +o pao001
 Alfredo
 
 PASS 3
-NICK apo9
+NICK apo94
 USER apo 0 * apo
 
 `

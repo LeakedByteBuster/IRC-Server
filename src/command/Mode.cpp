@@ -1,5 +1,250 @@
 #include "Server.hpp"
 
+typedef std::pair<Message::error_t, bool>           error_pair;
+typedef std::pair<Message::error_t, std::string>    logError;
+typedef struct s_Modes {
+    s_Modes() {
+        errorOccured = 0;
+    }
+    //  plusModes[n] should be executed before minusModes[n], to keep order of original string
+    //  pair< mode , mode's args if it has one >
+    std::vector< std::pair< std::string, std::string > >    plusModes;
+    std::vector< std::pair< std::string, std::string > >    minusModes;
+    bool                                                    errorOccured;
+}   t_Modes;
+
+
+// static void mode_L()
+// {
+//     return ;
+// }
+
+// static void mode_O()
+// {
+//     return ;
+// }
+
+// static void mode_T()
+// {
+//     return ;
+// }
+
+// static void mode_K()
+// {
+//     return ;
+// }
+
+// static  void    execute(std::vector<std::string> &, std::vector<std::string> &)
+// {
+
+//     return ;
+// }
+
+// static  void    execute(std::map<int, Client> &, std::vector<std::string> &)
+// {
+
+//     return ;
+// }
+
+
+static inline void    listChannelModes(const Channel &ch, Client clt)
+{
+    std::stringstream   ss;
+    std::string         token;
+    std::string         msg;
+    
+    msg = replyPrefix(ch, clt, "324");
+    ss << time(NULL);
+    ss >> token;
+    msg.append(" " + ch.getModeString() + "\r\n");
+    msg.append(replyPrefix(ch, clt, "329") + " " + token);
+    Server::sendMsg(clt, msg);
+}
+
+static inline Channel  &findChannel(std::string name)
+{
+    std::__1::map<std::__1::string, Channel>::iterator it;
+    it = Server::ChannelsInServer.find(name);
+    if (it == Server::ChannelsInServer.end())
+        throw error_pair(ERR_NOSUCHCHANNEL, 0);
+    return (it->second);
+}
+
+static inline bool isValidChar(char c)
+{
+    static const   std::string modes = "ioklt+-";
+    return ( ( modes.find(c) != std::string::npos ) ? 1 : 0 );
+}
+
+
+/*
+    +l : have a value [ERR_NEEDMOREPARAM]
+    +o : have a value [ERR_NEEDMOREPARAM]
+    +k : have a value [No error if not supplied]
+    +t : does not have a value
+    +i : does not have a value
+
+    -k : have a value [ignore it]
+    -o : have a value [ERR_NEEDMOREPARAM]
+    -l : does not have a value
+    -t : does not have a value
+    -i : does not have a value
+*/
+static std::vector<std::string>    parseModeString(std::string ms, std::vector<std::string> args)
+{
+    std::string                 err;
+    std::vector<std::string>    buff = splitByValue(ms, '+');
+    size_t                      argSize = (args.size() > 0) ? args.size(): 0; // to change error
+    bool                        minus;
+
+    for (size_t i = 0; i < buff.size() ; i++) {
+        minus = 1;
+        for (size_t j = 0; j < buff[i].size(); j++) {
+            if (! isValidChar(buff[i][j]) ) {
+                throw logError(ERR_UNKNOWNMODE, (err = buff[i][j]));
+            }
+            
+            if (buff[i][j] == '-') { minus = 0; continue ;}
+
+            if ( ( (buff[i][j] == 'k') || (buff[i][j] == 'o') || (buff[i][j] == 'l') ) && minus ) {
+                if (argSize > 0) {
+                    argSize--;
+                    continue ;
+                }
+                throw error_pair(ERR_NEEDMOREPARAMS, 1);
+            }
+
+            if ( ( (buff[i][j] == 'k') || (buff[i][j] == 'o') ) && !minus ) {
+                if (argSize > 0) {
+                    argSize--;
+                    continue ;
+                }
+                throw error_pair(ERR_NEEDMOREPARAMS, 1);
+            }
+
+        }
+
+    }
+
+    return (buff);
+}
+
+static std::string  appendModeArgs(std::vector<std::string> vec) 
+{
+    std::string args;
+
+    for (size_t i = 3; i < vec.size(); i++) {
+        if (i != vec[i].size() - 1) {
+            args.append(vec[i] + " ");
+            continue ;
+        }
+        args.append(vec[i] + " ");
+    }
+    return (args);
+}
+
+
+// static void insertMinusModes(const std::vector<std::string> &param, t_Modes &modes, std::string mString, size_t &n, const size_t &i)
+// {
+//     std::string toPush;
+
+//     for (size_t j = 0; j < mString.size(); j++) {
+//         toPush = mString[j];
+//         if ( !toPush.compare("o") || !toPush.compare("l") || !toPush.compare("k")) {
+//             modes.plusModes.push_back(std::make_pair(toPush, param[n]));
+//             n++;
+//             continue ;
+//         }
+//         modes.plusModes.push_back(std::make_pair(toPush, ""));
+//     }
+//     return ;
+// }
+
+static void insertPlusModes(const std::vector<std::string> &param, t_Modes &modes, std::string mString, size_t &n)
+{
+    std::string toPush;
+
+    for (size_t j = 0; j < mString.size(); j++) {
+        toPush = mString[j];
+        if ( !toPush.compare("o") || !toPush.compare("l") || !toPush.compare("k")) {
+            modes.plusModes.push_back(std::make_pair(toPush, param[n]));
+            n++;
+            continue ;
+        }
+        modes.plusModes.push_back(std::make_pair(toPush, ""));
+    }
+    return ;
+}
+
+static t_Modes   separateModes(std::vector<std::string> mString, std::vector<std::string> param)
+{
+    t_Modes modesVecs;
+    size_t  n = 0; // used for param arguments
+
+    for (size_t i = 0; i < mString.size(); i++) {
+        
+        size_t  pos = 0; // used for substr in case there's a '-' char
+
+        /* Insert all characters in mString[i] as plus modes. No '-' char is found  */
+        if (( pos = mString[i].find('-') ) == std::string::npos) {
+            insertPlusModes(param, modesVecs, mString[i], n);
+            continue ;
+        }
+
+        /* Insert plus and minus each in its proper variables in t_modes */
+        std::vector<std::string>    modesStr = splitByValue(mString[i], '-'); // modeStr[0] are plus modes, rest is minus modes
+        if (modesStr.size() == 0) { modesVecs.errorOccured = 1; return (modesVecs); } // no modes were given
+        insertPlusModes(param, modesVecs, mString[i].substr(0, pos), n); // insert plus modes
+
+
+        // insertMinusModes(param, modes, mString, n, i); // insert minus modes
+
+        // modes.minusModes.push_back(std::make_pair(mString[i].substr(0, pos), ""));
+    }
+    return (modesVecs);
+}
+
+/*
+    construct mode string using a bool as return in each mode function
+*/
+void    Operator::mode(std::map<int, Client> &, Client &clt, const std::vector<std::string> &args)
+{
+    // std::vector< std::pair<std::string, std::string> > modes;
+    try
+    {
+        if (args.size() <= 1) 
+            throw error_pair(ERR_NEEDMOREPARAMS, 1);
+        Channel &ch = findChannel(args[1]);
+        if (args.size() == 2) { listChannelModes(ch, clt); return ; }
+        if (clt.isOperator == 0) { throw error_pair(ERR_CHANOPRIVSNEEDED, 1) ; }
+
+        std::vector<std::string>    param = splitBySpace(appendModeArgs(args));
+        std::vector<std::string>    modeStrings = parseModeString(args[2], param);
+
+        t_Modes modes;
+
+        modes = separateModes(modeStrings, param);
+        if (modes.errorOccured) { return ; } // empty mode string is given
+        
+        std::cout << "Plus Modes: " << std::endl;
+        for (size_t i = 0; i < modes.plusModes.size(); i++) {
+            std::cout << modes.plusModes[i].first << " " << modes.plusModes[i].second << std::endl;
+        }
+
+
+    } catch (error_pair error) {
+        if (error.second == 1)
+            Server::sendMsg(clt, _ERR(clt.nickname, error.first));
+        else
+            Server::sendMsg(clt, JOIN_ERR(Channel(args[1]), clt, error.first));
+    } catch (logError err) {
+        Server::sendMsg(clt, JOIN_ERR(Channel(err.second), clt, err.first));
+    }
+
+    return ;
+}
+
+
 
 /*
 
@@ -124,92 +369,3 @@ mode #77 -ok jkhfdskjfds
 // MODE #1997    
 //     :tantalum.libera.chat 324 Jack #1997 +Cinst
 //     :tantalum.libera.chat 329 Jack #1997 1707369961
-
-typedef std::pair<Message::error_t, bool>           error_pair;
-typedef std::pair<Message::error_t, std::string>    logError;
-
-static inline void    listChannelModes(const Channel &ch, Client clt)
-{
-    std::stringstream   ss;
-    std::string         token;
-    std::string         msg;
-    
-    msg = replyPrefix(ch, clt, "324");
-    ss << time(NULL);
-    ss >> token;
-    msg.append(" " + ch.getModeString() + "\r\n");
-    msg.append(replyPrefix(ch, clt, "329") + " " + token);
-    Server::sendMsg(clt, msg);
-}
-
-static inline Channel  &findChannel(std::string name)
-{
-    std::__1::map<std::__1::string, Channel>::iterator it;
-    it = Server::ChannelsInServer.find(name);
-    if (it == Server::ChannelsInServer.end())
-        throw error_pair(ERR_NOSUCHCHANNEL, 0);
-    return (it->second);
-}
-
-static inline bool isValidChar(char c)
-{
-    static const   std::string modes = "ioklt+-";
-    return ( (modes.find(c) != std::string::npos) ? 1 : 0 );
-}
-
-static std::vector<std::string>    parseModeString(std::string ms)
-{
-    std::string                 err;
-    std::vector<std::string>    buff = splitByValue(ms, '+');
-    
-    printLog(buff);
-    for (size_t i = 0; i < buff.size() ; i++) {
-        for (size_t j = 0; j < buff[i].size(); j++){
-            if (! isValidChar(buff[i][j]) )
-                throw logError(ERR_UNKNOWNMODE, (err = buff[i][j]));
-        }
-    }
-
-    return (buff);
-}
-
-// static std::string  appendStrings(std::vector<std::string> vec) 
-// {
-//     std::string args;
-
-//     for (size_t i = 3; i < vec.size(); i++) {
-//         if (i != vec[i].size() - 1) {
-//             args.append(vec[i] + " ");
-//             continue ;
-//         }
-//         args.append(vec[i] + " ");
-//     }
-//     printLog(args);
-//     return (args);
-// }
-
-void    Operator::mode(Client clt, std::vector<std::string> args)
-{
-
-    std::pair<std::string, std::string> modes;
-    try 
-    {
-        if (args.size() <= 1) 
-            throw error_pair(ERR_NEEDMOREPARAMS, 1);
-        Channel &ch = findChannel(args[1]);
-        if (args.size() == 2) { listChannelModes(ch, clt); return ; }
-        std::vector<std::string>    add = parseModeString(args[2]);
-        // if (args.size() > 3)
-        //     std::string  modeArgs = appendStrings(args);
-
-    } catch (error_pair error) {
-        if (error.second == 1)
-            Server::sendMsg(clt, _ERR(clt.nickname, error.first));
-        else
-            Server::sendMsg(clt, JOIN_ERR(Channel(args[1]), clt, error.first));
-    } catch (logError err) {
-        Server::sendMsg(clt, JOIN_ERR(Channel(err.second), clt, err.first));
-    }
-
-    return ;
-}
