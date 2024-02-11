@@ -1,6 +1,4 @@
-#include "Server.hpp"
-
-std::map<int, Client> Server::clients;
+#include "Bot.hpp"
 static void    message(int fd, std::string msg)
 {
     if (msg.size() > 0) {

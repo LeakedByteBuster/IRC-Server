@@ -1,8 +1,20 @@
 #if !defined(BOT_CPP)
 #define BOT_CPP
 
+#include <vector>
+#include <sstream>
 
-// #include "/Users/mbousouf/Desktop/IRC-Server/include/Messages/Messages.hpp"
+
+
+#define BYTES_TO_READ   4096
+/* Sockets */
+#include <sys/socket.h> // socket(), bind(), listen(), connect(), accept()
+#include <sys/types.h> // bind()
+#include <arpa/inet.h> // inet_aton(), htons()
+#include <netdb.h> // getaddinfo()
+
+
+#include <iostream>
 
 class Server;
 

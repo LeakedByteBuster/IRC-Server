@@ -38,7 +38,7 @@ else ifeq ($(build), sani)
 	CXXFLAGS+=-fsanitize=address
 else ifeq ($(build), bot)
 	NAME = ircBot/bot
-	SRC = $(shell find ircBot -type f -name "*.cpp") src/client/Client.cpp
+	SRC = $(shell find ircBot -type f -name "*.cpp")
 	OBJ = $(patsubst %, $(OBJ_DIR)/%, $(SRC:.cpp=.o))
 endif
 

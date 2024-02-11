@@ -11,10 +11,7 @@
 
 
 
-
 class Channel;
-
-
 class   Client : public ClientOperator {
 
 public :

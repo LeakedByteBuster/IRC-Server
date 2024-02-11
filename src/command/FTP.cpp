@@ -21,6 +21,7 @@ void creat_file(Client clt, std ::string sender, std ::string filename)
 {
     int file_size;
     char *line = NULL;
+    std::string transf ="transferd_";
     FILE *fd;
     std ::vector<TFile>::iterator it = clt.Files.begin();
     std::fstream myfile;
@@ -43,7 +44,8 @@ void creat_file(Client clt, std ::string sender, std ::string filename)
         Server::sendMsg(clt, "I think the file is too big can you be kind with us :)");
     }
     // open the new file in client /dir
-    myfile.open("transferd_" + filename, std::ios::out | std::ios::binary);
+    transf.append(filename);
+    myfile.open( transf.c_str(), std::ios::out | std::ios::binary);
     if (myfile.is_open() == 0)
     {
         Server::sendMsg(clt, "C 'ant open file ");
