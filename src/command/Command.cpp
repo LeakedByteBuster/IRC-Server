@@ -55,9 +55,11 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
 
         case QUIT:
             Client_Quit(clients[id], commands,clients);
+             break;
 
         case PART:
                 Part_client(clients[id],commands);
+                break;
         case IRCBOT : // bot (time)
             //needs privmsg to be refractored after
             // Server::sendMsg(clients[id], Bot::botExecuter(commands[1], clients[id]));
