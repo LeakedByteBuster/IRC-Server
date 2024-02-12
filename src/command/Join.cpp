@@ -86,9 +86,8 @@ void    join(Client &clt, std::vector<std::string> &command)
             Server::sendMsg(clt, Message::getJoinReply(ch, clt));
             continue ;
         }
-
+        
         Channel &ch = Server::ChannelsInServer[name];
-    
         if (ch.isKey && (ch.getKey().compare(key) != 0)) { Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_BADCHANNELKEY)); continue ; }
         if (ch.isInviteOnly) {
             if ( std::find(ch.invitedUsers.begin(), ch.invitedUsers.end(), clt.nickname) == ch.invitedUsers.end()) {
@@ -104,7 +103,6 @@ void    join(Client &clt, std::vector<std::string> &command)
         it = ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
         if (it.second == 1) {
             clt.ChannelIn.insert(cltPair);
-
             Server::sendMsg(clt, Message::getJoinReply(ch, clt));
             /* BroadCast message */
             Server::sendMsg(ch, clt, ":" + userPrefix(clt) + " JOIN :" + ch.name); //S <-   :alice!a@localhost JOIN :#irctoast

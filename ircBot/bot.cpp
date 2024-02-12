@@ -1,4 +1,5 @@
 #include "Bot.hpp"
+
 static void    message(int fd, std::string msg)
 {
     if (msg.size() > 0) {

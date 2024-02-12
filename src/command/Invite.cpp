@@ -7,19 +7,12 @@ void Operator::invite (Client &clt, std::vector<std::string> &command,std::map<i
         Server::sendMsg( clt, _ERR(clt.nickname, ERR_NEEDMOREPARAMS));
         return ;
     }
-    // for (size_t i = 0 ; i < command.size () ; ++i)
-    // {
-    //    std::cout << "command in invite :" << command[i] << " ";
-    // }
-        // std::cout <<std::endl ;
-    
     command.erase (command.begin ());
     if (command.empty()) 
     {
         Server::sendMsg( clt, _ERR(clt.nickname, ERR_NEEDMOREPARAMS));
         return ;
     }
-    //  std::cout << "size-->" <<ch.clientsInChannel.size()  << std::endl ;
     if (!channelFound(command[1]) || Server::ChannelsInServer[command[1]].clientsInChannel.size() < 1 )
     {
         Server::sendMsg( clt, JOIN_ERR(command[1],clt, ERR_NOSUCHCHANNEL));
@@ -36,7 +29,8 @@ void Operator::invite (Client &clt, std::vector<std::string> &command,std::map<i
         Server::sendMsg( clt,_ERR(clt.nickname,ERR_CHANOPRIVSNEEDED));
         return ;
     }
-    if (getFdByNick(command[0],clients)!= -1)
+    int targetfd =getFdByNick(command[0],clients);
+    if (targetfd != -1)
     {
         if (clientIsOnChannel(ch.name,getFdByNick(command[0],clients)))
         {
@@ -44,13 +38,12 @@ void Operator::invite (Client &clt, std::vector<std::string> &command,std::map<i
             return ;
         }
     }
-
-    Server::sendMsg(clt, commandReply (ch,clt,"INVITE",TYPE_SERVER) + " :" + command[1]);
-    int id = 0;
-    if ((id = getFdByNick(command[0],clients))!= -1) {
-        Server::sendMsg(clients[id], commandReply (ch,clt,"INVITE",TYPE_USER) + " :" + command[1]);
-        ch.invitedUsers.push_back(clients[id].nickname);
+    else 
+    {
+       Server::sendMsg(clt,_ERR(clt.nickname,ERR_NOSUCHNICK));
+            return ;
     }
-    // Server::sendMsg(ch, clt, commandReply (ch,clt,"INVITE",TYPE_USER) + " :"  + command[1]);
-    
+    Server::sendMsg(targetfd, commandReply4 (ch,clt,"INVITE",TYPE_USER,command[0]));
+    Server::sendMsg(clt.fd, commandReply5 (ch,clt, TYPE_SERVER,command[0]));   
+    ch.invitedUsers.push_back (command[0]);
 }

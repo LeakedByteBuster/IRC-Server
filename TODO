@@ -1,0 +1,258 @@
+define "debug" in Makefile
+
+Registration :
+    - send new nick to all users in channels in which user is in
+        NICK lowjp
+        :upps1!~Mushi@197.230.30.146 NICK :lowjp
+    - error "you may not reregister" PASS, USER "ERR_ALREADYREGISTRED"
+    - parse with and without ":"
+    - check number of spaces in user, NICK, and PASS
+    - user is not deleted correctly when is disconnected 
+    - Refactor postRegistration() function
+
+NICK :
+    NICK dasdasdasd // errors :No nickname given not returned to check why
+    NICK dasdasdasd
+    NICK dasdasdasd
+    NICK
+    :ircCamel.localhost 431 dasdasdas :No nickname given
+    NICK aa
+    NICK aa
+
+    maybe remove this [just be sure to have >= 2 strings]
+        if (tokens.size() != 2) {
+        Server::sendMsg(clt, _ERR(clt.nickname, ERR_NONICKNAMEGIVEN));
+        throw std::invalid_argument("");
+    }
+
+LimeChat :
+    - Error sendMsg(): Socket operation on non-socket
+        (happens sometimes after send nick command)
+    - Handle QUIT command sent by LimeChat when client disconnect from server
+        Input: QUIT Leaving...
+        Input: QUIT Leaving...
+        Error(421): Unknown command
+
+Server :
+    - MSG_NOSIGNAL (SIGPIPE)
+
+AFTER REGISTRATION :
+    send 5 welcoming messages in userRegistration()
+
+JOIN :
+    JOIN 0 succeeding or 
+    JOIN 0 failing
+
+:pao001!~kj@197.230.30.146 QUIT :Ping timeout: 260 seconds
+    :pao001!~kj@197.230.30.146 QUIT :Ping timeout: 260 seconds
+MODE #alk001 +o pao001
+    :ioa002!~kj@197.230.30.146 MODE #alk001 +o pao001
+
+
+:nick!=user@hostname INVITE target :channelname
+:hostname 341 nick target channel name 
+INVITE :    
+:Do!~hoba@197.230.30.146 INVITE Dou :#ss //to target 
+
+:copper.libera.chat 341 Do Dou #ss //to client 
+
+PASS 6667
+NICK A
+USER a 0 *  a a a a
+
+PASS 0000
+NICK Do3
+USER hoba 0 * loba hoba douga 
+
+PASS 0000
+NICK B22
+USER Bb 0 * b b b 
+
++i :  Set Invite-Only Channel Mode .
+-i :  Remove Invite-Only Channel Mode .
++t :  Set the restrictions of the TOPIC command to channel operators .
+-t :  Remove the restrictions of the TOPIC command to channel operators .
++k :  Set the channel key .
+-k :  Remove the channel key (Password). 
++o :  Give channel operator privilege.
+-o :  Remove channel operator privilege.
++l :  Set the user limit to channel.
+-l :  Remove the user limit to channel.
+
+
+/* -------------------------------------------------------------------------- */
+/*                                  MODE -i                                   */
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                                  MODE +t                                   */
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                                  MODE -t                                   */
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                                  MODE +k                                   */
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                                  MODE -k                                   */
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                                  MODE +o                                   */
+/* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                                  MODE -o                                   */
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/*                                   MODES                                    */
+/* ---------------------------------------------------------------------------------------------------------------------------------------------------- */
+                                MODE +i
+-----------------------------------------------------------------------------------------------------------------------------
+         Set Invite-Only Channel Mode        -----> isInviteOnly == 1;
+
+This mode is standard, and the mode letter used for it is "+i".
+This channel mode controls whether new users need to be invited to the channel before being able to join.
+If this mode is set on a channel, a user must have received an INVITE for this channel before being allowed to join it.
+If they have not received an invite,
+they will receive an ERR_INVITEONLYCHAN (473) reply and the command will fail.
+------------------------------------------------------------------------------------------------------------------------------
+                                MODE -i
+------------------------------------------------------------------------------------------------------------------------------
+            Remove Invite-Only Channel Mode  -----> isInviteOnly == 0
+
+This mode is standard, and the mode letter used for it is "-i".
+This channel mode controls whether new users need to be invited to the channel before being able to join.
+If this mode is set on a channel, we have to remove it and everyone can access this channel 
+-----------------------------------------------------------------------------------------------------------------------------
+                                MODE +t
+---------------------------------------------------------------------------------------
+            Set Protected Topic Mode         -----> isTopic == 1 ;
+
+            This mode is standard, and the mode letter used for it is "+t".
+This channel mode controls whether channel privileges are required to set the topic, and does not have any value.
+If this mode is enabled, users must have channel privileges such as halfop or operator status in order
+to change the topic of a channel.
+----------------------------------------------------------------------------------------------------------------------
+                                MODE -t
+----------------------------------------------------------------------------------------------------------------------
+            Remove Protected Topic Mode      -----> isTopic == 0 ;
+
+In a channel that have this mode enabled, anyone may set the topic of the channel using the TOPIC command.
+----------------------------------------------------------------------------------------------------------------------
+                                MODE +k
+----------------------------------------------------------------------------------------------------------------------
+            Set the channel key              ------> isKey == 1 ;
+
+
+----------------------------------------------------------------------------------------------------------------------
+                                MODE -k
+----------------------------------------------------------------------------------------------------------------------
+            Remove the channel key           ------> isKey == 0 ;
+
+
+----------------------------------------------------------------------------------------------------------------------
+                                MODE +o
+----------------------------------------------------------------------------------------------------------------------
+            Operator Prefix (Give channel operator privilege )  --------> ClientOperator.isOperator == 1 ;
+
+This mode is standard. The prefix and mode letter used for it, respectively, are "@" and "+o".
+Users with this mode may perform channel moderation tasks such as kicking users,
+applying channel modes, and set other users to operator (or lower) status.
+----------------------------------------------------------------------------------------------------------------------
+                                MODE +o
+----------------------------------------------------------------------------------------------------------------------
+            Operator Prefix (Remove channel operator privilege )  --------> ClientOperator.isOperator == 0 ;
+
+
+-----------------------------------------------------------------------------------------------------------------------
+                                MODE +l
+-----------------------------------------------------------------------------------------------------------------------
+    Set the user limit to channel. -------> isUsersLimit = 1 ; with param how much Users channelLimits.usersLimit
+
+PASS 0000
+NICK ap
+USER apo 0 * apo
+
+<<<<<<< HEAD
+=======
+PASS 3
+NICK apo
+USER apo 0 * apo
+
+
+
+L'entreprise Disklosure recrute des stagiaires et des collaborateurs. Son équipe sera en déplacement le jeudi 08/02/2023 au campus de Khouribga à partir de 15h30 à E3. Venez nombreu-ses-x si vous êtes 
+
+interéssé-e-sCi-après une présentation de l'entreprise:Société : Disklosure SAActivité : Sustainability Software CompanyParticularité : Premier éditeur de solftware de Reporting ESG dédié à l'international au 
+
+MarocAdresse: Avenue Zoulikha Nasri, Lot 5, Étage 2, n°28, Sidi Maarouf, Casablanca, Maroc Profil : Développeur full stak - Stack Technologique : Laravel/VueJs. 
+
+
+PRIVMSG #a,#b,#c,#d,#e,#f :hello channels
+
+JOIN #a,#b,#c,#d,#e,#f
+
+privmsg poalo :hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat :hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat
+
+
+
+hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat :hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat
+
+privmsg poalo :hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat :hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat
+
+
+
+hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat :hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat
+privmsg poalo :hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat :hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat
+
+
+
+<<<<<<< HEAD
+hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat :hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat
+
+
+
+
+
+
+
+correct Error msg 
+
+:lead.libera.chat 461 Dou KICK :Not enough parameters
+
+
+our Error msg // we need the command
+
+:ircCamel.localhost 461 Dou :Not enough parameters
+=======
+hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat :hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat
+>>>>>>> dda69f5c4dee785862f937c58aa2ff4af8c47aa1
+
+
+
+PASS 0000
+NICK B22
+USER Bb 0 * b b b
+:ircCamel.localhost 433  :Nickname is already in use
+when i try to reconnect after i press control+z
+
+
+IRC-Server git:(ahallali) ✗  nc localhost 3000
+PASS 0000
+NICK ap
+USER apo 0 * apo
+:ircCamel.localhost 001 ap :Welcome to the Camel Internet Relay Chat Network ap
+:ircCamel.localhost 002 ap :Your host is ircCamel.localhost , running version ircCamel 1.0
+:ircCamel.localhost 003 ap :This server was created on Sun Feb 11 22:13:50 2024
+:ircCamel.localhost 004 ap :ircCamel.localhost ircCamel 1.0 ol itkol lok
+join #a
+:ap!apo@127.0.0.1 JOIN #a
+:ircCamel.localhost MODE #a +Cnst
+:ircCamel.localhost 353 ap @ #a :ap @Do3 
+:ircCamel.localhost 366 ap #a :End of /NAMES list.
+^Z
+[2]  + 92759 suspended  nc localhost 3000
+➜  IRC-Server git:(ahallali) ✗  nc localhost 3000
+PASS 0000
+NICK ap
+USER apo 0 * apo
+:ircCamel.localhost 433  :Nickname is already in use
