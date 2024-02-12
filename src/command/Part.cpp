@@ -13,17 +13,18 @@ std :: string Partprefix(Client &clt)
 
 void Part_client(Client & clt, std::vector<std::string> command)
 {
-    if(command.size() < 2 || (command.size() == 2 && command[1].size() == 1))
+    if(command.size() < 2 || (command.size() == 2 && command[1].compare(":") == 1))
     {Server::sendMsg(clt, _ERR(clt.nickname, ERR_NEEDMOREPARAMS)); return;}
 
     std::vector<std::string> channels = parse_such(command[1]);
+    std::string reason = compile_msg(command,2);
     for(size_t i = 0;i < channels.size();i++)
     {
         int id = check_channel(Server::ChannelsInServer , channels[i],clt);
 
         if(!id) // Channel Not found
         {
-            Server::sendMsg(clt, _ERR(clt.nickname , ERR_NOSUCHNICK));
+            Server::sendMsg(clt, JOIN_ERR(Channel(channels[i]), clt , ERR_NOSUCHCHANNEL));
             continue;
         }
         else if(id == 2) // channel found and the leaver is a member on it
@@ -32,16 +33,21 @@ void Part_client(Client & clt, std::vector<std::string> command)
             std::map<std::string,Channel>::iterator it = Server::ChannelsInServer.find(channels[i]);
             if(it != Server::ChannelsInServer.end())
             {
-                msg.append(Partprefix(clt));
-                msg.append(channels[i]);
+                msg = commandReply(it->second, clt, "PART", TYPE_USER);
+                msg.append(" :" + reason);
+                // msg.append(Partprefix(clt));
+                // msg.append(channels[i]);
+                // msg.append(reason);
 
                 if(it->second.clientsInChannel.size() > 1)
                 {
+                    std::cout<<msg<<std::endl;
                     Server::sendMsg(it->second,clt,msg);
                     DeleteClt(it->second,clt);
                 }
                 else
                 {
+                    std::cout<<msg<<std::endl;
                     Server::sendMsg(it->second,clt,msg);
                     Server::ChannelsInServer.erase(it);
                 }
@@ -50,7 +56,7 @@ void Part_client(Client & clt, std::vector<std::string> command)
             }
             else{
 
-                Server::sendMsg(clt, _ERR(clt.nickname , ERR_NOSUCHNICK));
+                Server::sendMsg(clt, JOIN_ERR(it->second, clt , ERR_NOSUCHCHANNEL));
             }
             continue;
         }

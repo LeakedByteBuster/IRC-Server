@@ -21,7 +21,7 @@ std :: string Quitprefix(Client &clt)
     std::string prefix;
     prefix.append(":");
     prefix.append(userPrefix(clt));
-    prefix.append(" QUIT :");
+    prefix.append(" QUIT ");
     return(prefix);
 }
 
