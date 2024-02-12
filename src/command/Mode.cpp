@@ -1,49 +1,12 @@
 #include "Server.hpp"
 
+typedef std::pair<Message::error_t, bool>                                       error_pair;
+typedef std::pair<Message::error_t, std::string>                                logError;
+typedef std::vector< std::pair< std::pair< std::string, std::string >, bool > > modesList;
 
-
-// static void mode_L()
-// {
-//     return ;
-// }
-
-// static void mode_O()
-// {
-//     return ;
-// }
-
-// static void mode_T()
-// {
-//     return ;
-// }
-
-// static void mode_K()
-// {
-//     return ;
-// }
-
-// static  void    execute(std::vector<std::string> &, std::vector<std::string> &)
-// {
-
-//     return ;
-// }
-
-// static  void    execute(std::map<int, Client> &, std::vector<std::string> &)
-// {
-
-//     return ;
-// }
-typedef std::pair<Message::error_t, bool>           error_pair;
-typedef std::pair<Message::error_t, std::string>    logError;
 typedef struct s_Modes {
-    s_Modes() {
-        errorOccured = 0;
-    }
-    //  plusModes[n] should be executed before minusModes[n], to keep order of original string
-    //  pair< mode , mode's args if it has one >
-    std::vector< std::pair< std::string, std::string > >    plusModes;
-    std::vector< std::pair< std::string, std::string > >    minusModes;
-    bool                                                    errorOccured;
+    //  vec<pair < pair < mode, param >, minus | plus > > || (bool == '+') = 1 / (bool == '-') = 0
+    modesList   toExecute;
 }   t_Modes;
 
 /* -------------------------------------------------------------------------- */
@@ -153,11 +116,13 @@ static void insertMinusModes(const std::vector<std::string> &param, t_Modes &mod
             toPush = mString[i][j];
             if ( toPush.compare("-") != 0 ) { // if it's a '-' skip it
                 if ( !toPush.compare("o") || !toPush.compare("k")) {
-                    modes.minusModes.push_back(std::make_pair(toPush, param[n]));
+                    // modes.minusModes.push_back(std::make_pair(toPush, param[n]));
+                    modes.toExecute.push_back( make_pair( make_pair(toPush, param[n]), 0 ) );
                     n++;
                     continue ;
                 }
-                modes.minusModes.push_back(std::make_pair(toPush, ""));
+                // modes.minusModes.push_back(std::make_pair(toPush, ""));
+                modes.toExecute.push_back( make_pair( make_pair(toPush, ""), 0 ) );
             }
         }
     }
@@ -171,11 +136,13 @@ static void insertPlusModes(const std::vector<std::string> &param, t_Modes &mode
     for (size_t j = 0; j < mString.size(); j++) {
         toPush = mString[j];
         if ( !toPush.compare("o") || !toPush.compare("l") || !toPush.compare("k")) {
-            modes.plusModes.push_back(std::make_pair(toPush, param[n]));
+            // modes.plusModes.push_back(std::make_pair(toPush, param[n]));
+            modes.toExecute.push_back( make_pair( make_pair(toPush, param[n]), 1 ) );
             n++;
             continue ;
         }
-        modes.plusModes.push_back(std::make_pair(toPush, ""));
+        // modes.plusModes.push_back(std::make_pair(toPush, ""));
+        modes.toExecute.push_back( make_pair( make_pair(toPush, ""), 1 ) );
     }
     return ;
 }
@@ -212,6 +179,51 @@ static t_Modes   separateModes(std::vector<std::string> mString, std::vector<std
 }
 
 /* -------------------------------------------------------------------------- */
+/*                               Modes Methods                                */
+/* -------------------------------------------------------------------------- */
+
+// typedef std::vector< std::pair< std::pair< std::string, std::string >, bool > > modesList;
+
+// static bool mode_L(Channel &ch, const bool &sign)
+// {
+//     return ;
+// }
+
+// static bool mode_O(std::map<int, Client> &clients, Client &clt, std::string arg, const bool &sign)
+// {
+
+//     return ;
+// }
+
+// static bool mode_T(Channel &ch, const bool &sign)
+// {
+//     return ;
+// }
+
+// static bool mode_K(Channel &ch, std::string key, const bool &sign)
+// {
+
+//     return ;
+// }
+
+/*
+------------- 'i' MODE
+MODE #1997 -i [ignores it silently, if not already set]
+
+MODE #1997 +i
+    :Jack!~hoba@197.230.30.146 MODE #1997 +i 
+MODE #986 -i jk hkjhk jh
+    :apo98s!~apo@197.230.30.146 MODE #986 -i 
+*/
+static bool mode_I(Channel &ch, const bool &sign)
+{
+    if ((sign && (ch.isInviteOnly == 1)) || (!sign && (ch.isInviteOnly == 0)))
+        return (0);
+    (sign == 1) ? ch.isInviteOnly = 1 : ch.isInviteOnly = 0;
+    return (1);
+}
+
+/* -------------------------------------------------------------------------- */
 /*                                    MODE                                    */
 /* -------------------------------------------------------------------------- */
 
@@ -229,10 +241,42 @@ static inline void    listChannelModes(const Channel &ch, Client clt)
     Server::sendMsg(clt, msg);
 }
 
+static std::string    setModes(std::map<int, Client> &, Client &, const modesList &list, Channel &ch)
+{
+    std::string res;
+    std::string mode;
+    std::string param;
+    bool        sign;
+    bool        pSign = 0;
+    bool        mSign = 0;
+    // std::map<>
+
+    for (size_t i = 0; i < list.size(); i++) {
+        mode = list[i].first.first;
+        param = list[i].first.second;
+        sign = list[i].second;
+        if (sign == 1 && !pSign) {
+            res.append("+");
+            pSign = 1;
+            mSign = 0;
+        } else if (sign == 0 && !mSign) {
+            res.append("-");
+            pSign = 0;
+            mSign = 1;
+        }
+
+        if ((mode.compare("i") == 0) && mode_I(ch, sign)) {
+            res.append(mode);
+        }
+    }
+    printLog(res, "res --> ");
+    return (res);
+}
+
 /*
     construct mode string using a bool as return in each mode function
 */
-void    Operator::mode(std::map<int, Client> &, Client &clt, const std::vector<std::string> &args)
+void    Operator::mode(std::map<int, Client> &clients, Client &clt, const std::vector<std::string> &args)
 {
     // std::vector< std::pair<std::string, std::string> > modes;
     try
@@ -249,17 +293,18 @@ void    Operator::mode(std::map<int, Client> &, Client &clt, const std::vector<s
         t_Modes modes;
 
         modes = separateModes(modeStrings, param);
-        if (modes.errorOccured) { return ; } // empty mode string is given
+        if (modes.toExecute.size() == 0) { return ; } // empty mode string is given
 
-        // **************************************************************************************** //
-        std::cout << "Plus Modes: " << std::endl;
-        for (size_t i = 0; i < modes.plusModes.size(); i++) {
-            std::cout << modes.plusModes[i].first << " " << modes.plusModes[i].second << std::endl;
-        }
-        std::cout << "Minus Modes: " << std::endl;
-        for (size_t i = 0; i < modes.minusModes.size(); i++) {
-            std::cout << modes.minusModes[i].first << " " << modes.minusModes[i].second << std::endl;
-        }
+        // // **************************************************************************************** //
+        // std::cout << "Modes: " << std::endl;
+        // for (size_t i = 0; i < modes.toExecute.size(); i++) {
+        //     std::cout << modes.toExecute[i].first.first << " " << modes.toExecute[i].first.second << " ? " << modes.toExecute[i].second << std::endl;
+        // }
+        // // **************************************************************************************** //
+
+        setModes(clients, clt, modes.toExecute, ch);
+
+        printLog(ch.isInviteOnly, "is invite : ");
 
     } catch (error_pair error) {
         if (error.second == 1)
@@ -272,7 +317,6 @@ void    Operator::mode(std::map<int, Client> &, Client &clt, const std::vector<s
 
     return ;
 }
-
 
 /*
 
@@ -293,13 +337,7 @@ MODE #986 +l 2147483647
 MODE #986 +l
     :mercury.libera.chat 461 apo98s MODE :Not enough parameters
 
-------------- 'i' MODE
-MODE #1997 -i [ignores it silently, if not already set]
 
-MODE #1997 +i
-    :Jack!~hoba@197.230.30.146 MODE #1997 +i 
-MODE #986 -i jk hkjhk jh
-    :apo98s!~apo@197.230.30.146 MODE #986 -i 
 
 ------------- 'o' MODE
 MODE #986  +o 02 [ignores it silently]

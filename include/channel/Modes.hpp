@@ -7,9 +7,15 @@ struct ClientOperator {
 
 struct ChannelModes {
 
-	ChannelModes (int userLimits, bool key) {		
+	ChannelModes () {		
 		isInviteOnly = 0;
-		isUsersLimit = userLimits;
+		isUsersLimit = 1;
+		isTopic = 0;
+		isKey = 0;
+	}
+	ChannelModes (bool key) {		
+		isInviteOnly = 0;
+		isUsersLimit = 1;
 		isTopic = 0;
 		isKey = key;
 	}

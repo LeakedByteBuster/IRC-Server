@@ -1,17 +1,17 @@
 #include "channel.hpp"
 
-Channel::Channel() : ChannelModes(USERS_CHANNEL_LIMIT, 0)
+Channel::Channel() : ChannelModes()
     , key(""), topic(""), name("")
 {
 }
 
-Channel::Channel(const std::string name) : ChannelModes(USERS_CHANNEL_LIMIT, 0)
+Channel::Channel(const std::string name) : ChannelModes()
     , key(""), topic(""), name(name)
 {
 }
 
 Channel::Channel(const std::string name, const std::string key, std::string topic, int usersLimit)
-    : ChannelModes( usersLimit, !key.empty() ? 1 : 0 ), key(key), topic(topic), name(name)
+    : ChannelModes(!key.empty() ? 1 : 0 ), key(key), topic(topic), name(name)
 {
     this->usersLimit = usersLimit;
 }
