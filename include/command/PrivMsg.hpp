@@ -1,4 +1,5 @@
-#pragma once 
+#pragma once
+
 
 #include <iostream>
 #include <vector>
@@ -10,32 +11,6 @@
 #include "Messages.hpp"
 #include "channel.hpp"
 #include <utility>
-
-#define MSG_MAX 512
-
-
-class Server;
-
-enum    Commands {
-    UNKNOWN,
-    SENDFILE,
-    GETFILE,
-    NICK,
-    PASS_USER,
-    PRVMSG,
-    PONG,
-    IRCBOT,
-    DATE,
-    JOKE,
-    WHOAMI,
-    JOIN,
-    KICK,
-    TOPIC,
-    INVITE,
-    MODE,
-    QUIT,
-    PART
-};
 
 // compare first string in vector too see if is a valid command
 void                        execute_commmand(std::map<int,Client> &clients, std ::vector<std ::string> &commands, int id);
@@ -61,5 +36,3 @@ int                        is_client_in_channel (std::string & name,std::map<std
 int                        check_existed_channel (std::map<std::string,Channel> &channelsInServer , std::string name);
 void                       Detrm_Dest_Msg(Channel ChnlDest ,  const Client & except , std::string Msg , bool Operator);
 std::string                ChnlReply(const Client &sender , const Channel &recv ,  const std::string &msg);
-
-

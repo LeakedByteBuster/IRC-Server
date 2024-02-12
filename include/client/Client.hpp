@@ -3,13 +3,23 @@
 
 #include <iostream>
 #include <arpa/inet.h>
+#include <vector>
+#include <utility>
+#include <map>
 #include "TFile.hpp"
 #include "Modes.hpp"
-#include <vector>
+
+
+
+
+class Channel;
+
 
 class   Client : public ClientOperator {
 
 public :
+
+    std::map<std::string, Channel> ChannelIn; // map of channel that the client memmber of them
     std :: vector<TFile> Files;
     struct sockaddr_in  hints;
     std::string         username;

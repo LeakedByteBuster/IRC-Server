@@ -2,10 +2,12 @@
 #define CHANNEL_HPP
 
 #include <map>
-#include "Client.hpp"
+#include <iostream>
 #include "Modes.hpp"
 #include "Operator.hpp"
 
+
+class Client;
 #define USERS_CHANNEL_LIMIT	25
 
 struct	channelLimits {

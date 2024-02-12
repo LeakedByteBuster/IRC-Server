@@ -12,8 +12,6 @@ int  channelFound (std::string name)
 
 bool clientIsOnChannel (std::string channelName,int fd)
 {
-    std::cout << "name " << channelName << std::endl;
-    std::cout << "fd " << fd << std::endl;
     std::map<std::string, Channel>  :: iterator it = Server::ChannelsInServer.find(channelName);
     if (it != Server::ChannelsInServer.end ())
     {
@@ -90,8 +88,6 @@ KICK #aa user :okokkookok   :
     reason = reasonArg(command , 2);
     if (reason[0] == ':')
         reason.erase(0);
-    // std::cout << "res --> " << reason << std::endl;
-    // command.erase(command.begin());
     if (command.back() == ":")
         command.pop_back ();
     if (command.empty()) 

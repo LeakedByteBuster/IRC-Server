@@ -87,7 +87,9 @@
     BUILD_ERROR(ERR_CANNOTSENDTOCHAN,    404, \
         getStaticErrorMsg(ERR_CANNOTSENDTOCHAN)) \
     BUILD_ERROR(ERR_INPUTTOOLONG,    417, \
-        getStaticErrorMsg(ERR_INPUTTOOLONG))
+        getStaticErrorMsg(ERR_INPUTTOOLONG))\
+    // BUILD_ERROR(ERR_NOTONCHANNEL ,    442, \
+    //     getStaticErrorMsg(ERR_NOTONCHANNEL ))
 
 #define FOR_LIST_OF_JOIN_ERRORS(BUILD_JOIN_ERROR) \
     BUILD_JOIN_ERROR(ERR_NOSUCHCHANNEL,    403, \
@@ -152,7 +154,8 @@ struct  ErrorTypesAndNumbers {
         USERNOTINCHANNEL = 441, //  "<client> <nick> <channel> :They aren't on that channel"
         NOTONCHANNEL     = 442, //  "<client> <channel> :You're not on that channel"
         USERONCHANNEL    = 443, //    "<client> <nick> <channel> :is already on channel"
-    
+        // NOTONCHANNEL     = 442      
+
         // ERR_ERR_TOOMANYTARGETS = 407,
         // ERR_ERR_UNAVAILRESOURCE = 15
 

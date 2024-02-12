@@ -24,6 +24,11 @@
 #include "Command.hpp"
 #include "channel.hpp"
 #include "utils.hpp"
+#include "PrivMsg.hpp"
+#include "Bot.hpp"
+#include "Part.hpp"
+
+#include "Quit.hpp"
 
 #define SOCK_DOMAIN AF_INET
 #define BACKLOG SOMAXCONN
@@ -35,8 +40,8 @@ class   Server {
 public :
     static std::map<std::string, Channel>   ChannelsInServer; // all channels
     //  list of clients connected to the server || Nickname, Client class
-    std::map<int, Client>                   clients; 
-    std::string                             serverCreationDate;
+    std::map<int, Client>                   clients; // all clients in server
+    static std::string                             serverCreationDate;
 
     //	creates a TCP, IPv4, Passive socket
     Server(std::string portNum, std::string password);
@@ -78,6 +83,7 @@ private :
 
     // make class command a friend to server class to get client id from class command
     friend class command;
+    friend class bot;
 };
 
 // template<typename T, typename Key>

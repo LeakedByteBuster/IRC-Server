@@ -172,7 +172,13 @@ PASS 0000
 NICK ap
 USER apo 0 * apo
 
-`
+<<<<<<< HEAD
+=======
+PASS 3
+NICK apo
+USER apo 0 * apo
+
+
 
 L'entreprise Disklosure recrute des stagiaires et des collaborateurs. Son équipe sera en déplacement le jeudi 08/02/2023 au campus de Khouribga à partir de 15h30 à E3. Venez nombreu-ses-x si vous êtes 
 
@@ -200,6 +206,7 @@ privmsg poalo :hey limechat limechat limechat limechat limechat limechat limecha
 
 
 
+<<<<<<< HEAD
 hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat :hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat
 
 
@@ -216,3 +223,36 @@ correct Error msg
 our Error msg // we need the command
 
 :ircCamel.localhost 461 Dou :Not enough parameters
+=======
+hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat :hey limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat limechat:hey limechat
+>>>>>>> dda69f5c4dee785862f937c58aa2ff4af8c47aa1
+
+
+
+PASS 0000
+NICK B22
+USER Bb 0 * b b b
+:ircCamel.localhost 433  :Nickname is already in use
+when i try to reconnect after i press control+z
+
+
+IRC-Server git:(ahallali) ✗  nc localhost 3000
+PASS 0000
+NICK ap
+USER apo 0 * apo
+:ircCamel.localhost 001 ap :Welcome to the Camel Internet Relay Chat Network ap
+:ircCamel.localhost 002 ap :Your host is ircCamel.localhost , running version ircCamel 1.0
+:ircCamel.localhost 003 ap :This server was created on Sun Feb 11 22:13:50 2024
+:ircCamel.localhost 004 ap :ircCamel.localhost ircCamel 1.0 ol itkol lok
+join #a
+:ap!apo@127.0.0.1 JOIN #a
+:ircCamel.localhost MODE #a +Cnst
+:ircCamel.localhost 353 ap @ #a :ap @Do3 
+:ircCamel.localhost 366 ap #a :End of /NAMES list.
+^Z
+[2]  + 92759 suspended  nc localhost 3000
+➜  IRC-Server git:(ahallali) ✗  nc localhost 3000
+PASS 0000
+NICK ap
+USER apo 0 * apo
+:ircCamel.localhost 433  :Nickname is already in use

@@ -2,13 +2,15 @@
 #define BOT_CPP
 
 
-#include "utils.hpp"
+// #include "/Users/mbousouf/Desktop/IRC-Server/include/Messages/Messages.hpp"
+
+class Server;
 
 class Bot {
 
 public:
     Bot();
-    static std::string botExecuter(std::string buff, const Client &clt);
+    std::string botExecuter(std::string buff, std::string clientName);
     const std::string & getJoke();
 
 private:
@@ -17,3 +19,4 @@ private:
 };
 
 #endif // BOT_CPP
+#define ERR_INVALIDARGUMENTS "Error :invalid number of arguments :<serverip> <port> <pass>"

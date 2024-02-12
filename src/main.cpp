@@ -1,9 +1,11 @@
 #include <climits>
 #include "Server.hpp"
 
+
 int main(int ac, char **av)
 {
-    try
+
+    try 
     {
         if (ac != 3)
             throw std::invalid_argument("Error : ./irc <port> <password>");

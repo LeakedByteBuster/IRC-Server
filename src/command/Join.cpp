@@ -86,22 +86,24 @@ void    join(Client &clt, std::vector<std::string> &command)
         std::string key = input[i].second;
 
         if ( tryInsert(name, key) ) {
-
             Channel &ch = Server::ChannelsInServer[name];
+            std::pair<std::string,Channel> cltPair(name,ch);
             
             if ( !key.empty() ) { ch.isKey = 1; }
             clt.isOperator = 1; // set clt as an operator
             //  insert clt in channel's client map
             ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
+            clt.ChannelIn.insert(cltPair);
             Server::sendMsg(clt, Message::getJoinReply(ch, clt));
             continue ;
         }
-
         Channel &ch = Server::ChannelsInServer[name];
+        std::pair<std::string,Channel> cltPair(name,ch);
         if (ch.isKey && (ch.getKey().compare(key) != 0)) { Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_BADCHANNELKEY)); continue ; }
         if (ch.isInviteOnly) { Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_INVITEONLYCHAN)); continue ; }
         clt.isOperator = 0; // reInitialize it to zero
         ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
+        clt.ChannelIn.insert(cltPair);
         Server::sendMsg(clt, Message::getJoinReply(ch, clt));
         /* BroadCast message */
         Server::sendMsg(ch, clt, ":" + userPrefix(clt) + " JOIN :" + ch.name); //S <-   :alice!a@localhost JOIN :#irctoast

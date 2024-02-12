@@ -1,4 +1,5 @@
 #include "Client.hpp"
+#include "channel.hpp"
 #include <sys/socket.h>
 
 Client::Client() : fd(0)

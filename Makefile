@@ -36,6 +36,10 @@ else ifeq ($(build), debug)
 	CXXFLAGS+=-DDEBUG
 else ifeq ($(build), sani)
 	CXXFLAGS+=-fsanitize=address
+else ifeq ($(build), bot)
+	NAME = ircBot/bot
+	SRC = $(shell find ircBot -type f -name "*.cpp") src/client/Client.cpp
+	OBJ = $(patsubst %, $(OBJ_DIR)/%, $(SRC:.cpp=.o))
 endif
 
 all : $(NAME)
@@ -59,8 +63,12 @@ fcleanTest :
 	@ $(RM) $(TESTS_NAME)
 
 fcleanbot :
-	@ $(RM) $(BOT_NAME)
+	@ $(RM) $(NAME)
+
+bclean : clean
+	@ $(RM) $(NAME)
 
 re : fclean all
+r : bclean all
 
 -include $(DEPS)

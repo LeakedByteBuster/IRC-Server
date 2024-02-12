@@ -15,18 +15,12 @@ void Operator::invite (Client &clt, std::vector<std::string> &command,std::map<i
         Server::sendMsg( clt, _ERR(clt.nickname, ERR_NEEDMOREPARAMS));
         return ;
     }
-    //  std::cout << "size-->" <<ch.clientsInChannel.size()  << std::endl ;
     if (!channelFound(command[1]) || Server::ChannelsInServer[command[1]].clientsInChannel.size() < 1 )
     {
         Server::sendMsg( clt, JOIN_ERR(command[1],clt, ERR_NOSUCHCHANNEL));
         return ;
     }
      Channel &ch = Server::ChannelsInServer[command[1]];
-    if (!clientIsOnChannel(command[1],clt.fd))
-    {
-        Server::sendMsg(clt,_ERR(clt.nickname,ERR_NOTONCHANNEL));
-        return ;
-    }
     if (ch.isInviteOnly && !clt.isOperator)
     {
         Server::sendMsg( clt,_ERR(clt.nickname,ERR_CHANOPRIVSNEEDED));

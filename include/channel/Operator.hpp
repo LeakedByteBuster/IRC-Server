@@ -1,6 +1,8 @@
 #if !defined(OPERATOR_HPP)
 #define OPERATOR_HPP
 
+#include "Client.hpp"
+
 class   Operator {
 
 public :
