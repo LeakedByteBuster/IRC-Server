@@ -100,12 +100,16 @@ void    join(Client &clt, std::vector<std::string> &command)
         std::pair<std::string,Channel> cltPair(name,ch);
 
         clt.isOperator = 0; // reInitialize it to zero
-        ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
-        clt.ChannelIn.insert(cltPair);
+        std::__1::pair<std::__1::map<int, Client>::iterator, bool> it;
+        it = ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
+        if (it.second == 1) {
+            clt.ChannelIn.insert(cltPair);
 
-        Server::sendMsg(clt, Message::getJoinReply(ch, clt));
-        /* BroadCast message */
-        Server::sendMsg(ch, clt, ":" + userPrefix(clt) + " JOIN :" + ch.name); //S <-   :alice!a@localhost JOIN :#irctoast
+            Server::sendMsg(clt, Message::getJoinReply(ch, clt));
+            /* BroadCast message */
+            Server::sendMsg(ch, clt, ":" + userPrefix(clt) + " JOIN :" + ch.name); //S <-   :alice!a@localhost JOIN :#irctoast
+        }
+    
     }
     return ;
 }
