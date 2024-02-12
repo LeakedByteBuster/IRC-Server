@@ -60,7 +60,7 @@ void Operator::topic (Client &clt, std::vector<std::string> &command)
     }
     else 
     {
-        if ((ch.isTopic && !clt.isOperator ))
+        if ((ch.isTopic && !ch.clientsInChannel[clt.fd].isOperator))
         {
             Server::sendMsg( clt,_ERR(clt.nickname,ERR_CHANOPRIVSNEEDED));
             return ;
