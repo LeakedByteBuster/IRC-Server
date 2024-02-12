@@ -35,19 +35,14 @@ void Part_client(Client & clt, std::vector<std::string> command)
             {
                 msg = commandReply(it->second, clt, "PART", TYPE_USER);
                 msg.append(" :" + reason);
-                // msg.append(Partprefix(clt));
-                // msg.append(channels[i]);
-                // msg.append(reason);
 
                 if(it->second.clientsInChannel.size() > 1)
                 {
-                    std::cout<<msg<<std::endl;
                     Server::sendMsg(it->second,clt,msg);
                     DeleteClt(it->second,clt);
                 }
                 else
                 {
-                    std::cout<<msg<<std::endl;
                     Server::sendMsg(it->second,clt,msg);
                     Server::ChannelsInServer.erase(it);
                 }
