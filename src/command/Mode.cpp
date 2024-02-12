@@ -186,22 +186,22 @@ static t_Modes   separateModes(std::vector<std::string> mString, std::vector<std
 /*                               Modes Methods                                */
 /* -------------------------------------------------------------------------- */
 
-// typedef std::vector< std::pair< std::pair< std::string, std::string >, bool > > modesList;
-
-static bool mode_O(std::map<int, Client> &clients, std::string arg, const bool &sign)
+static bool mode_O(Channel ch, std::map<int, Client> &clients, std::string arg, const bool &sign)
 {
     int cltFd = search_a_client(clients, arg);
     if (cltFd == 0) { return (0); }
-    
+
     Client  &clt = clients[cltFd];
+    std::string n = ch.name;
+    if (is_client_in_channel(n, Server::ChannelsInServer, clt.nickname) == 0)
+        return (0);
     if ((sign && (clt.isOperator == 1)) || (!sign && (clt.isOperator == 0)))
         return (0);
 
     (sign == 1) ? clt.isOperator = 1 : clt.isOperator = 0;
-    printLog(clt.isOperator, "isOperator = ");
+    // printLog(clt.isOperator, "isOperator = ");
     return (1);
 }
-
 
 static bool mode_K(Channel &ch, std::string key, const bool &sign)
 {
@@ -215,6 +215,7 @@ static bool mode_K(Channel &ch, std::string key, const bool &sign)
     }
 
     ch.isKey = 0;
+    ch.setKey("");
     return (1);
 }
 
@@ -301,16 +302,20 @@ static std::string    setModes(std::map<int, Client> &clients, Client &, const m
         if ((mode.compare("l") == 0) && mode_L(ch, param, sign)) {
             putSign(res, sign, pSign, mSign);
             res.append(mode);
+            if (sign == 1)
+                resArgs.append(" " + param);
             continue ;
         }
         if ((mode.compare("k") == 0) && mode_K(ch, param, sign)) {
             putSign(res, sign, pSign, mSign);
             res.append(mode);
+            (sign == 1) ? resArgs.append(" " + param) : resArgs.append(" *");
             continue ;
         }
-        if ((mode.compare("o") == 0) && mode_O(clients, param, sign)) {
+        if ((mode.compare("o") == 0) && mode_O(ch, clients, param, sign)) {
             putSign(res, sign, pSign, mSign);
             res.append(mode);
+            resArgs.append(" " + param);
             continue ;
         }
     }
@@ -341,21 +346,18 @@ void    Operator::mode(std::map<int, Client> &clients, Client &clt, const std::v
         modes = separateModes(modeStrings, param);
         if (modes.toExecute.size() == 0) { return ; } // empty mode string is given
 
-        // // **************************************************************************************** //
-        // std::cout << "Modes: " << std::endl;
-        // for (size_t i = 0; i < modes.toExecute.size(); i++) {
-        //     std::cout << modes.toExecute[i].first.first << " " << modes.toExecute[i].first.second << " ? " << modes.toExecute[i].second << std::endl;
-        // }
-        // // **************************************************************************************** //
-
         std::string res = setModes(clients, clt, modes.toExecute, ch);
+        if (!res.empty()) {
+            std::string msg = commandReply(ch, clt, "MODE", TYPE_USER) + " " + res;
+            Server::sendMsg(ch, msg);
+        }
 
-        printLog(res, "mode string --> ");
-        printLog(ch.isInviteOnly, "is invite : ");
-        printLog(ch.isTopic, "is topic : ");
-        printLog(ch.isUsersLimit, "is userLimit : ");
-        printLog(ch.isKey, "is key : ");
-        printLog(ch.usersLimit, "userLimit = ");
+        // printLog(res, "mode string --> ");
+        // printLog(ch.isInviteOnly, "is invite : ");
+        // printLog(ch.isTopic, "is topic : ");
+        // printLog(ch.isUsersLimit, "is userLimit : ");
+        // printLog(ch.isKey, "is key : ");
+        // printLog(ch.usersLimit, "userLimit = ");
 
     } catch (error_pair error) {
         if (error.second == 1)
