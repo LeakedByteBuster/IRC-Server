@@ -25,6 +25,8 @@ NICK :
         throw std::invalid_argument("");
     }
 
+pop_back [tochange c++20]
+
 LimeChat :
     - Error sendMsg(): Socket operation on non-socket
         (happens sometimes after send nick command)
@@ -52,6 +54,8 @@ JOIN :
     :pao001!~kj@197.230.30.146 QUIT :Ping timeout: 260 seconds
 MODE #alk001 +o pao001
     :ioa002!~kj@197.230.30.146 MODE #alk001 +o pao001
+
+    join only if the user is in vector of invited users to channel ***********
 
 Alfredo
 
