@@ -14,7 +14,7 @@ public :
     /* Change or view the channel topic */
     static void     topic(Client &clt, std::vector<std::string> &command);
     /* Change the channel’s mode */
-    static void    mode(std::map<int, Client> &clients, Client &clt, const std::vector<std::string> &args);
+    static void    mode(Client &clt, const std::vector<std::string> &args);
 };
 
 std::string reasonArg (std::vector<std::string> &command,size_t positionStart);

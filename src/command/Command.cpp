@@ -65,7 +65,7 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
         
 
         case MODE:
-            Operator::mode(clients, clients[id], commands);    
+            Operator::mode(clients[id], commands);    
             break;
 
         case QUIT:

@@ -186,20 +186,21 @@ static t_Modes   separateModes(std::vector<std::string> mString, std::vector<std
 /*                               Modes Methods                                */
 /* -------------------------------------------------------------------------- */
 
-static bool mode_O(Channel ch, std::map<int, Client> &clients, std::string arg, const bool &sign)
+static bool mode_O(Channel &ch, std::string arg, const bool &sign)
 {
-    int cltFd = search_a_client(clients, arg);
+    int cltFd = search_a_client(ch.clientsInChannel, arg);
     if (cltFd == 0) { return (0); }
 
-    Client  &clt = clients[cltFd];
+    // Client  &clt = clients[cltFd];
     std::string n = ch.name;
-    if (is_client_in_channel(n, Server::ChannelsInServer, clt.nickname) == 0)
-        return (0);
-    if ((sign && (clt.isOperator == 1)) || (!sign && (clt.isOperator == 0)))
+    // if (is_client_in_channel(n, Server::ChannelsInServer, ch.clientsInChannel[cltFd].nickname) == 0)
+    //     return (0);
+    if ((sign && (ch.clientsInChannel[cltFd].isOperator == 1)) || (!sign && (ch.clientsInChannel[cltFd].isOperator == 0)))
         return (0);
 
-    (sign == 1) ? clt.isOperator = 1 : clt.isOperator = 0;
-    // printLog(clt.isOperator, "isOperator = ");
+    (sign == 1) ? ch.clientsInChannel[cltFd].isOperator = 1 : ch.clientsInChannel[cltFd].isOperator = 0;
+    printLog(ch.clientsInChannel[cltFd].isOperator, "isOperator = ");
+
     return (1);
 }
 
@@ -208,12 +209,11 @@ static bool mode_K(Channel &ch, std::string key, const bool &sign)
     if ((sign && (ch.isKey == 1)) || (!sign && (ch.isKey == 0)))
         return (0);
 
-    if (!key.empty()) {
+    if (sign == 1) {
         ch.isKey = 1;
         ch.setKey(key);
         return (1);
     }
-
     ch.isKey = 0;
     ch.setKey("");
     return (1);
@@ -273,7 +273,7 @@ static inline void    listChannelModes(const Channel &ch, Client clt)
     Server::sendMsg(clt, msg);
 }
 
-static std::string    setModes(std::map<int, Client> &clients, Client &, const modesList &list, Channel &ch)
+static std::string    setModes(Client &, const modesList &list, Channel &ch)
 {
     std::string res; // string used as a return value of modes set
     std::string resArgs(" "); // used to holds param of modes (appended with res at the end)
@@ -312,7 +312,7 @@ static std::string    setModes(std::map<int, Client> &clients, Client &, const m
             (sign == 1) ? resArgs.append(" " + param) : resArgs.append(" *");
             continue ;
         }
-        if ((mode.compare("o") == 0) && mode_O(ch, clients, param, sign)) {
+        if ((mode.compare("o") == 0) && mode_O(ch, param, sign)) {
             putSign(res, sign, pSign, mSign);
             res.append(mode);
             resArgs.append(" " + param);
@@ -327,7 +327,7 @@ static std::string    setModes(std::map<int, Client> &clients, Client &, const m
 /*
     construct mode string using a bool as return in each mode function
 */
-void    Operator::mode(std::map<int, Client> &clients, Client &clt, const std::vector<std::string> &args)
+void    Operator::mode(Client &clt, const std::vector<std::string> &args)
 {
     // std::vector< std::pair<std::string, std::string> > modes;
     try
@@ -336,7 +336,10 @@ void    Operator::mode(std::map<int, Client> &clients, Client &clt, const std::v
             throw error_pair(ERR_NEEDMOREPARAMS, 1);
         Channel &ch = findChannel(args[1]);
         if (args.size() == 2) { listChannelModes(ch, clt); return ; }
-        if (clt.isOperator == 0) { throw error_pair(ERR_CHANOPRIVSNEEDED, 1) ; }
+        // maybe return an error : not in channel
+        int cltFd = search_a_client(ch.clientsInChannel, clt.nickname); if (cltFd == 0) { return ; }
+
+        if (ch.clientsInChannel[clt.fd].isOperator == 0) { throw error_pair(ERR_CHANOPRIVSNEEDED, 1) ; }
 
         std::vector<std::string>    param = splitBySpace(appendModeArgs(args));
         std::vector<std::string>    modeStrings = parseModeString(args[2], param);
@@ -346,7 +349,7 @@ void    Operator::mode(std::map<int, Client> &clients, Client &clt, const std::v
         modes = separateModes(modeStrings, param);
         if (modes.toExecute.size() == 0) { return ; } // empty mode string is given
 
-        std::string res = setModes(clients, clt, modes.toExecute, ch);
+        std::string res = setModes(clt, modes.toExecute, ch);
         if (!res.empty()) {
             std::string msg = commandReply(ch, clt, "MODE", TYPE_USER) + " " + res;
             Server::sendMsg(ch, msg);
