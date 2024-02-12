@@ -16,7 +16,7 @@ struct	channelLimits {
 class Channel : public ChannelModes, public channelLimits {
 
 private:
-	const std::string	key;
+	std::string	key;
 
 public:
 	std::vector <std::string> invitedUsers; // when  mode invite only enable add client nick to this vector
@@ -33,6 +33,7 @@ public:
 	std::string getUsersInString() const ;
 	std::string getClientsInString() const;
 	const std::string	&getKey() const ;
+	void				setKey(std::string key);
 	const std::string	getModeString() const ;
 };
 

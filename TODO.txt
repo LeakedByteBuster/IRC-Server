@@ -60,7 +60,7 @@ MODE #alk001 +o pao001
 Alfredo
 
 PASS 3
-NICK apo94
+NICK apo9
 USER apo 0 * apo
 
 `

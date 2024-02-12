@@ -188,19 +188,35 @@ static t_Modes   separateModes(std::vector<std::string> mString, std::vector<std
 
 // typedef std::vector< std::pair< std::pair< std::string, std::string >, bool > > modesList;
 
+static bool mode_O(std::map<int, Client> &clients, std::string arg, const bool &sign)
+{
+    int cltFd = search_a_client(clients, arg);
+    if (cltFd == 0) { return (0); }
+    
+    Client  &clt = clients[cltFd];
+    if ((sign && (clt.isOperator == 1)) || (!sign && (clt.isOperator == 0)))
+        return (0);
 
-// static bool mode_O(std::map<int, Client> &clients, Client &clt, std::string arg, const bool &sign)
-// {
+    (sign == 1) ? clt.isOperator = 1 : clt.isOperator = 0;
+    printLog(clt.isOperator, "isOperator = ");
+    return (1);
+}
 
-//     return ;
-// }
 
+static bool mode_K(Channel &ch, std::string key, const bool &sign)
+{
+    if ((sign && (ch.isKey == 1)) || (!sign && (ch.isKey == 0)))
+        return (0);
 
-// static bool mode_K(Channel &ch, std::string key, const bool &sign)
-// {
+    if (!key.empty()) {
+        ch.isKey = 1;
+        ch.setKey(key);
+        return (1);
+    }
 
-//     return ;
-// }
+    ch.isKey = 0;
+    return (1);
+}
 
 static bool mode_L(Channel &ch, std::string param, const bool &sign)
 {
@@ -218,8 +234,7 @@ static bool mode_L(Channel &ch, std::string param, const bool &sign)
         return (1);
     }
 
-    (sign == 1) ? ch.isUsersLimit = 1 : ch.isUsersLimit = 0;
-
+    ch.isUsersLimit = 0;
     return (1);
 }
 
@@ -257,14 +272,15 @@ static inline void    listChannelModes(const Channel &ch, Client clt)
     Server::sendMsg(clt, msg);
 }
 
-static std::string    setModes(std::map<int, Client> &, Client &, const modesList &list, Channel &ch)
+static std::string    setModes(std::map<int, Client> &clients, Client &, const modesList &list, Channel &ch)
 {
-    std::string res;
-    std::string mode;
-    std::string param;
-    bool        sign;
-    bool        pSign = 0;
-    bool        mSign = 0;
+    std::string res; // string used as a return value of modes set
+    std::string resArgs(" "); // used to holds param of modes (appended with res at the end)
+    std::string mode; // current char in while
+    std::string param; // current correspondant param of the mode (if any)
+    bool        sign; // sign of the current char
+    bool        pSign = 0; // used to append + to res
+    bool        mSign = 0; // used to append - to res
 
     for (size_t i = 0; i < list.size(); i++) {
         mode = list[i].first.first;
@@ -287,7 +303,19 @@ static std::string    setModes(std::map<int, Client> &, Client &, const modesLis
             res.append(mode);
             continue ;
         }
+        if ((mode.compare("k") == 0) && mode_K(ch, param, sign)) {
+            putSign(res, sign, pSign, mSign);
+            res.append(mode);
+            continue ;
+        }
+        if ((mode.compare("o") == 0) && mode_O(clients, param, sign)) {
+            putSign(res, sign, pSign, mSign);
+            res.append(mode);
+            continue ;
+        }
     }
+    if (resArgs.size() > 1) // because it's initialized with space 0x20
+        res.append(resArgs);
     return (res);
 }
 
@@ -326,6 +354,7 @@ void    Operator::mode(std::map<int, Client> &clients, Client &clt, const std::v
         printLog(ch.isInviteOnly, "is invite : ");
         printLog(ch.isTopic, "is topic : ");
         printLog(ch.isUsersLimit, "is userLimit : ");
+        printLog(ch.isKey, "is key : ");
         printLog(ch.usersLimit, "userLimit = ");
 
     } catch (error_pair error) {

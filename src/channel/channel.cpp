@@ -46,6 +46,10 @@ const std::string	Channel::getModeString() const {
     return (modeString);
 }
 
+void    Channel::setKey(std::string key) {
+    this->key = key;
+}
+
 const std::string	& Channel::getKey() const {
     return (this->key);
 }
