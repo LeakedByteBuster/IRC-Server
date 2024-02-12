@@ -56,11 +56,13 @@ MODE #alk001 +o pao001
     :ioa002!~kj@197.230.30.146 MODE #alk001 +o pao001
 
     join only if the user is in vector of invited users to channel ***********
+    join if there is enough space for another user
+    delete user from invited users 
 
 Alfredo
 
 PASS 3
-NICK apo9
+NICK ap554
 USER apo 0 * apo
 
 `

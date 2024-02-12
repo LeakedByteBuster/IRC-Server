@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include <algorithm>
 
 bool    isChannelNameCorrect(std::string name)
 {
@@ -60,18 +61,6 @@ bool    tryInsert(const std::string &name, const std::string key)
     return ((it.second == 1) ? 1 : 0);
 }
 
-/*
-While a user is joined to a channel, they receive all status messages 
-related to that channel including new JOIN, PART, KICK, and MODE messages.
-
-If a user’s JOIN command is successful, the server:
-
-Sends them a JOIN message described above.
-May send a MODE message with the current channel’s modes.
-Sends them RPL_TOPIC and RPL_TOPICTIME numerics if the channel has a topic set (if the topic is not set, the user is sent no numerics).
-Sends them one or more RPL_NAMREPLY numerics (which also contain the name of the user that’s joining).
-*/
-
 void    join(Client &clt, std::vector<std::string> &command)
 {
     command.erase(command.begin()); // skip first argument "JOIN"
@@ -97,15 +86,23 @@ void    join(Client &clt, std::vector<std::string> &command)
             Server::sendMsg(clt, Message::getJoinReply(ch, clt));
             continue ;
         }
-        
+
         Channel &ch = Server::ChannelsInServer[name];
-        std::pair<std::string,Channel> cltPair(name,ch);
     
         if (ch.isKey && (ch.getKey().compare(key) != 0)) { Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_BADCHANNELKEY)); continue ; }
-        if (ch.isInviteOnly) { Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_INVITEONLYCHAN)); continue ; }
+        if (ch.isInviteOnly) {
+            if ( std::find(ch.invitedUsers.begin(), ch.invitedUsers.end(), clt.nickname) == ch.invitedUsers.end()) {
+                Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_INVITEONLYCHAN));
+                continue ;
+            }
+        }
+
+        std::pair<std::string,Channel> cltPair(name,ch);
+
         clt.isOperator = 0; // reInitialize it to zero
         ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
         clt.ChannelIn.insert(cltPair);
+
         Server::sendMsg(clt, Message::getJoinReply(ch, clt));
         /* BroadCast message */
         Server::sendMsg(ch, clt, ":" + userPrefix(clt) + " JOIN :" + ch.name); //S <-   :alice!a@localhost JOIN :#irctoast

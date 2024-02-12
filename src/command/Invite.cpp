@@ -7,11 +7,12 @@ void Operator::invite (Client &clt, std::vector<std::string> &command,std::map<i
         Server::sendMsg( clt, _ERR(clt.nickname, ERR_NEEDMOREPARAMS));
         return ;
     }
-    for (size_t i = 0 ; i < command.size () ; ++i)
-    {
-       std::cout << "command in invite :" << command[i] << " ";
-    }
-        std::cout <<std::endl ;
+    // for (size_t i = 0 ; i < command.size () ; ++i)
+    // {
+    //    std::cout << "command in invite :" << command[i] << " ";
+    // }
+        // std::cout <<std::endl ;
+    
     command.erase (command.begin ());
     if (command.empty()) 
     {
@@ -24,7 +25,7 @@ void Operator::invite (Client &clt, std::vector<std::string> &command,std::map<i
         Server::sendMsg( clt, JOIN_ERR(command[1],clt, ERR_NOSUCHCHANNEL));
         return ;
     }
-     Channel &ch = Server::ChannelsInServer[command[1]];
+    Channel &ch = Server::ChannelsInServer[command[1]];
     if (!clientIsOnChannel(command[1],clt.fd))
     {
         Server::sendMsg(clt,_ERR(clt.nickname,ERR_NOTONCHANNEL));
@@ -43,7 +44,13 @@ void Operator::invite (Client &clt, std::vector<std::string> &command,std::map<i
             return ;
         }
     }
-    // std::cout << "-->" << commandReply (ch,clt,"INVITE",TYPE_USER) << std::endl;
-    Server::sendMsg(clt, commandReply (ch,clt,"INVITE",TYPE_USER));
+
+    Server::sendMsg(clt, commandReply (ch,clt,"INVITE",TYPE_SERVER) + " :" + command[1]);
+    int id = 0;
+    if ((id = getFdByNick(command[0],clients))!= -1) {
+        Server::sendMsg(clients[id], commandReply (ch,clt,"INVITE",TYPE_USER) + " :" + command[1]);
+        ch.invitedUsers.push_back(clients[id].nickname);
+    }
+    // Server::sendMsg(ch, clt, commandReply (ch,clt,"INVITE",TYPE_USER) + " :"  + command[1]);
     
 }
