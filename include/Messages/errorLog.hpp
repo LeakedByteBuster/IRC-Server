@@ -45,9 +45,11 @@
 #define ERR_INPUTTOOLONG        Message::MSGTOOLONG
 #define ERR_USERONCHANNEL       Message::USERONCHANNEL
 #define ERR_UNKNOWNMODE         Message::UNKNOWNMODE
+
+// #define ERR_NOTONCHANNEL        Message::NOTONCHANNEL
+
 // #define rplAwayMsg and call _ERR()
 
-// shortcut for using Message::get_REPLY() method
 
 /*
     error number in ERR_NONICKNAMEGIVEN and ERR_ERRONEUSNICKNAME
@@ -89,7 +91,9 @@
     BUILD_ERROR(ERR_CANNOTSENDTOCHAN,    404, \
         getStaticErrorMsg(ERR_CANNOTSENDTOCHAN)) \
     BUILD_ERROR(ERR_INPUTTOOLONG,    417, \
-        getStaticErrorMsg(ERR_INPUTTOOLONG))
+        getStaticErrorMsg(ERR_INPUTTOOLONG))\
+    // BUILD_ERROR(ERR_NOTONCHANNEL ,    442, \
+    //     getStaticErrorMsg(ERR_NOTONCHANNEL ))
 
 #define FOR_LIST_OF_JOIN_ERRORS(BUILD_JOIN_ERROR) \
     BUILD_JOIN_ERROR(ERR_NOSUCHCHANNEL,    403, \

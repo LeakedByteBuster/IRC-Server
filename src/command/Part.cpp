@@ -1,40 +1,65 @@
-// #include "Server.hpp"
+#include "Part.hpp"
+
+#include "Server.hpp"
+
+std :: string Partprefix(Client &clt)
+{
+    std::string prefix;
+    prefix.append(":");
+    prefix.append(userPrefix(clt));
+    prefix.append(" PART :");
+    return(prefix);
+}
+
+void Part_client(Client & clt, std::vector<std::string> command)
+{
+    if(command.size() < 2 || (command.size() == 2 && command[1].size() == 1))
+    {Server::sendMsg(clt, _ERR(clt.nickname, ERR_NEEDMOREPARAMS)); return;}
+
+    std::vector<std::string> channels = parse_such(command[1]);
+    for(size_t i = 0;i < channels.size();i++)
+    {
+        int id = check_channel(Server::ChannelsInServer , channels[i],clt);
+
+        if(!id) // Channel Not found
+        {
+            Server::sendMsg(clt, _ERR(clt.nickname , ERR_NOSUCHNICK));
+            continue;
+        }
+        else if(id == 2) // channel found and the leaver is a member on it
+        {
+            std::string msg;
+            std::map<std::string,Channel>::iterator it = Server::ChannelsInServer.find(channels[i]);
+            if(it != Server::ChannelsInServer.end())
+            {
+                msg.append(Partprefix(clt));
+                msg.append(channels[i]);
+
+                if(it->second.clientsInChannel.size() > 1)
+                {
+                    Server::sendMsg(it->second,clt,msg);
+                    DeleteClt(it->second,clt);
+                }
+                else
+                {
+                    Server::sendMsg(it->second,clt,msg);
+                    Server::ChannelsInServer.erase(it);
+                }
+
+                Server::sendMsg(clt,msg);
+            }
+            else{
+
+                Server::sendMsg(clt, _ERR(clt.nickname , ERR_NOSUCHNICK));
+            }
+            continue;
+        }
+        else // the channel found but the sender is not member on it
+        {
+            Server::sendMsg(clt, _ERR(clt.nickname, ERR_NOTONCHANNEL));
+            continue;
+        }
+    }
 
 
-
-// std::vector<std::string> parsePart(Client &clt, std::vector<std::string> &command)
-// {
-//     std::vector<std::string>   tokens;
-//     std::vector<std::string>                            splited;
-//     std::string                                         error;
-
-//     splited = splitByValue(command[0], ',');
-//     if (splited.empty()) {
-//         Server::sendMsg(clt, JOIN_ERR(Channel(command[0]), clt, ERR_BADCHANMASK));
-//         return (tokens);
-//     }
-    
-//     for (size_t i = 0; i < splited.size(); i++) {
-//         if (!isChannelNameCorrect(splited[i]) || splited[i].size() > MAX_CHANNEL_NAME_LEN + 1)
-//          {
-//             if (i != 0)
-//                 error.append("\r\n");
-//             error.append(JOIN_ERR( Channel(splited[i]), clt, ERR_BADCHANMASK));
-//             continue ;
-//         }
-//         tokens.push_back(splited[i]);
-//     }
-//      if (!error.empty()) {
-//         Server::sendMsg( clt, error );
-//     }
-//     return (tokens);
-// }
-// void part (Client &clt, std::vector<std::string> &command)
-// {
-//     std::vector<std::string>   tokens = parsePart (clt ,command);
-//     std::string reason = reasonArg (command,2);
-//     for (size_t i = 0 ; i < tokens.size () ; ++i)
-//     {
-//         if 
-//     }
-// }
+}

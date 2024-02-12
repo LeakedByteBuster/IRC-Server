@@ -1,4 +1,5 @@
 #include "channel.hpp"
+#include "Client.hpp"
 
 Channel::Channel() : ChannelModes()
     , key(""), topic(""), name("")

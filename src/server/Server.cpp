@@ -106,12 +106,12 @@ Server::~Server()
         std::cerr << "Error close() : " << strerror(errno) << std::endl;
     }
     //  Close all clients fd
-    std::map<int, Client>::iterator it = clients.begin();
-    for (; it != clients.end(); it++)
-    {
-        if (close(it->second.fd) == -1)
-            std::cerr << "Error close() : " << strerror(errno) << std::endl;
-    }
+    // std::map<int, Client>::iterator it = clients.begin();
+    // for (; it != clients.end(); it++)
+    // {
+    //     if (close(it->second.fd) == -1)
+    //         std::cerr << "Error close() : " << strerror(errno) << std::endl;
+    // }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -307,8 +307,8 @@ void    Server::sendMsg(const Channel &ch, std::string msg)
 {
     const std::map<int, Client> &clts = ch.clientsInChannel;
     std::map<int, Client>::const_iterator it = clts.begin();
-
     for (; it != clts.end(); it++) {
+        
         Server::sendMsg(it->second, msg);
     }
 }
