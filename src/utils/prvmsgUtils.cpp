@@ -14,7 +14,7 @@ std :: string compile_msg(std::vector<std::string> commands, int position)
         }
         msg.append(commands[i]);
     }
-    if(commands.size() > 3)
+    if(commands.size() >= 3)
         msg.erase(msg.begin());
     return (msg);
 }

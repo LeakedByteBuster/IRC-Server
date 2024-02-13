@@ -38,7 +38,7 @@ void Client_Quit(Client & clt,std::vector<std::string> command,std::map<int,Clie
     else
         reason.append("Client Quit");
     Server::sendMsg(clt,reason);
-    std::map<std::string,Channel>::iterator it = clt.ChannelIn.begin();
+    std::map<std::string,Channel &>::iterator it = clt.ChannelIn.begin();
     for(; it != clt.ChannelIn.end();it++)
     {
         Server::sendMsg(it->second,clt,reason);

@@ -16,7 +16,7 @@ class   Client : public ClientOperator {
 
 public :
 
-    std::map<std::string, Channel> ChannelIn; // map of channel that the client memmber of them
+    std::map<std::string , Channel &> ChannelIn; // map of channel that the client memmber of them
     std :: vector<TFile> Files;
     struct sockaddr_in  hints;
     std::string         username;

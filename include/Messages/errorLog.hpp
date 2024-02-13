@@ -172,7 +172,7 @@ void    printLog(std::vector<std::string> args);
 template<typename T>
 void    printLog(T s, const std::string msg)
 {
-    std::cout << HRED << "[ DEBUG ] " << msg << ": " << s << RESET << std::endl;
+    std::cout << HRED << "[ DEBUG ] " << msg << " >>> " << s << RESET << std::endl;
     return ;
 }
 

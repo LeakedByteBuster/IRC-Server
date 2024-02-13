@@ -25,6 +25,7 @@ void check_targets(std::vector<std::string> command , std::vector<std::string> p
     std :: string Chnl_name;
 
     std :: string msg = compile_msg(command,2);
+    printLog(msg,"msg");
     if(msg.size() > MSG_MAX)
     {
         Server::sendMsg(clt, _ERR(clt.nickname ,ERR_INPUTTOOLONG));

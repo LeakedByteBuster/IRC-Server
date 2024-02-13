@@ -12,11 +12,16 @@ MAKEFILE :
 PRIVMSG : [ERROR: Receiving two ':' characters when sending only one]
     Message sent from c1 to c2
         privmsg c2 :
-    Received message
-        :c1!c1@127.0.0.1 PRIVMSG c2 :::
+    Received message››
+        :c1!c1@127.0.0.1 PRIVMSG c2 ::: >>>>>> // 
+*******************************************************************************        
+[FIX] it in msgcompile() and make the condition (command.size()>= 3) inline 17
 
 QUIT :
     [ERROR: message of quit is not brodcasted correctly, other user aren't notified when a client in the network has quit the server]
+
+*************************************************************************************************************************************
+[FIX] with make map of channel that client member on it with refrence any change that's happens to the channle will make on map 
 --------------------------------------------------------------------------------------------------------------------------------------------------
 
 INVITE : [ERROR: message of error sent is not well formated, an extra ':' before channel name] [c4 is a NON connected client]
@@ -34,7 +39,7 @@ INVITE : [ERROR: message of error sent is not well formated, an extra ':' before
 
 
 
-PASS 6667
+PASS 0000
 NICK A
 USER a 0 *  a a a a
 
