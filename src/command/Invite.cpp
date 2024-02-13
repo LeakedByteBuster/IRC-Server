@@ -13,7 +13,7 @@ void Operator::invite (Client &clt, std::vector<std::string> &command,std::map<i
         Server::sendMsg( clt, _ERR(clt.nickname, ERR_NEEDMOREPARAMS));
         return ;
     }
-    if (!channelFound(command[1]) || Server::ChannelsInServer[command[1]].clientsInChannel.size() < 1 )
+    if (!channelFound(command[1]) )
     {
         Server::sendMsg( clt, JOIN_ERR(command[1],clt, ERR_NOSUCHCHANNEL));
         return ;
@@ -32,7 +32,7 @@ void Operator::invite (Client &clt, std::vector<std::string> &command,std::map<i
     int targetfd =getFdByNick(command[0],clients);
     if (targetfd != -1)
     {
-        if (clientIsOnChannel(ch.name,getFdByNick(command[0],clients)))
+        if (clientIsOnChannel(ch.name,targetfd))
         {
             Server::sendMsg( clt,_ERR(clt.nickname,ERR_USERONCHANNEL));
             return ;
