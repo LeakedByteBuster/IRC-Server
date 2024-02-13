@@ -184,7 +184,7 @@ std::string getRplIsupport(const std::string &nick) {
     std::string support(static_cast<std::string>(":") + SERVER_PREFIX + "005 " + nick);
 
     support.append(static_cast<std::string>(" CASEMAPPING=rfc1459 ") + "PREFIX=(o)@ " + "CHANMODES=,k,l,ti " + "CHANNELLEN=32 "
-        + "CHANLIMIT=25 " + "CHANTYPES=# " + "NICKLEN=9 " + "USERLEN=9 ");
+        + "CHANLIMIT=#: " + "CHANTYPES=# " + "NICKLEN=9 " + "USERLEN=9 ");
 
     return (support);
 }

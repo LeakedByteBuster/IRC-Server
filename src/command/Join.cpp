@@ -53,9 +53,12 @@ std::vector<std::pair<std::string, std::string> >
     return (tokens);
 }
 
-bool    tryInsert(const std::string &name, const std::string key)
+bool    tryInsert(std::string &name, const std::string key)
 {
     std::pair<std::map<std::string, Channel>::iterator, bool>    it;
+
+    if (name.size() > 32)
+        name = name.substr(0, 32);
 
     it = Server::ChannelsInServer.insert(std::make_pair(name, Channel(name, key, "", USERS_CHANNEL_LIMIT)));
     return ((it.second == 1) ? 1 : 0);
@@ -87,16 +90,17 @@ void    join(Client &clt, std::vector<std::string> &command)
         }
         
         Channel &ch = Server::ChannelsInServer[name];
-        if (ch.isKey && (ch.getKey().compare(key) != 0)) { Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_BADCHANNELKEY)); continue ; }
+        if (ch.isKey && (ch.getKey().compare(key) != 0)) {
+            Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_BADCHANNELKEY));
+            continue ;
+        }
         if (ch.isInviteOnly) {
             if ( std::find(ch.invitedUsers.begin(), ch.invitedUsers.end(), clt.nickname) == ch.invitedUsers.end()) {
                 Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_INVITEONLYCHAN));
                 continue ;
             }
         }
-
         std::pair<std::string,Channel> cltPair(name,ch);
-
         clt.isOperator = 0; // reInitialize it to zero
         std::__1::pair<std::__1::map<int, Client>::iterator, bool> it;
         it = ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
