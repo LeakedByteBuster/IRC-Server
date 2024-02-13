@@ -53,11 +53,14 @@ std::vector<std::pair<std::string, std::string> >
     return (tokens);
 }
 
-bool    tryInsert(const std::string &name, const std::string key)
+bool    tryInsert(std::string &name, const std::string key)
 {
     std::pair<std::map<std::string, Channel>::iterator, bool>    it;
-    
-    it = Server::ChannelsInServer.insert(std::make_pair(name, Channel(name, key, "", USERS_CHANNEL_LIMIT)));
+
+    if (name.size() > 32)
+        name = name.substr(0, 32);
+
+    it = Server::ChannelsInServer.insert(std::make_pair(name, Channel(name, key, "", DEFAULT_MAX_USERS_IN_CHANNEL)));
     return ((it.second == 1) ? 1 : 0);
 }
 
@@ -76,38 +79,37 @@ void    join(Client &clt, std::vector<std::string> &command)
 
         if ( tryInsert(name, key) ) {
             Channel &ch = Server::ChannelsInServer[name];
-            std::pair<std::string,Channel> cltPair(name,ch);
-            
+
             if ( !key.empty() ) { ch.isKey = 1; }
             clt.isOperator = 1; // set clt as an operator
-            //  insert clt in channel's client map
             ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
-            clt.ChannelIn.insert(cltPair);
+            clt.ChannelIn.insert(std::make_pair(name,ch));
             Server::sendMsg(clt, Message::getJoinReply(ch, clt));
             continue ;
         }
-        
         Channel &ch = Server::ChannelsInServer[name];
-        if (ch.isKey && (ch.getKey().compare(key) != 0)) { Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_BADCHANNELKEY)); continue ; }
+        if (ch.isUsersLimit && (ch.clientsInChannel.size() == static_cast<size_t>(ch.usersLimit))) {
+            Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_CHANNELISFULL));
+            return ;
+        }
+        if (ch.isKey && (ch.getKey().compare(key) != 0)) {
+            Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_BADCHANNELKEY));
+            continue ;
+        }
         if (ch.isInviteOnly) {
             if ( std::find(ch.invitedUsers.begin(), ch.invitedUsers.end(), clt.nickname) == ch.invitedUsers.end()) {
                 Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_INVITEONLYCHAN));
                 continue ;
             }
         }
-
-        std::pair<std::string,Channel> cltPair(name,ch);
-
         clt.isOperator = 0; // reInitialize it to zero
         std::__1::pair<std::__1::map<int, Client>::iterator, bool> it;
         it = ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
         if (it.second == 1) {
-            clt.ChannelIn.insert(cltPair);
+            clt.ChannelIn.insert(std::make_pair(name,ch));
             Server::sendMsg(clt, Message::getJoinReply(ch, clt));
-            /* BroadCast message */
-            Server::sendMsg(ch, clt, ":" + userPrefix(clt) + " JOIN :" + ch.name); //S <-   :alice!a@localhost JOIN :#irctoast
+            Server::sendMsg(ch, clt, ":" + userPrefix(clt) + " JOIN :" + ch.name);
         }
-    
     }
     return ;
 }

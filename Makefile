@@ -32,8 +32,6 @@ ifeq ($(build), tests)
 	NAME=$(TESTS_NAME)
 else ifeq ($(build), log)
 	CXXFLAGS+=-DLOG
-else ifeq ($(build), debug)
-	CXXFLAGS+=-DDEBUG
 else ifeq ($(build), sani)
 	CXXFLAGS+=-fsanitize=address
 else ifeq ($(build), bot)
