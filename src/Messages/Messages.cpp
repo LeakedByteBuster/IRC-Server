@@ -115,18 +115,7 @@ std::string Message::getKickReply(const Channel &ch, const Client &clt, std::str
         );
     return  (reply);
 }
-// std::string Message::getKickedReply(const Channel &ch, const Client &clt, std::string target)
-// {
-//      std::string reply(
-//         commandReply(ch, clt, "KICK", TYPE_USER)
-//         + " " 
-//         + target
-//         + " :"
-//         + "Kicked by "
-//         +clt.nickname
-//         );
-//     return  (reply);
-// }
+
 std::string Message::getTopicReply(const Channel &ch, const Client & clt, std::string num , std::string topic)
 {
      std::string reply(
@@ -134,20 +123,6 @@ std::string Message::getTopicReply(const Channel &ch, const Client & clt, std::s
         );
     return  (reply);
 }
-// std::string Message::getInviteReply(const Channel &ch, const Client & clt, std::string num , std::string topic)
-// {
-//      std::string reply(
-//         commandReply2(ch, clt, num, topic)
-//         );
-//     return  (reply);
-// }
-// _ERR(..) + ch.name  + ch.topic;
-// _ERR(..) + ch.name + time()
-
-// void    printLog(std::string str)
-// {
-//     std::cout << HRED << "[ DEBUG ] " << str << RESET <<  std::endl;
-// }
 
 void    printLog(std::vector<std::string> args)
 {

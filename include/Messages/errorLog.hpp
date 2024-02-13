@@ -168,16 +168,7 @@ struct  ErrorTypesAndNumbers {
     } error_t;
 } ;
 
-// void    printLog(std::string str);
 void    printLog(std::vector<std::string> args);
-
-// void    printLog(std::vector< std::pair< std::string, std::string > > args)
-// {
-//     std::vector< std::pair< std::string, std::string > >::iterator  it = args.begin();
-//     for (; it < args.end(); it++) { 
-//         std::cout << HRED << "[ DEBUG ] " << it->first << " - " << it->second << RESET << std::endl;
-//     }
-// }
 
 // used to print any basic types for debugging purposes: int, string...
 template<typename T>
