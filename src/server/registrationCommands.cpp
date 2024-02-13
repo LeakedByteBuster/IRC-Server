@@ -131,7 +131,7 @@ void    parseUser(Client &clt, std::string str)
     //  set username and realname for the client
     if (tokens[1].size() > 9)
         str = tokens[1].substr(0, 9);
-    if (rname.size() > 9)
+    if (rname.size() > 15)
         rname = rname.substr(0, 15);
     clt.username = tokens[1];
     clt.realname = rname;

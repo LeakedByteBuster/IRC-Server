@@ -180,6 +180,16 @@ int whichCommand(const std::string &first_argument)
     return (ret);
 }
 
+std::string getRplIsupport(const std::string &nick) {
+    std::string support(static_cast<std::string>(":") + SERVER_PREFIX + "005 " + nick);
+
+    support.append(static_cast<std::string>(" CASEMAPPING=rfc1459 ") + "PREFIX=(o)@ " + "CHANMODES=,k,l,ti " + "CHANNELLEN=32 "
+        + "CHANLIMIT=25 " + "CHANTYPES=# " + "NICKLEN=9 " + "USERLEN=9 ");
+
+    return (support);
+}
+
+
 std::string Server::postRegistration(const Client &clt)
 {
     std::string str;
@@ -225,8 +235,10 @@ std::string Server::postRegistration(const Client &clt)
         + SERVER_VERSION 
         + " ol "
         + "itkol " 
-        + "lok"
+        + "lok\r\n"
     );
+    str.append(getRplIsupport(clt.nickname));
+
     Server::sendMsg(clt, str);
     str.clear();
 

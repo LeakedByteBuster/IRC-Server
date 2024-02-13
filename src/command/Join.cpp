@@ -56,7 +56,7 @@ std::vector<std::pair<std::string, std::string> >
 bool    tryInsert(const std::string &name, const std::string key)
 {
     std::pair<std::map<std::string, Channel>::iterator, bool>    it;
-    
+
     it = Server::ChannelsInServer.insert(std::make_pair(name, Channel(name, key, "", USERS_CHANNEL_LIMIT)));
     return ((it.second == 1) ? 1 : 0);
 }
@@ -80,7 +80,6 @@ void    join(Client &clt, std::vector<std::string> &command)
             
             if ( !key.empty() ) { ch.isKey = 1; }
             clt.isOperator = 1; // set clt as an operator
-            //  insert clt in channel's client map
             ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
             clt.ChannelIn.insert(cltPair);
             Server::sendMsg(clt, Message::getJoinReply(ch, clt));
@@ -105,7 +104,7 @@ void    join(Client &clt, std::vector<std::string> &command)
             clt.ChannelIn.insert(cltPair);
             Server::sendMsg(clt, Message::getJoinReply(ch, clt));
             /* BroadCast message */
-            Server::sendMsg(ch, clt, ":" + userPrefix(clt) + " JOIN :" + ch.name); //S <-   :alice!a@localhost JOIN :#irctoast
+            Server::sendMsg(ch, clt, ":" + userPrefix(clt) + " JOIN :" + ch.name);
         }
     
     }

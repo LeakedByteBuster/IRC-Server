@@ -5,11 +5,29 @@ LimeChat :
     - Error sendMsg(): Socket operation on non-socket
         (happens sometimes after send nick command)
 
-Server :
-    - MSG_NOSIGNAL (SIGPIPE)
-
 AFTER REGISTRATION :
     send 5 welcoming messages in userRegistration()
+
+JOIN :
+    if topic is set SEND RPL_TOPIC
+    user limit in channel, check if reached
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+PRIVMSG : [ERROR: Receiving two ':' characters when sending only one]
+    Message sent from c1 to c2
+        privmsg c2 :
+    Received message
+        :c1!c1@127.0.0.1 PRIVMSG c2 :::
+
+QUIT :
+    [ERROR: message of quit is not brodcasted correctly, other user aren't notified when a client in the network has quit the server]
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+INVITE : [ERROR: message of error sent is not well formated, an extra ':' before channel name] [c4 is a NON connected client]
+    input : []
+        [ INPU ] INVITE c4 #1 
+    output :
+        [ SENT ] :ircCamel.localhost 403 c1 :#1 :No such channel
 
 
 PASS 6667
@@ -29,5 +47,6 @@ NICK ap
 USER apo 0 * apo
 
 PASS 3
-NICK apo
+NICK apo54
 USER apo 0 * apo
+
