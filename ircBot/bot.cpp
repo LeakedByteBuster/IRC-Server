@@ -89,26 +89,6 @@ Bot::Bot()
         numJokes = len;
 }
 
-// static std::string     getInfos(const Client &clt)
-// {
-//     std::string ret;
-//     bool    t = clt.isOperator;
-
-//     ret = static_cast<std::string>("003 ");
-//     ret.append(clt.username + ": Nickname: " + clt.nickname + "\r\n");
-    
-//     ret.append(static_cast<std::string>("003 ")
-//         + clt.username + ": Username: " + clt.username + "\r\n");
-    
-//     ret.append(static_cast<std::string>("003 ") + clt.username);
-//     ret.append(": realname: " + clt.realname + "\r\n");
-    
-//     ret.append(static_cast<std::string>("003 ") + clt.username);
-//     t == 1 ?    ret.append(": Operator Status: true\r\n") \
-//                 : ret.append(": Operator Status: false\r\n");
-
-//     return (ret);
-// }
 
 const std::string & Bot::getJoke()
 {
@@ -181,6 +161,8 @@ std::string   botExecuter(std::string buff, const std::string )
             }
         }
     }
+    if(ret.empty())
+        ret = "ERROR_UNKNOW_BOTCOMMAND";
     return (ret);
 }
 
@@ -277,7 +259,21 @@ void Extract_Cmd(std::string buff , std::string &Cmd)
     Cmd = tmp.back();
 }
 
+int check_command(std::string buff)
+{
+    std::vector<std::string> line = ByLines(buff);
+    std::vector<std::string> commands = BySpace(line[0]);
 
+    if(commands.size() < 3)
+    {
+        return(0);
+    }
+    else if(commands[1].compare("PRIVMSG") && commands[1].compare("privmsg"))
+    {
+        return(0);
+    }
+    return(1);
+}
 
 
 int main(int ac, char **av) 
@@ -287,11 +283,11 @@ int main(int ac, char **av)
     int                 fd = 0;
     char                buff[4096];
     int                 bytes = 0;
+    std::vector<std::string> commands; 
     std::string         clientNick;
     std::string         commandBot;
     std::string         finalMsg;
     std::string         DragMessage;
-    int                 Numberofline = 0;    
 
     if (ac != 4) {
         std::cerr << ERR_INVALIDARGUMENTS << std::endl;
@@ -314,8 +310,7 @@ int main(int ac, char **av)
             std::cout << "Server disconnected" << std::endl;
             break ;
         }
-        Numberofline++;
-        if(Numberofline > 1)
+        if(check_command(buff))
         {
             std :: string Trash = Extract_Nick(buff,clientNick);
             Extract_Cmd(Trash,commandBot);

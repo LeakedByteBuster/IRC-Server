@@ -12,6 +12,7 @@
 #include <sys/types.h> // bind()
 #include <arpa/inet.h> // inet_aton(), htons()
 #include <netdb.h> // getaddinfo()
+#include <unistd.h>
 
 
 #include <iostream>

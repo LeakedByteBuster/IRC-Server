@@ -120,7 +120,6 @@ void get_file(std::map<int,Client> &clients, std ::vector<std ::string> &command
     //if there is no files in client vector files
     else if (cl.Files.empty())
     {
-        // std::cout << "reciever :"<<cl.fd<<std::endl;
         Server::sendMsg(cl, _ERR(cl.nickname, ERR_NOSUCHFILENAME));
         return;
     }
