@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include <algorithm>
 
 
 // append all msg argument on command in single string
@@ -14,8 +15,10 @@ std :: string compile_msg(std::vector<std::string> commands, int position)
         }
         msg.append(commands[i]);
     }
-    if(commands.size() >= 3)
-        msg.erase(msg.begin());
+    if(std::count(msg.begin(), msg.end(), ':') > 0) {
+        std::string::iterator it = std::find(msg.begin(), msg.end(), ':');
+        msg.erase(it);
+    }
     return (msg);
 }
 
