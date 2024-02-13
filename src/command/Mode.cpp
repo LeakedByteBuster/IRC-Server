@@ -112,9 +112,6 @@ static std::vector<std::string>    parseModeString(std::string ms, std::vector<s
 /*                            Storing Mode String                             */
 /* -------------------------------------------------------------------------- */
 
-//  mode #1 o-l-t+t----ot+it 5 s
-//  mode #1 o-l-t+t----ot+it 5 s
-
 static void insertMinusModes(const std::vector<std::string> &param, t_Modes &modes, std::vector<std::string> mString, size_t &n)
 {
     std::string toPush;
@@ -186,21 +183,18 @@ static t_Modes   separateModes(std::vector<std::string> mString, std::vector<std
 /*                               Modes Methods                                */
 /* -------------------------------------------------------------------------- */
 
-static bool mode_O(Channel &ch, std::string arg, const bool &sign)
+static bool mode_O(Channel &ch, std::string arg, const bool &sign, const Client &clt)
 {
     int cltFd = search_a_client(ch.clientsInChannel, arg);
-    if (cltFd == 0) { return (0); }
-
-    // Client  &clt = clients[cltFd];
-    std::string n = ch.name;
-    // if (is_client_in_channel(n, Server::ChannelsInServer, ch.clientsInChannel[cltFd].nickname) == 0)
-    //     return (0);
-    if ((sign && (ch.clientsInChannel[cltFd].isOperator == 1)) || (!sign && (ch.clientsInChannel[cltFd].isOperator == 0)))
+    if (cltFd == 0) {
+        Server::sendMsg(clt, _ERR(arg, ERR_NOSUCHNICK));
+        return (0); 
+    }
+    if ((sign && (ch.clientsInChannel[cltFd].isOperator == 1))
+        || (!sign && (ch.clientsInChannel[cltFd].isOperator == 0))) {
         return (0);
-
+    }
     (sign == 1) ? ch.clientsInChannel[cltFd].isOperator = 1 : ch.clientsInChannel[cltFd].isOperator = 0;
-    printLog(ch.clientsInChannel[cltFd].isOperator, "isOperator = ");
-
     return (1);
 }
 
@@ -221,21 +215,22 @@ static bool mode_K(Channel &ch, std::string key, const bool &sign)
 
 static bool mode_L(Channel &ch, std::string param, const bool &sign)
 {
-    if ((sign && (ch.isUsersLimit == 1)) || (!sign && (ch.isUsersLimit == 0)))
+    if (!sign && (ch.isUsersLimit == 0))
         return (0);
 
     if (!param.empty()) {
         char    *endptr = NULL;
+        errno = 0;
         long    res = std::strtol(param.data(), &endptr, 10);
-        if ((*endptr != '\0') || (errno == ERANGE) || res < 1 || res > USERS_CHANNEL_LIMIT) {
-            return (0);
-        }
+        if ((*endptr != '\0') || (errno == ERANGE) || res < 1) { return (0); }
+        if (res > INT_MAX) { res = INT_MAX; }
         ch.isUsersLimit = 1;
         ch.usersLimit = res;
         return (1);
     }
 
     ch.isUsersLimit = 0;
+    ch.usersLimit = INT_MAX;
     return (1);
 }
 
@@ -273,7 +268,7 @@ static inline void    listChannelModes(const Channel &ch, Client clt)
     Server::sendMsg(clt, msg);
 }
 
-static std::string    setModes(Client &, const modesList &list, Channel &ch)
+static std::string    setModes(Client &clt, const modesList &list, Channel &ch)
 {
     std::string res; // string used as a return value of modes set
     std::string resArgs(" "); // used to holds param of modes (appended with res at the end)
@@ -302,8 +297,19 @@ static std::string    setModes(Client &, const modesList &list, Channel &ch)
         if ((mode.compare("l") == 0) && mode_L(ch, param, sign)) {
             putSign(res, sign, pSign, mSign);
             res.append(mode);
-            if (sign == 1)
-                resArgs.append(" " + param);
+            if (sign == 1) {
+                char    *endptr = NULL;
+                errno = 0;
+                long    res = std::strtol(param.data(), &endptr, 10);
+                if ((*endptr == '\0') || (errno != ERANGE) || res > 0) {
+                    if (res > INT_MAX) { res = INT_MAX; }
+                    std::stringstream   ss;
+                    std::string         token;
+                    ss << res; ss >> token;
+                    resArgs.append(" " + token);
+                }
+
+            }
             continue ;
         }
         if ((mode.compare("k") == 0) && mode_K(ch, param, sign)) {
@@ -312,7 +318,7 @@ static std::string    setModes(Client &, const modesList &list, Channel &ch)
             (sign == 1) ? resArgs.append(" " + param) : resArgs.append(" *");
             continue ;
         }
-        if ((mode.compare("o") == 0) && mode_O(ch, param, sign)) {
+        if ((mode.compare("o") == 0) && mode_O(ch, param, sign, clt)) {
             putSign(res, sign, pSign, mSign);
             res.append(mode);
             resArgs.append(" " + param);
@@ -355,13 +361,6 @@ void    Operator::mode(Client &clt, const std::vector<std::string> &args)
             Server::sendMsg(ch, msg);
         }
 
-        // printLog(res, "mode string --> ");
-        // printLog(ch.isInviteOnly, "is invite : ");
-        // printLog(ch.isTopic, "is topic : ");
-        // printLog(ch.isUsersLimit, "is userLimit : ");
-        // printLog(ch.isKey, "is key : ");
-        // printLog(ch.usersLimit, "userLimit = ");
-
     } catch (error_pair error) {
         if (error.second == 1)
             Server::sendMsg(clt, _ERR(clt.nickname, error.first));
@@ -373,127 +372,3 @@ void    Operator::mode(Client &clt, const std::vector<std::string> &args)
 
     return ;
 }
-
-/*
-
------------- 'l' MODE
-MODE #1997 -l [ignores it silently, if not already set]
-MODE #986 +l s s s s s [ignores it silently]
-MODE #986 +l 0 [ignores it silently]
-
-MODE #986 -l scc cs ca c aca
-    :apo98s!~apo@197.230.30.146 MODE #986 -l 
-MODE #986 +l 11
-    :apo98s!~apo@197.230.30.146 MODE #986 +l 11
-MODE #986 +l 11ssdsd6++
-    :apo98s!~apo@197.230.30.146 MODE #986 +l 11
-MODE #986 +l 2147483647
-    :apo98s!~apo@197.230.30.146 MODE #986 +l 2147483647
-
-MODE #986 +l
-    :mercury.libera.chat 461 apo98s MODE :Not enough parameters
-
-------------- 'i' MODE
-MODE #1997 -i [ignores it silently, if not already set]
-
-MODE #1997 +i
-    :Jack!~hoba@197.230.30.146 MODE #1997 +i 
-MODE #986 -i jk hkjhk jh
-    :apo98s!~apo@197.230.30.146 MODE #986 -i 
-
-------------- 'o' MODE
-MODE #986  +o 02 [ignores it silently]
-MODE #986 -o 02 [ignores it silently]
-
-MODE #986 +o apo98 
-    :apo98s!~apo@197.230.30.146 MODE #986 +o apo98
-MODE #986 -o apo98
-    :apo98s!~apo@197.230.30.146 MODE #986 -o apo98
-
-MODE #1997 -o 
-    :tantalum.libera.chat 461 Jack MODE :Not enough parameters
-MODE #1997 +o 
-    :tantalum.libera.chat 461 Jack MODE :Not enough parameters
-MODE #joi0556 +o dsad
-    Error(401): dsad No such nick/channel
-
--------------  'k' MODE
-
-MODE #1997 +k [ignores it silently]
-MODE #1997 -k [ignores it silently]
-
-MODE #1997 +k 0
-    :Doug007!~hoba@197.230.30.146 MODE #1997 +k 0
-MODE #4989 -k dsajkdhasjdhasjkdhasjdhasdkahsd
-    :apo98s!~apo@197.230.30.146 MODE #4989 -k *
-
--------------  't' MODE
-mode #77 +t hello every one [ignores it silently, if already set]
-
-
----------------------------------------------------------
-OTHERS :
---------
-
-MODE #1997    
-    :tantalum.libera.chat 324 Jack #1997 +Cinst
-    :tantalum.libera.chat 329 Jack #1997 1707369961
-MODE #986
-    :mercury.libera.chat 324 apo98s #986 +lk 11 apo98
-    :mercury.libera.chat 329 apo98s #986 1707441174
-
-
----------------------------------------------------------
-MODE #1997    
-    :tantalum.libera.chat 324 Jack #1997 +Cinst
-    :tantalum.libera.chat 329 Jack #1997 1707369961
-
-MODE #1997 -i+o Alfredo fdsfsd dfsfs
-    :Jack!~hoba@197.230.30.146 MODE #1997 +o Alfredo
-
-MODE #1997 +i
-    :Jack!~hoba@197.230.30.146 MODE #1997 +i 
-
-MODE #1997 -oi+k 0 Doug007
-    :Doug007!~hoba@197.230.30.146 MODE #1997 +k Doug007
-
- ------ERRORS--------ERRORS---------ERRORS------------ 
-
-mode
-    :zirconium.libera.chat 461 apo9 MODE :Not enough parameters
-MODE #1997 +k
-
-MODE #1997 +k 0
-    :Doug007!~hoba@197.230.30.146 MODE #1997 +k 0
-
----------------------------------------------------------
-
-MODE #1997 *9
-    :tantalum.libera.chat 472 Jack * :is an unknown mode char to me
-
-MODE #1997 -i
-    :lead.libera.chat 482 Alfredo #1997 :You're not a channel operator
-
-MODE #1997 -o 
-    :tantalum.libera.chat 461 Jack MODE :Not enough parameters
-
-MODE #1997 -Cn+io*
-    :tantalum.libera.chat 461 Doug007 MODE :Not enough parameters
-
-MODE #1997 -Cn+io* Doug007
-    :tantalum.libera.chat 472 Doug007 * :is an unknown MODE char to me
-
-MODE #1996
-    :tantalum.libera.chat 403 Doug007 #1996 :No such channel
-
-mode #77 -ok jkhfdskjfds 
-    :zirconium.libera.chat 401 apo9 jkhfdskjfds :No such nick/channel
-*/
-
-
-// expect arg: +o, +l, +k
-// expect no arg: -l, -k, -i, -t, +t
-
-// MODE #1997    
-//     :tantalum.libera.chat 324 Jack #1997 +Cinst
-//     :tantalum.libera.chat 329 Jack #1997 1707369961

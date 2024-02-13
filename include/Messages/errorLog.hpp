@@ -73,7 +73,7 @@
     BUILD_ERROR(ERR_NOTONCHANNEL,   442, \
         getStaticErrorMsg(ERR_NOTONCHANNEL))\
     BUILD_ERROR(ERR_USERONCHANNEL,   443, \
-        getStaticErrorMsg(ERR_NOTONCHANNEL))\
+        getStaticErrorMsg(ERR_USERONCHANNEL))\
     BUILD_ERROR(ERR_NEEDMOREPARAMS,   461, \
         getStaticErrorMsg(ERR_NEEDMOREPARAMS)) \
     BUILD_ERROR(ERR_ALREADYREGISTRED, 462, \
@@ -166,16 +166,7 @@ struct  ErrorTypesAndNumbers {
     } error_t;
 } ;
 
-// void    printLog(std::string str);
 void    printLog(std::vector<std::string> args);
-
-// void    printLog(std::vector< std::pair< std::string, std::string > > args)
-// {
-//     std::vector< std::pair< std::string, std::string > >::iterator  it = args.begin();
-//     for (; it < args.end(); it++) { 
-//         std::cout << HRED << "[ DEBUG ] " << it->first << " - " << it->second << RESET << std::endl;
-//     }
-// }
 
 // used to print any basic types for debugging purposes: int, string...
 template<typename T>

@@ -72,6 +72,8 @@ std::string commandReply(const Channel &ch, const Client &clt, std::string comma
 
 std::string commandReply2(const Channel &ch, const Client &clt, std::string num, std::string  msg);
 std::string commandReply3(const Channel &ch, const Client &clt, std::string command, int prefixType,std::string topic);
+std::string commandReply4(const Channel &ch, const Client &clt, std::string command, int prefixType,std::string target);
+std::string commandReply5(const Channel &ch, const Client &clt, int prefixType,std::string target);
 std::string replyPrefix(const Channel &ch, const Client &clt, const std::string symbol);
 // std::string commandReply2( <sender> , <reciever> , <message>) 
 // it's same of replyPrefix but change channle with reciever

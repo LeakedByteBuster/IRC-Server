@@ -61,6 +61,22 @@ std::string commandReply3(const Channel &ch, const Client &clt, std::string comm
     rpl.append(" :" + topic);
     return (rpl);
 }
+std::string commandReply4(const Channel &ch, const Client &clt, std::string command, int prefixType,std::string target)
+{
+    std::string rpl(":"); 
+    rpl.append( (prefixType == TYPE_SERVER) ? SERVER_PREFIX : userPrefix(clt) + " ");
+    rpl.append(command + " " + target );
+    rpl.append(" :" + ch.name);
+    return (rpl);
+}
+std::string commandReply5(const Channel &ch, const Client &clt, int prefixType,std::string target)
+{
+    std::string rpl(":"); 
+    rpl.append( (prefixType == TYPE_SERVER) ? SERVER_PREFIX : userPrefix(clt) + " ");
+    rpl.append("341 " + clt.nickname + " " + target );
+    rpl.append(" " + ch.name);
+    return (rpl);
+}
 /* -------------------------------------------------------------------------- */
 /*                       Static Error Messages Database                       */
 /* -------------------------------------------------------------------------- */

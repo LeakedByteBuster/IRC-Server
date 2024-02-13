@@ -80,9 +80,13 @@ std::string Message::getJoinError(const Channel &ch, const Client &clt, short sy
     returns a string that has :
         JOIN message
         MODE message with the current channel’s modes
-        RPL_TOPIC and RPL_TOPICTIME numerics if the channel has a topic set (if the topic is not set, the user is sent no numerics).
-        one or more RPL_NAMREPLY
+        RPL_TOPIC
+        RPL_ISUPPORT :
+            Format: CASEMAPPING=<casemap>, CHANLIMIT=<prefixes>:[limit]{,<prefixes>:[limit]},
+            CHANMODES=A,B,C,D[,X,Y...], CHANNELLEN=<string>, CHANTYPES=[string],
+            NICKLEN=<number>, PREFIX=[(modes)prefixes], USERLEN=<number>
 */
+
 std::string Message::getJoinReply(const Channel &ch, const Client &clt)
 {
     std::string reply(
@@ -91,6 +95,9 @@ std::string Message::getJoinReply(const Channel &ch, const Client &clt)
         + ":" + SERVER_PREFIX + "353 " + clt.nickname + " @ " + ch.name + " :" + ch.getClientsInString() +"\r\n"
         + replyPrefix(ch, clt, "366") + " :End of /NAMES list."
     );
+    if (ch.isTopic) {
+        reply.append("\r\n" + commandReply(ch, clt, "TOPIC", TYPE_USER) + " :" + ch.topic + "\r\n");
+    }
     return (reply);
 }
 
@@ -115,18 +122,7 @@ std::string Message::getKickReply(const Channel &ch, const Client &clt, std::str
         );
     return  (reply);
 }
-// std::string Message::getKickedReply(const Channel &ch, const Client &clt, std::string target)
-// {
-//      std::string reply(
-//         commandReply(ch, clt, "KICK", TYPE_USER)
-//         + " " 
-//         + target
-//         + " :"
-//         + "Kicked by "
-//         +clt.nickname
-//         );
-//     return  (reply);
-// }
+
 std::string Message::getTopicReply(const Channel &ch, const Client & clt, std::string num , std::string topic)
 {
      std::string reply(
@@ -134,20 +130,6 @@ std::string Message::getTopicReply(const Channel &ch, const Client & clt, std::s
         );
     return  (reply);
 }
-// std::string Message::getInviteReply(const Channel &ch, const Client & clt, std::string num , std::string topic)
-// {
-//      std::string reply(
-//         commandReply2(ch, clt, num, topic)
-//         );
-//     return  (reply);
-// }
-// _ERR(..) + ch.name  + ch.topic;
-// _ERR(..) + ch.name + time()
-
-// void    printLog(std::string str)
-// {
-//     std::cout << HRED << "[ DEBUG ] " << str << RESET <<  std::endl;
-// }
 
 void    printLog(std::vector<std::string> args)
 {
@@ -155,4 +137,4 @@ void    printLog(std::vector<std::string> args)
         std::cout  << HRED << "[ DEBUG ] " << args[i] << RESET << std::endl;
     }
     std::cout << std::endl;
-}
+} 

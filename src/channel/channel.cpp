@@ -64,7 +64,6 @@ std::string   Channel::getClientsInString() const
     std::map<int, Client>::const_iterator it = clientsInChannel.begin();
 
     for (; it != clientsInChannel.end(); it++) {
-        printLog(it->second.isOperator, "op = ");
         if (it->second.isOperator) {
             tmp = "@";
         }

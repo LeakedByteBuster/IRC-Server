@@ -8,7 +8,7 @@
 
 
 class Client;
-#define USERS_CHANNEL_LIMIT	25
+#define DEFAULT_MAX_USERS_IN_CHANNEL	25
 
 struct	channelLimits {
 	int	usersLimit; // max users in channel
