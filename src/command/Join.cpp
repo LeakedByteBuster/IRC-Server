@@ -79,12 +79,11 @@ void    join(Client &clt, std::vector<std::string> &command)
 
         if ( tryInsert(name, key) ) {
             Channel &ch = Server::ChannelsInServer[name];
-            std::pair<std::string,Channel> cltPair(name,ch);
             
             if ( !key.empty() ) { ch.isKey = 1; }
             clt.isOperator = 1; // set clt as an operator
             ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
-            clt.ChannelIn.insert(cltPair);
+            clt.ChannelIn.insert(std::make_pair(name,ch));
             Server::sendMsg(clt, Message::getJoinReply(ch, clt));
             continue ;
         }
@@ -100,17 +99,14 @@ void    join(Client &clt, std::vector<std::string> &command)
                 continue ;
             }
         }
-        std::pair<std::string,Channel> cltPair(name,ch);
         clt.isOperator = 0; // reInitialize it to zero
         std::__1::pair<std::__1::map<int, Client>::iterator, bool> it;
         it = ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
         if (it.second == 1) {
-            clt.ChannelIn.insert(cltPair);
+            clt.ChannelIn.insert(std::make_pair(name,ch));
             Server::sendMsg(clt, Message::getJoinReply(ch, clt));
-            /* BroadCast message */
             Server::sendMsg(ch, clt, ":" + userPrefix(clt) + " JOIN :" + ch.name);
         }
-    
     }
     return ;
 }
