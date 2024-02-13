@@ -60,7 +60,7 @@ bool    tryInsert(std::string &name, const std::string key)
     if (name.size() > 32)
         name = name.substr(0, 32);
 
-    it = Server::ChannelsInServer.insert(std::make_pair(name, Channel(name, key, "", USERS_CHANNEL_LIMIT)));
+    it = Server::ChannelsInServer.insert(std::make_pair(name, Channel(name, key, "", DEFAULT_MAX_USERS_IN_CHANNEL)));
     return ((it.second == 1) ? 1 : 0);
 }
 
@@ -79,7 +79,7 @@ void    join(Client &clt, std::vector<std::string> &command)
 
         if ( tryInsert(name, key) ) {
             Channel &ch = Server::ChannelsInServer[name];
-            
+
             if ( !key.empty() ) { ch.isKey = 1; }
             clt.isOperator = 1; // set clt as an operator
             ch.clientsInChannel.insert(std::make_pair(clt.fd, clt));
@@ -87,8 +87,11 @@ void    join(Client &clt, std::vector<std::string> &command)
             Server::sendMsg(clt, Message::getJoinReply(ch, clt));
             continue ;
         }
-        
         Channel &ch = Server::ChannelsInServer[name];
+        if (ch.isUsersLimit && (ch.clientsInChannel.size() == static_cast<size_t>(ch.usersLimit))) {
+            Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_CHANNELISFULL));
+            return ;
+        }
         if (ch.isKey && (ch.getKey().compare(key) != 0)) {
             Server::sendMsg(clt, JOIN_ERR(ch, clt, ERR_BADCHANNELKEY));
             continue ;

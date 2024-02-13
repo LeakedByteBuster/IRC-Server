@@ -215,21 +215,22 @@ static bool mode_K(Channel &ch, std::string key, const bool &sign)
 
 static bool mode_L(Channel &ch, std::string param, const bool &sign)
 {
-    if ((sign && (ch.isUsersLimit == 1)) || (!sign && (ch.isUsersLimit == 0)))
+    if (!sign && (ch.isUsersLimit == 0))
         return (0);
 
     if (!param.empty()) {
         char    *endptr = NULL;
+        errno = 0;
         long    res = std::strtol(param.data(), &endptr, 10);
-        if ((*endptr != '\0') || (errno == ERANGE) || res < 1 || res > USERS_CHANNEL_LIMIT) {
-            return (0);
-        }
+        if ((*endptr != '\0') || (errno == ERANGE) || res < 1) { return (0); }
+        if (res > INT_MAX) { res = INT_MAX; }
         ch.isUsersLimit = 1;
         ch.usersLimit = res;
         return (1);
     }
 
     ch.isUsersLimit = 0;
+    ch.usersLimit = INT_MAX;
     return (1);
 }
 
@@ -296,8 +297,19 @@ static std::string    setModes(Client &clt, const modesList &list, Channel &ch)
         if ((mode.compare("l") == 0) && mode_L(ch, param, sign)) {
             putSign(res, sign, pSign, mSign);
             res.append(mode);
-            if (sign == 1)
-                resArgs.append(" " + param);
+            if (sign == 1) {
+                char    *endptr = NULL;
+                errno = 0;
+                long    res = std::strtol(param.data(), &endptr, 10);
+                if ((*endptr == '\0') || (errno != ERANGE) || res > 0) {
+                    if (res > INT_MAX) { res = INT_MAX; }
+                    std::stringstream   ss;
+                    std::string         token;
+                    ss << res; ss >> token;
+                    resArgs.append(" " + token);
+                }
+
+            }
             continue ;
         }
         if ((mode.compare("k") == 0) && mode_K(ch, param, sign)) {
