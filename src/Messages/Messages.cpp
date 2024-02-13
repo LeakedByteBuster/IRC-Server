@@ -130,4 +130,4 @@ void    printLog(std::vector<std::string> args)
         std::cout  << HRED << "[ DEBUG ] " << args[i] << RESET << std::endl;
     }
     std::cout << std::endl;
-}
+} 

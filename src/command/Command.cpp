@@ -29,7 +29,12 @@ void execute_commmand(std::map<int, Client> &clients, std::vector<std::string> &
                         buff = buff.append(" ");
                     buff = buff.append(commands[i]);
                 }
+                Client tmp = clients[id];
                 parseNick(clients, clients[id], buff);
+                std::__1::map<int, Client>::iterator it = clients.begin();
+                for (; it != clients.end(); it++) {
+                    Server::sendMsg(it->second, ":" + userPrefix(tmp) + " NICK :" + commands[1]);
+                }
             }
             catch (std::exception &e) { }
             break;
