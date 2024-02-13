@@ -24,7 +24,7 @@ void Operator::invite (Client &clt, std::vector<std::string> &command,std::map<i
         Server::sendMsg(clt,_ERR(clt.nickname,ERR_NOTONCHANNEL));
         return ;
     }
-    if (ch.isInviteOnly && !clt.isOperator)
+    if (ch.isInviteOnly && !ch.clientsInChannel[clt.fd].isOperator)
     {
         Server::sendMsg( clt,_ERR(clt.nickname,ERR_CHANOPRIVSNEEDED));
         return ;

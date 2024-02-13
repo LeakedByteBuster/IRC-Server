@@ -115,7 +115,7 @@ KICK #aa user :okokkookok   :
         return ;
     } 
     // check if user is operator
-    if (!clt.isOperator)
+    if (!Server::ChannelsInServer[command[0]].clientsInChannel[clt.fd].isOperator)
     {
         Server::sendMsg( clt,_ERR(clt.nickname,ERR_CHANOPRIVSNEEDED));
         return ;
